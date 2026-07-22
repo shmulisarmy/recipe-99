@@ -1,0 +1,67 @@
+import { createSignal } from "solid-js";
+import { MoveRecipeOnTopOfOtherRecipe } from "../actions";
+import { reSimulatePlannerProjection } from "../logic";
+import type { RecipeProjection } from "./types";
+
+/** Calendar cells only — the modal always shows the full name. */
+export const MAX_PILL_CHARS = 14;
+
+function truncateName(name: string): string {
+  return name.length > MAX_PILL_CHARS
+    ? `${name.slice(0, MAX_PILL_CHARS).trimEnd()}…`
+    : name;
+}
+
+export function RecipePill(props: {
+  item: RecipeProjection;
+  onOpen: () => void;
+  truncate?: boolean;
+  class?: string;
+}) {
+  const [isDragOver, setIsDragOver] = createSignal(false);
+
+  const id = () => props.item.plannedRecipeReference.id;
+  const recipeName = () => props.item.plannedRecipeReference.recipe;
+  const name = () =>
+    props.truncate === false ? recipeName() : truncateName(recipeName());
+
+  return (
+    <button
+      type="button"
+      draggable={true}
+      class={`block w-full truncate rounded-md text-left font-medium capitalize ${
+        props.class ?? "px-1.5 py-0.5 text-xs"
+      }`}
+      classList={{
+        "bg-green-100 text-green-800 hover:bg-green-200": props.item.couldMake && !isDragOver(),
+        "bg-red-100 text-red-800 hover:bg-red-200": !props.item.couldMake && !isDragOver(),
+        "ring-2 ring-stone-400 opacity-60": isDragOver(),
+      }}
+      onDragStart={(e) => {
+        e.dataTransfer!.setData("text/plain", id());
+        e.dataTransfer!.effectAllowed = "move";
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer!.dropEffect = "move";
+        setIsDragOver(true);
+      }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDragEnd={() => setIsDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+        const draggedId = e.dataTransfer!.getData("text/plain");
+        if (draggedId && draggedId !== id()) {
+          MoveRecipeOnTopOfOtherRecipe(draggedId, id());
+          reSimulatePlannerProjection();
+        }
+      }}
+      onClick={() => props.onOpen()}
+    >
+      {name()}
+      {props.item.multiplier !== 1 ? ` ×${props.item.multiplier}` : ""}
+    </button>
+  );
+}
