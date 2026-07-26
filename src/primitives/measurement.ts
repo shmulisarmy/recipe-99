@@ -129,3 +129,25 @@ function convertFromGrams(
   export function Measurement_Convert(m: Measurement, to: Unit): Measurement {
     return convertFromGrams(convertToGrams(m), to);
   }
+
+
+  export function Measurement_Max(a: Measurement, b: Measurement): Measurement {
+    if (Measurement_GTE(a, b)) return a;
+    return b;
+  }
+
+
+  export function Measurement_Min(a: Measurement, b: Measurement): Measurement {
+    if (Measurement_LTE(a, b)) return a;
+    return b;
+  }
+
+  export function Measurement_ToString(measurement: Measurement): string {
+    return `${measurement.amount} ${measurement.unit}`
+  }
+
+
+  function removePluralS(s: string): string {
+    console.assert(s.endsWith('s'));
+    return s.slice(0, -1);
+  }

@@ -21,3 +21,5 @@ Each direct child directory is a self-contained feature that owns its internal l
 - Run `npm run build` after changing feature exports or their consumers.
 
 # Child DOX Index
+
+- `available_ingredients_bulk_add_form/AGENTS.md` — bulk pantry intake and shopping-cart draft handoff.
