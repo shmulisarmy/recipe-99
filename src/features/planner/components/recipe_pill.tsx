@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { MoveRecipeOnTopOfOtherRecipe } from "../actions";
+import { MoveRecipeOnTopOfOtherRecipe } from "../actions/recipe";
 import { reSimulatePlannerProjection } from "../logic";
 import type { RecipeProjection } from "./types";
 

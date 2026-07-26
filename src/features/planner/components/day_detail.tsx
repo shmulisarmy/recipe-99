@@ -1,5 +1,5 @@
 import { createSignal, For, JSX, Show } from "solid-js";
-import { InsertRecipeAtBeginningOfDate } from "../actions";
+import { InsertRecipeAtBeginningOfDate } from "../actions/recipe";
 import { reSimulatePlannerProjection } from "../logic";
 import { CartButton } from "./cart_button";
 import { RecipePill } from "./recipe_pill";
