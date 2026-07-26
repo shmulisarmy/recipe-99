@@ -80,7 +80,7 @@ export function PushOverIngredientShoppingItemForTheNextDay(ingredientName: stri
         throw new Error(`PushOverIngredientShoppingItemForTheNextDay: ingredient ${ingredientName} not found in shopping cart`);
     }
     const stillNeededToGet = Measurement_Minus(day.shoppingCart.toGet[ingredientName], day.shoppingCart.alreadyGot[ingredientName] || ZeroedMeasurement());
-    day.shoppingCart.toGet[ingredientName] = JSON.parse(JSON.stringify(day.shoppingCart.toGet[ingredientName]));
+    day.shoppingCart.toGet[ingredientName] = JSON.parse(JSON.stringify(day.shoppingCart.alreadyGot[ingredientName]));
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
     const nextDay = planner[tomorrow.toDateString()];
     nextDay.shoppingCart.toGet[ingredientName] = Measurement_Plus(nextDay.shoppingCart.toGet[ingredientName]?? ZeroedMeasurement(), stillNeededToGet);

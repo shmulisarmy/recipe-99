@@ -1,4 +1,4 @@
-import { For, onMount, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { ShoppingCartAlreadyGotDraft } from "./types";
 import { StillNeedToGetToday, today, todaysShoppingCart } from "../planner/outside_feature_exports";
 import { Measurement_GT, Measurement_ToString, ZeroedMeasurement } from "../../primitives/measurement";
@@ -23,9 +23,15 @@ function handleActions(){
 export function FormTemplateWithDataStructure(props: {shoppingCartAlreadyGot: ShoppingCartAlreadyGotDraft}) {
     let heading!: HTMLHeadingElement;
     const todaysShoppingCart_ = todaysShoppingCart();
+    const [actionsHandled, setActionsHandled] = createSignal(false);
     
 
     onMount(() => heading.focus());
+
+    function finishShoppingCart(){
+        handleActions();
+        setActionsHandled(true);
+    }
     
 
     return (
@@ -116,6 +122,28 @@ export function FormTemplateWithDataStructure(props: {shoppingCartAlreadyGot: Sh
                         )}
                     </For>
                 </div>
+
+                <footer class="border-t border-stone-100 bg-stone-50 px-4 py-4 sm:px-6">
+                    <Show
+                        when={actionsHandled()}
+                        fallback={
+                            <button
+                                class="min-h-11 w-full cursor-pointer rounded-xl bg-stone-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-stone-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2"
+                                type="button"
+                                onClick={finishShoppingCart}
+                            >
+                                Save cart choices
+                            </button>
+                        }
+                    >
+                        <div class="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-200" role="status" aria-live="polite">
+                            <svg aria-hidden="true" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
+                            </svg>
+                            Shopping carts updated
+                        </div>
+                    </Show>
+                </footer>
             </div>
         </section>
     );
