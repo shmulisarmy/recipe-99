@@ -46,7 +46,7 @@ function cartCounts(): Map<string, number> {
 
 export function Planner() {
   // Static data — compute the projection once.
-  const carts = cartCounts();
+  // const carts = cartCounts();
   const days = monthGridDays();
   const todayStr = today.toDateString();
 
@@ -104,7 +104,7 @@ export function Planner() {
                     isToday={dateStr === todayStr}
                     selected={selectedDay() === dateStr}
                     recipes={projection[dateStr] ?? []}
-                    cartCount={carts.get(dateStr)}
+                    cartCount={planner[dateStr]? Object.keys(planner[dateStr].shoppingCart.toGet).length: undefined} 
                     onSelectDay={() => setSelectedDay(dateStr)}
                     onOpenRecipe={(item) => setOpenRecipe(item)}
                     onOpenCart={() => setOpenCartDay(dateStr)}
@@ -119,7 +119,7 @@ export function Planner() {
         <DayDetail
           dateStr={selectedDay()}
           recipes={projection[selectedDay()] ?? []}
-          cartCount={carts.get(selectedDay())}
+          cartCount={planner[selectedDay()] ? Object.keys(planner[selectedDay()].shoppingCart.toGet).length : undefined}
           onOpenRecipe={(item) => setOpenRecipe(item)}
           onOpenCart={() => setOpenCartDay(selectedDay())}
         />

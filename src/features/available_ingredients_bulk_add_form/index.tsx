@@ -21,13 +21,18 @@ import { FormTemplateWithDataStructure } from "./next_step";
 const UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
 
 
-
+function UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft: ShoppingCartAlreadyGotDraft) { 
+    //for each ingredient in ShoppingCartAlreadyGotUpdateDraft it adds the amount to the shopping cart already got
+    for (const [name, amount] of Object.entries(ShoppingCartAlreadyGotUpdateDraft)) {
+        todaysShoppingCart().alreadyGot[name] = Measurement_Plus(todaysShoppingCart().alreadyGot[name]||ZeroedMeasurement(), amount);
+    }
+}
 
 
 
 export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkAddFormProps) {
     const formData = createMutable<BulkAddIngredients>(structuredClone(props.ingredientsToAdd));
-    const shoppingCartAlreadyGot = createMutable<ShoppingCartAlreadyGotDraft>({});
+    const ShoppingCartAlreadyGotUpdateDraft = createMutable<ShoppingCartAlreadyGotDraft>({});
     const [step, setStep] = createSignal<"bulk-add" | "form-template-with-data-structure">("bulk-add");
     const [isAddingIngredient, setIsAddingIngredient] = createSignal(false);
     const [newIngredientName, setNewIngredientName] = createSignal("");
@@ -49,16 +54,16 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
 
     function setShoppingCartSelection(name: string, selected: boolean) {
         if (!selected) {
-            delete shoppingCartAlreadyGot[name];
+            delete ShoppingCartAlreadyGotUpdateDraft[name];
             return;
         }
 
         const amount = amountForShoppingCart(name);
-        if (amount) shoppingCartAlreadyGot[name] = { ...amount };
+        if (amount) ShoppingCartAlreadyGotUpdateDraft[name] = { ...amount };
     }
 
-    function refreshShoppingCartSelection(name: string) {
-        if (shoppingCartAlreadyGot[name]) setShoppingCartSelection(name, true);
+    function refreshShoppingCartSelection(ingredientName: string) {
+        if (ShoppingCartAlreadyGotUpdateDraft[ingredientName]) setShoppingCartSelection(ingredientName, true);
     }
 
     for (const name of Object.keys(formData)) {
@@ -67,7 +72,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
 
     function removeIngredient(name: string) {
         delete formData[name];
-        delete shoppingCartAlreadyGot[name];
+        delete ShoppingCartAlreadyGotUpdateDraft[name];
     }
 
     function openAddIngredient() {
@@ -125,6 +130,10 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
                 : { ...measurement };
         }
 
+        //
+        UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft);
+        //
+
         reSimulatePlannerProjection();
         setStep("form-template-with-data-structure");
     }
@@ -132,7 +141,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
     return (
         <Show
             when={step() === "bulk-add"}
-            fallback={<FormTemplateWithDataStructure shoppingCartAlreadyGot={shoppingCartAlreadyGot} />}
+            fallback={<FormTemplateWithDataStructure shoppingCartAlreadyGot={ShoppingCartAlreadyGotUpdateDraft} />}
         >
             <section class="mx-auto max-w-2xl px-4 py-8 sm:py-10">
                 <div class="mb-5 flex items-center gap-3" aria-label="Step 1 of 2">
@@ -209,7 +218,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
                                                         <input
                                                             class="h-4 w-4 shrink-0 accent-emerald-600"
                                                             type="checkbox"
-                                                            checked={Boolean(shoppingCartAlreadyGot[name])}
+                                                            checked={Boolean(ShoppingCartAlreadyGotUpdateDraft[name])}
                                                             onChange={(event) => setShoppingCartSelection(name, event.currentTarget.checked)}
                                                         />
                                                         <span>

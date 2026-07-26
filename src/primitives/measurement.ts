@@ -1,4 +1,8 @@
+import {z} from "zod";
+
+
 function convertToGrams(measurement: Measurement): number {
+  zMeasurement.parse(measurement);
   switch (measurement.unit) {
     case 'grams':
       return measurement.amount;
@@ -18,6 +22,7 @@ function convertFromGrams(
   gramAmount: number,
   convertTo: Unit,
 ): Measurement {
+  zUnit.parse(convertTo);
   switch (convertTo) {
     case 'grams':
       return {
@@ -48,27 +53,41 @@ function convertFromGrams(
   
   
   export  function Measurement_GT(a: Measurement, b: Measurement): boolean {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     return convertToGrams(a) > convertToGrams(b);
   }
   
   export  function Measurement_LT(a: Measurement, b: Measurement): boolean {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     return convertToGrams(a) < convertToGrams(b);
   }
   
   export  function Measurement_EQ(a: Measurement, b: Measurement): boolean {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     return convertToGrams(a) === convertToGrams(b);
   }
   
   export  function Measurement_GTE(a: Measurement, b: Measurement): boolean {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     return convertToGrams(a) >= convertToGrams(b);
   }
   
   export  function Measurement_LTE(a: Measurement, b: Measurement): boolean {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     return convertToGrams(a) <= convertToGrams(b);
   }
   
   
   export  function Measurement_Plus(a: Measurement, b: Measurement): Measurement {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     if (a.unit === b.unit) {
       return {
         amount: a.amount + b.amount,
@@ -84,6 +103,8 @@ function convertFromGrams(
   
   
    export function Measurement_Minus(a: Measurement, b: Measurement): Measurement {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     if (a.unit === b.unit) {
       return {
         amount: a.amount - b.amount,
@@ -97,6 +118,7 @@ function convertFromGrams(
     }
   }
   export  function Measurement_Times(a: Measurement,  multiplier: number): Measurement {
+    zMeasurement.parse(a);
       return {
         amount: a.amount * multiplier,
         unit: a.unit,
@@ -104,8 +126,9 @@ function convertFromGrams(
    
   }
 
-  export  function Measurement_Divide(a: Measurement,  divider: number): Measurement {
-      return {
+  export  function Measurement_Divide(a: Measurement,  divider: number): Measurement {    
+    zMeasurement.parse(a);
+    return {
         amount: a.amount / divider,
         unit: a.unit,
       };
@@ -121,28 +144,43 @@ function convertFromGrams(
   
   export type Unit = 'grams' | 'kilograms' | 'ounces' | 'pounds';
 
-  export type Measurement = {
-    amount: number;
-    unit: Unit;
-  };
+const zUnit = z.enum(['grams', 'kilograms', 'ounces', 'pounds']);
+
+  const zMeasurement = z.object({
+    amount: z.number(),
+    unit: zUnit,
+  });
+
+  // export type Measurement = {
+  //   amount: number;
+  //   unit: Unit;
+  // };
+  export type Measurement = z.infer<typeof zMeasurement>;
 
   export function Measurement_Convert(m: Measurement, to: Unit): Measurement {
+    zMeasurement.parse(m);
+    zUnit.parse(to);
     return convertFromGrams(convertToGrams(m), to);
   }
 
 
   export function Measurement_Max(a: Measurement, b: Measurement): Measurement {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     if (Measurement_GTE(a, b)) return a;
     return b;
   }
 
 
   export function Measurement_Min(a: Measurement, b: Measurement): Measurement {
+    zMeasurement.parse(a);
+    zMeasurement.parse(b);
     if (Measurement_LTE(a, b)) return a;
     return b;
   }
 
   export function Measurement_ToString(measurement: Measurement): string {
+    zMeasurement.parse(measurement);
     return `${measurement.amount} ${measurement.unit}`
   }
 
