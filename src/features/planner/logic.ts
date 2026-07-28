@@ -1,21 +1,24 @@
 import { createMutable } from "solid-js/store";
-import { AvailableIngredients, IngredientSet, menu, Recipe } from "../../data";
+import { getOrSetRecipeByTitle, getSecretPantry, IngredientSet } from "../../data";
 import { recipeMakingProjection } from "../../logic";
 import { planner } from "./data";
 import { Date_, PlannedRecipe, ShoppingCart } from "./types";
-import { Measurement, Measurement_GT, Measurement_Minus, Measurement_Plus, ZeroedMeasurement } from "../../primitives/measurement";
+import { Measurement_Minus, Measurement_Plus, ZeroedMeasurement } from "../../primitives/measurement";
+import { PlannerProjection } from "./components/types";
+import { deepCopy } from "../../utils/object";
 
 
 
 
-export function createPlannerProjection() {
+export async function createPlannerProjection() {
+    
     type RecipeProjection = {
         plannedRecipeReference: PlannedRecipe;
         multiplier: number;
         couldMake: boolean;
         scratchPadOfIngredientsNeededToUse: IngredientSet;
     };
-    const workingIngredientsForProjection: IngredientSet = JSON.parse(JSON.stringify(AvailableIngredients));
+    const workingIngredientsForProjection: IngredientSet = deepCopy(getSecretPantry()); 
     const projection: Record<Date_, RecipeProjection[]> = {};
 
     function fillCart(cart: ShoppingCart) {
@@ -36,7 +39,9 @@ export function createPlannerProjection() {
             const { recipe: recipeName, overrideDayMultiplier } = recipe;
             const multiplier =  overrideDayMultiplier ?? plannedDay.multiplier
             
-            const recipeInMenu = menu.get(recipeName);
+            const recipeInMenu = await getOrSetRecipeByTitle(recipeName);
+            // const recipeInMenu = menu.get(recipeName);
+            console.log({recipeInMenu})
             if (!recipeInMenu) throw new Error(`Recipe "${recipeName}" not found in menu.`);
 
             const { unfulfilledIngredients, scratchPadOfIngredientsNeededToUse,substitutedIngredientUses } = recipeMakingProjection(recipeInMenu, workingIngredientsForProjection, multiplier);
@@ -61,10 +66,16 @@ export function createPlannerProjection() {
 }
 
 
-export const projection = createMutable(createPlannerProjection());
+export const projection: PlannerProjection = createMutable({});
+
+createPlannerProjection().then(projection_ => 
+    Object.assign(projection, projection_)
+);
 
 export function reSimulatePlannerProjection() {
-    Object.assign(projection, createPlannerProjection());
+    createPlannerProjection().then(projection_ => 
+        Object.assign(projection, projection_)
+    );
 }
 
 

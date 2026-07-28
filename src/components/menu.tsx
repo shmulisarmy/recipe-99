@@ -1,8 +1,10 @@
 import { createSignal, createMemo, For, Show } from "solid-js";
-import { menu, AvailableIngredients } from "../data";
+import { getSecretPantry } from "../data";
 import type { Recipe, RequiredIngredient } from "../data";
 import { recipeMakingProjection } from "../logic";
 import type { Measurement } from "../primitives/measurement";
+import { useQuery } from "convex-solidjs";
+import { api } from "../../convex/_generated/api";
 
 type RecipeStatus =
   | { kind: "ready"; recipe: Recipe }
@@ -28,7 +30,7 @@ function imageForRecipe(title: string): string {
 
 /** Build the readiness verdict for a single recipe. Guards the `false` return defensively. */
 function projectRecipe(recipe: Recipe): RecipeStatus {
-  const proj = recipeMakingProjection(recipe, AvailableIngredients, 1);
+  const proj = recipeMakingProjection(recipe, getSecretPantry(), 1);
   if (proj && proj.unfulfilledIngredients.length === 0) {
     return { kind: "ready", recipe };
   }
@@ -170,8 +172,10 @@ export function Menu() {
   const [readyOnly, setReadyOnly] = createSignal(false);
 
   // Compute readiness once per recipe (AvailableIngredients is static).
+   const menu2 = useQuery(api.data.getAllRecipes, {});
+  
   const allStatuses = createMemo<RecipeStatus[]>(() =>
-    Array.from(menu.values()).map((recipe) => projectRecipe(recipe))
+    Array.from(menu2.data() ?? []).map((recipe) => projectRecipe(recipe))
   );
 
   const totalCount = createMemo(() => allStatuses().length);

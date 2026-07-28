@@ -1,7 +1,9 @@
 import { createSignal, For, Show } from "solid-js";
-import { AvailableIngredients } from "../data";
 import { reSimulatePlannerProjection } from "../features/planner/logic";
 import { Measurement_Convert, Unit } from "../primitives/measurement";
+import { useMutation } from "convex-solidjs";
+import { api } from "../../convex/_generated/api";
+import { getSecretPantry } from "../data";
 
 const ALL_UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
 
@@ -10,7 +12,8 @@ function fmt(n: number): string {
 }
 
 function IngredientRow(props: { name: string }) {
-  const stored = () => AvailableIngredients[props.name];
+  const updateIngredient = useMutation(api.data.updateAvailableIngredient);
+  const stored = () => getSecretPantry()[props.name];
 
   const [amount, setAmount] = createSignal(stored().amount);
   const [targetUnit, setTargetUnit] = createSignal<Unit>(stored().unit);
@@ -22,14 +25,23 @@ function IngredientRow(props: { name: string }) {
   function applyAmount() {
     const v = amount();
     if (isNaN(v) || v < 0) return;
-    AvailableIngredients[props.name] = { amount: v, unit: stored().unit };
+    
+    updateIngredient.mutate({
+      userId: "shmuli", // Supply appropriate userId if available
+      ingredientName: props.name, 
+      measurement: getSecretPantry()[props.name] = { amount: v, unit: stored().unit },
+    });
     reSimulatePlannerProjection();
   }
 
   function applyConvert() {
     const converted = convertedPreview();
     if (!converted) return;
-    AvailableIngredients[props.name] = converted;
+    updateIngredient.mutate({
+      userId: "shmuli", // Supply appropriate userId if available
+      ingredientName: props.name, 
+      measurement: getSecretPantry()[props.name] = converted,
+    });
     setAmount(converted.amount);
     setTargetUnit(converted.unit);
     reSimulatePlannerProjection();
@@ -106,7 +118,7 @@ export function InventoryEditor() {
         the same quantity.
       </p>
       <div class="rounded-2xl bg-white px-4 shadow-sm ring-1 ring-stone-200">
-        <For each={Object.keys(AvailableIngredients)}>
+        <For each={Object.keys(getSecretPantry())}>
           {(name) => <IngredientRow name={name} />}
         </For>
       </div>

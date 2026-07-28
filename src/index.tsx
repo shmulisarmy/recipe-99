@@ -2,10 +2,18 @@
 import './index.css';
 import { render } from 'solid-js/web';
 import 'solid-devtools';
+import { ConvexProvider, setupConvex } from "convex-solidjs";
+
 
 import App from './App';
+import { convexClient } from './convex_client';
 
 const root = document.getElementById('root');
+
+
+
+
+
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   throw new Error(
@@ -13,4 +21,8 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(() => <App />, root!);
+render(() =>
+  <ConvexProvider client={convexClient}>
+    <App />
+  </ConvexProvider>
+, root!);

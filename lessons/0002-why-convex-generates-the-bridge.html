@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why Convex generates the bridge</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Lesson 0002 · about 7 minutes</p>
+    <h1>Why Convex generates the bridge</h1>
+    <p class="lede">You noticed two apparent indirections. They are the same design idea appearing twice: local objects cannot cross runtime boundaries, so Convex crosses those boundaries with typed names.</p>
+
+    <p class="thesis">Convex code generation turns runtime addresses into editor-checked TypeScript.</p>
+
+    <section class="architecture" aria-label="Schema and database boundary">
+      <article class="domain solid">
+        <p class="label">Schema construction</p>
+        <h2>Local definition</h2>
+        <pre><code>const numbers =
+  defineTable(...)</code></pre>
+        <p>This value describes a table while Convex analyzes and deploys your schema.</p>
+      </article>
+      <div class="bridge">typed<br>name</div>
+      <article class="domain convex">
+        <p class="label">Query execution</p>
+        <h2>Deployed table</h2>
+        <pre><code>ctx.db
+  .query("numbers")</code></pre>
+        <p>The query executes later, on a deployment containing a table registered under that name.</p>
+      </article>
+    </section>
+
+    <h2>Your first observation: why <code>"numbers"</code>?</h2>
+    <p><code>defineTable(...)</code> produces a schema-definition value. It is used inside <code>defineSchema({ numbers })</code> when Convex builds the data model. It is not a live table object or database connection.</p>
+
+    <p>Inside <code>getAllNumbers</code>, <code>ctx.db</code> is the live database interface for that particular query execution. It identifies the deployed table by name:</p>
+
+    <pre><code>return await ctx.db.query("numbers").collect();</code></pre>
+
+    <div class="callout">
+      <h3>The string is less “stringly typed” than it looks</h3>
+      <p>Because you import <code>query</code> from <code>./_generated/server</code>, TypeScript knows the tables from your exported schema. After code generation, misspelling <code>"numbers"</code> as <code>"numbres"</code> should produce an editor/typecheck error.</p>
+    </div>
+
+    <section class="architecture" aria-label="Backend and browser boundary">
+      <article class="domain convex">
+        <p class="label">Convex deployment</p>
+        <h2>Implementation</h2>
+        <pre><code>// data.ts
+export const
+  getAllNumbers =
+    query(...)</code></pre>
+        <p>This function runs on the backend and can access <code>ctx.db</code>.</p>
+      </article>
+      <div class="bridge">typed<br>address</div>
+      <article class="domain solid">
+        <p class="label">Solid browser</p>
+        <h2>Reference</h2>
+        <pre><code>api.data
+  .getAllNumbers</code></pre>
+        <p>This is a typed address for the function—not its implementation.</p>
+      </article>
+    </section>
+
+    <h2>Your second observation: why generated <code>api</code>?</h2>
+    <p>The browser and Convex backend are different JavaScript runtimes. Importing the backend implementation into the browser would be the wrong direction: the browser cannot supply <code>ctx.db</code>, and backend code should not be bundled into the frontend.</p>
+
+    <p>Convex instead derives a public name from the backend file and export:</p>
+
+    <pre><code>convex/data.ts + export getAllNumbers
+                  ↓
+       api.data.getAllNumbers
+                  ↓
+          "data:getAllNumbers"</code></pre>
+
+    <p>The generated value is a <code>FunctionReference</code>. Its TypeScript type carries “this is a query,” its argument shape, and its return type. At runtime, it tells the Convex client which deployed function to call. Convex documents this file-and-export naming rule in its <a href="https://docs.convex.dev/functions/query-functions">query guide</a> and the reference object in its <a href="https://docs.convex.dev/api/modules/server#functionreference">FunctionReference API</a>.</p>
+
+    <h2>What <code>useQuery</code> adds</h2>
+    <pre><code>const numbers = useQuery(api.data.getAllNumbers, {});</code></pre>
+    <p><code>useQuery</code> combines the typed address with arguments and opens a subscription. The query runs on Convex, not in the component. Queries are cached and subscribable; when relevant database data changes, Convex updates subscribed clients. <a href="https://docs.convex.dev/functions">Convex functions overview</a>.</p>
+
+    <section class="exercise">
+      <p class="label">Retrieval practice</p>
+      <h2>Name the two bridges</h2>
+      <form class="quiz" data-quiz>
+        <fieldset data-answer="deployed">
+          <legend>Inside <code>ctx.db.query("numbers")</code>, what does <code>"numbers"</code> represent?</legend>
+          <label><input type="radio" name="q1" value="deployed"> A deployed table name</label>
+          <label><input type="radio" name="q1" value="local"> A local table object</label>
+          <label><input type="radio" name="q1" value="cache"> A browser cache key</label>
+        </fieldset>
+
+        <fieldset data-answer="reference">
+          <legend>What is <code>api.data.getAllNumbers</code>?</legend>
+          <label><input type="radio" name="q2" value="reference"> A typed function reference</label>
+          <label><input type="radio" name="q2" value="implementation"> The backend implementation itself</label>
+          <label><input type="radio" name="q2" value="result"> A copied query result</label>
+        </fieldset>
+
+        <button type="submit">Check answers</button>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <p class="source">Keep the <a href="../reference/convex-generated-bridges.html">generated bridges reference</a> nearby. It compresses the schema value, table name, backend function, and client reference into one path. Previous: <a href="0001-add-convex-without-rebuilding-solid.html">adding Convex without rebuilding Solid</a>.</p>
+
+    <footer class="next">
+      <h2>Continue with your teacher</h2>
+      <p>Ask about anything that still feels magical. A useful next experiment is to intentionally misspell the table name, then inspect the type error before correcting it.</p>
+    </footer>
+  </main>
+</body>
+</html>

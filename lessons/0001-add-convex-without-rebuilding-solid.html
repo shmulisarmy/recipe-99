@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Convex without rebuilding Solid</title>
+  <link rel="stylesheet" href="../assets/course.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Lesson 0001 · about 8 minutes</p>
+    <h1>Add Convex without rebuilding Solid</h1>
+    <p class="lede">The tangible win: you will be able to draw the correct Recipe-99 target structure and decide where each kind of state belongs before moving any code.</p>
+
+    <p class="thesis">You are adding a backend boundary, not migrating the frontend framework.</p>
+
+    <section class="architecture" aria-label="Solid and Convex architecture">
+      <article class="domain solid">
+        <p class="label">Existing · browser</p>
+        <h2>Solid + Vite</h2>
+        <ul>
+          <li><code>src/index.tsx</code></li>
+          <li><code>src/App.tsx</code></li>
+          <li><code>src/features/</code></li>
+          <li>transient UI state</li>
+        </ul>
+      </article>
+      <div class="bridge">typed<br>API</div>
+      <article class="domain convex">
+        <p class="label">Added · backend</p>
+        <h2>Convex</h2>
+        <ul>
+          <li><code>convex/schema.ts</code></li>
+          <li><code>convex/*.ts</code></li>
+          <li><code>convex/_generated/</code></li>
+          <li>persisted domain data</li>
+        </ul>
+      </article>
+    </section>
+
+    <h2>1. Keep the structure you already earned</h2>
+    <p>Recipe-99 already separates features behind <code>outside_feature_exports.ts</code>. Convex does not replace that boundary. The new <code>convex/</code> directory is a sibling of <code>src/</code>, not a new home for the frontend.</p>
+
+    <pre><code>recipe-99/
+├── convex/                 # new backend boundary
+│   ├── _generated/         # generated types; commit these
+│   ├── schema.ts
+│   └── pantry.ts
+├── src/                    # stays the Solid frontend
+│   ├── index.tsx           # gains the Convex provider
+│   └── features/           # existing boundaries stay intact
+└── .env.local              # deployment details; local only</code></pre>
+
+    <p>The official workflow says that <code>npx convex dev</code> configures a deployment, creates <code>convex/</code>, watches backend functions, and maintains <code>convex/_generated/</code>. It does not require a meta-framework. <a href="https://docs.convex.dev/understanding/workflow">Read the primary source</a>.</p>
+
+    <h2>2. Put state where its lifetime belongs</h2>
+    <table>
+      <thead>
+        <tr><th>Question</th><th>If yes</th><th>Example here</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Must it survive refresh?</td><td>Convex</td><td>available ingredients</td></tr>
+        <tr><td>Must another device see it?</td><td>Convex</td><td>planned days</td></tr>
+        <tr><td>Is it only interaction state?</td><td>Solid</td><td>open modal, field draft</td></tr>
+        <tr><td>Is it a pure calculation?</td><td>Keep it pure</td><td>measurement addition</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <h3>Specific migration advice for this repository</h3>
+      <p>Do not move all of <code>src/data.ts</code> or <code>src/features/planner/data.ts</code> at once. Start with one aggregate—available pantry ingredients is a good first slice—then replace only that slice's reads and writes. Local editor drafts can remain Solid state.</p>
+    </div>
+
+    <h2>3. Add one frontend seam</h2>
+    <p>Because this is a client-rendered Vite app, the provider belongs at the existing root in <code>src/index.tsx</code>. No SolidStart server entry, route loader, or hydration layer is needed.</p>
+
+    <pre><code>import { ConvexProvider, setupConvex } from "convex-solidjs";
+
+const convex = setupConvex(import.meta.env.VITE_CONVEX_URL);
+
+render(
+  () =&gt; (
+    &lt;ConvexProvider client={convex}&gt;
+      &lt;App /&gt;
+    &lt;/ConvexProvider&gt;
+  ),
+  root!,
+);</code></pre>
+
+    <p><code>convex-solidjs</code> is a community package rather than an officially listed Convex client. Its Solid-native API is convenient, but keep that choice mentally separate from the architecture: the official <code>ConvexClient</code> from <code>convex/browser</code> can replace the adapter later without relocating the backend.</p>
+
+    <h2>4. Use two loops—or one command</h2>
+    <pre><code>npm install convex convex-solidjs
+npx convex dev           # terminal 1: backend sync + codegen
+npm run dev              # terminal 2: Vite
+
+# Optional single command after initial configuration:
+npx convex dev --start 'vite'</code></pre>
+
+    <p>The <code>--start</code> option is part of the current Convex CLI. It is convenience, not architecture. <a href="https://docs.convex.dev/cli/reference/dev">See the CLI reference</a>.</p>
+
+    <section class="exercise">
+      <p class="label">Retrieval practice</p>
+      <h2>Check the boundary</h2>
+      <form class="quiz" data-quiz>
+        <fieldset data-answer="backend">
+          <legend>Which code moves under the new <code>convex/</code> folder?</legend>
+          <label><input type="radio" name="q1" value="frontend"> All frontend features</label>
+          <label><input type="radio" name="q1" value="backend"> Only backend functions</label>
+          <label><input type="radio" name="q1" value="types"> Every shared type</label>
+        </fieldset>
+
+        <fieldset data-answer="sync">
+          <legend>What is <code>npx convex dev</code> responsible for?</legend>
+          <label><input type="radio" name="q2" value="sync"> Backend sync and codegen</label>
+          <label><input type="radio" name="q2" value="render"> Frontend rendering and routing</label>
+          <label><input type="radio" name="q2" value="features"> Feature boundaries and styling</label>
+        </fieldset>
+
+        <fieldset data-answer="index">
+          <legend>Where is the minimal frontend integration seam in this SPA?</legend>
+          <label><input type="radio" name="q3" value="index"> Existing SPA entry point</label>
+          <label><input type="radio" name="q3" value="planner"> Existing planner feature root</label>
+          <label><input type="radio" name="q3" value="vite"> Existing Vite config file</label>
+        </fieldset>
+
+        <button type="submit">Check answers</button>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <h2>Your first real migration move</h2>
+    <p>After Convex is configured, model just the pantry data, write one query and one mutation, and connect only the available-ingredients feature. That creates a complete vertical slice while leaving planner data untouched. A schema is technically optional, but this app already has known TypeScript shapes, so defining that first table early is useful rather than speculative. <a href="https://docs.convex.dev/database/schemas">Convex schema guidance</a>.</p>
+
+    <p class="source">Keep the <a href="../reference/convex-solid-vite-migration-map.html">migration map</a> open while making the first change. It compresses the tree, ownership test, setup commands, and migration rhythm into one page.</p>
+
+    <footer class="next">
+      <h2>Continue with your teacher</h2>
+      <p>Ask any follow-up question that feels fuzzy. A strong next lesson would be: “Help me design the first pantry table and trace exactly which Recipe-99 reads and writes it replaces.”</p>
+    </footer>
+  </main>
+</body>
+</html>

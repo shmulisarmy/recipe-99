@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convex + Solid/Vite migration map</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Recipe-99 reference · print-friendly</p>
+    <h1>Convex + Solid/Vite migration map</h1>
+    <p class="lede">A placement guide for adding Convex to this existing SPA. SolidStart is not required.</p>
+
+    <h2>The target tree</h2>
+    <pre><code>recipe-99/
+├── convex/
+│   ├── _generated/       ← generated; commit it
+│   ├── schema.ts         ← persisted document shapes
+│   └── pantry.ts         ← queries and mutations
+├── src/
+│   ├── index.tsx         ← create client + mount provider
+│   ├── features/         ← keep current public boundaries
+│   ├── primitives/       ← keep pure domain primitives
+│   └── data.ts           ← shrink slice-by-slice
+├── .env.local            ← generated deployment details; do not commit
+└── package.json</code></pre>
+
+    <h2>Ownership test</h2>
+    <table>
+      <thead>
+        <tr><th>If the value…</th><th>Owner</th><th>Recipe-99 example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>must survive refresh or sync between users</td><td><code>convex/</code></td><td>pantry amounts, recipes, planned days</td></tr>
+        <tr><td>exists only while a control is open or being edited</td><td><code>src/</code> Solid state</td><td>modal state, draft input, focus target</td></tr>
+        <tr><td>is a pure calculation</td><td>keep near its consumers</td><td>measurement arithmetic</td></tr>
+        <tr><td>authorizes or validates a persisted write</td><td><code>convex/</code></td><td>mutation args and invariant checks</td></tr>
+        <tr><td>is generated from the backend API</td><td><code>convex/_generated/</code></td><td><code>api</code>, <code>Doc</code>, <code>Id</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Smallest setup sequence</h2>
+    <pre><code>npm install convex convex-solidjs
+npx convex dev
+
+# Or run Vite from the same process after configuration:
+npx convex dev --start 'vite'</code></pre>
+
+    <div class="callout">
+      <h3>Client-library caveat</h3>
+      <p><code>convex-solidjs</code> is a community adapter, not a client listed in the official Convex docs. It offers Solid-native providers and accessors. The official fallback is <code>ConvexClient</code> from <code>convex/browser</code>; changing between them does not change the backend folder structure.</p>
+    </div>
+
+    <h2>Minimal SPA seam</h2>
+    <pre><code>import { ConvexProvider, setupConvex } from "convex-solidjs";
+
+const convex = setupConvex(import.meta.env.VITE_CONVEX_URL);
+
+render(
+  () =&gt; (
+    &lt;ConvexProvider client={convex}&gt;
+      &lt;App /&gt;
+    &lt;/ConvexProvider&gt;
+  ),
+  root!,
+);</code></pre>
+
+    <h2>Migration rhythm</h2>
+    <ol>
+      <li>Choose one persisted aggregate, such as available pantry ingredients.</li>
+      <li>Model only that table and its query/mutation.</li>
+      <li>Replace that feature's local store access behind its existing feature boundary.</li>
+      <li>Build and verify behavior.</li>
+      <li>Only then choose the next aggregate.</li>
+    </ol>
+
+    <p class="source">Primary source: <a href="https://docs.convex.dev/understanding/workflow">Convex dev workflow</a>. See the <a href="../lessons/0001-add-convex-without-rebuilding-solid.html">first lesson</a> for the reasoning exercise.</p>
+  </main>
+</body>
+</html>

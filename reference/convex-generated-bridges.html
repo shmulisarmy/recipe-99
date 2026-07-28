@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convex generated bridges</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Recipe-99 reference · two runtime bridges</p>
+    <h1>Names cross boundaries. Types make them safe.</h1>
+    <p class="lede">Convex does not pass your local schema objects or backend function objects across runtimes. It generates typed names for both boundaries.</p>
+
+    <h2>Bridge 1: schema → database runtime</h2>
+    <pre><code>// schema construction time
+const numbers = defineTable({ name_: v.string() });
+export default defineSchema({ numbers });
+
+// query execution time
+ctx.db.query("numbers")</code></pre>
+    <p><code>numbers</code> is a schema-definition value. <code>"numbers"</code> is the deployed table name. The generated <code>ctx.db</code> type restricts that string to tables in the exported schema.</p>
+
+    <h2>Bridge 2: backend module → browser runtime</h2>
+    <pre><code>// convex/data.ts
+export const getAllNumbers = query(/* ... */);
+
+// browser code
+api.data.getAllNumbers
+// means the registered address "data:getAllNumbers"</code></pre>
+    <p>The generated API member is a <strong>FunctionReference</strong>: a typed address containing the query kind, argument type, and return type. It is not the backend implementation.</p>
+
+    <h2>Current Recipe-99 path</h2>
+    <pre><code>schema.ts
+  defineSchema({ numbers })
+        ↓ codegen
+data.ts
+  ctx.db.query("numbers")
+  export getAllNumbers
+        ↓ file + export name
+_generated/api
+  api.data.getAllNumbers
+        ↓ useQuery(reference, args)
+Convex deployment
+  runs data:getAllNumbers
+        ↓ subscription result
+Solid component updates</code></pre>
+
+    <table>
+      <thead>
+        <tr><th>Thing</th><th>What it really is</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>numbers</code></td><td>Local schema-definition value</td></tr>
+        <tr><td><code>"numbers"</code></td><td>Typed deployed-table identifier</td></tr>
+        <tr><td><code>getAllNumbers</code></td><td>Backend function implementation</td></tr>
+        <tr><td><code>api.data.getAllNumbers</code></td><td>Typed backend-function address</td></tr>
+        <tr><td><code>useQuery(...)</code></td><td>Client subscription using that address</td></tr>
+      </tbody>
+    </table>
+
+    <p class="source">Primary sources: <a href="https://docs.convex.dev/functions/query-functions">Convex query functions</a> and the <a href="https://docs.convex.dev/api/modules/server#functionreference">FunctionReference API</a>. Continue with <a href="../lessons/0002-why-convex-generates-the-bridge.html">lesson 0002</a>.</p>
+  </main>
+</body>
+</html>

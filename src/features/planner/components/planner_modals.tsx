@@ -1,5 +1,5 @@
 import { For, JSX, Show, onCleanup } from "solid-js";
-import { AvailableIngredients, menu, RequiredIngredient } from "../../../data";
+import { GetIngredientMeasurement, RequiredIngredient } from "../../../data";
 import type { RecipeProjection } from "./types";
 import { planner } from "../data";
 import {
@@ -11,6 +11,8 @@ import {
     Measurement_Times,
     ZeroedMeasurement,
 } from "../../../primitives/measurement";
+import { api } from "../../../../convex/_generated/api";
+import { useQuery } from "convex-solidjs";
 
 // ---------- Formatting helpers ----------
 
@@ -73,7 +75,9 @@ export function RecipeModal(props: {
     onClose: () => void;
 }): JSX.Element {
     const recipeName = () => props.item.plannedRecipeReference.recipe;
-    const recipeInMenu = () => menu.get(recipeName());
+    // const recipeInMenu = () => menu.get(recipeName());
+    const recipeInMenu2 = useQuery(api.data.getRecipeByTitle, { recipeTitle: recipeName() });
+    const recipeInMenu = () => recipeInMenu2.data();
 
     const inScratchpad = (ingredient: RequiredIngredient) => {
         const pad = props.item.scratchPadOfIngredientsNeededToUse;
@@ -126,7 +130,7 @@ export function RecipeModal(props: {
                         <For each={missing()}>
                             {(ingredient) => {
                                 const need = () => Measurement_Times(ingredient.Measurement, props.item.multiplier);
-                                const have = () => AvailableIngredients[ingredient.name] ?? ZeroedMeasurement();
+                                const have = () => GetIngredientMeasurement(ingredient.name) ?? ZeroedMeasurement();
                                 const haveInNeedUnit = () => Measurement_Convert(have(), need().unit);
                                 const pct = () => need().amount === 0 ? 100
                                     : Math.min(100, Math.max(0, (haveInNeedUnit().amount / need().amount) * 100));

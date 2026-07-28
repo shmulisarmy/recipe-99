@@ -16,6 +16,7 @@ export function DayCell(props: {
   onOpenRecipe: (item: RecipeProjection) => void;
   onOpenCart: () => void;
 }) {
+  console.log({props})
   const [isDragOver, setIsDragOver] = createSignal(false);
 
   return (

@@ -1,4 +1,6 @@
 import { createPlannerProjection } from "../logic";
 
+
+export type PlannerProjection = Awaited<ReturnType<typeof createPlannerProjection>>;
 export type RecipeProjection =
-  ReturnType<typeof createPlannerProjection>[string][number];
+  PlannerProjection[string][number];

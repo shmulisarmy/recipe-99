@@ -17,6 +17,8 @@ import {
 } from "../planner/outside_feature_exports";
 import { AvailableIngredientsBulkAddFormProps, BulkAddIngredients, ShoppingCartAlreadyGotDraft } from "./types";
 import { FormTemplateWithDataStructure } from "./next_step";
+import { useMutation } from "convex-solidjs";
+import { api } from "../../../convex/_generated/api";
 
 const UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
 
@@ -39,6 +41,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
     const [newIngredientAmount, setNewIngredientAmount] = createSignal(1);
     const [newIngredientUnit, setNewIngredientUnit] = createSignal<Unit>("grams");
     const [addIngredientError, setAddIngredientError] = createSignal("");
+    const m = useMutation(api.data.AvailableIngredientsBulkAdd);
     let newIngredientNameInput!: HTMLInputElement;
 
     function amountForShoppingCart(name: string): Measurement | undefined {
@@ -123,12 +126,10 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         event.preventDefault();
         const entries = Object.entries(formData);
         if (entries.some(([, measurement]) => !Number.isFinite(measurement.amount) || measurement.amount < 0)) return;
-
-        for (const [name, measurement] of entries) {
-            AvailableIngredients[name] = AvailableIngredients[name]
-                ? Measurement_Plus(AvailableIngredients[name], measurement)
-                : { ...measurement };
-        }
+        m.mutate({
+            userId: "shmuli",
+            ingredientsToAdd: entries.map(([name, measurement]) => ({ name, Measurement: measurement })),
+        });
 
         //
         UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft);
