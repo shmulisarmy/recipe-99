@@ -1,24 +1,35 @@
 import { createMutable } from "solid-js/store";
-import { getOrSetRecipeByTitle, getSecretPantry, IngredientSet } from "../../data";
+import { IngredientSet, Recipe, RecipeCache, RecipeId, RequiredIngredient } from "../../data";
 import { recipeMakingProjection } from "../../logic";
 import { planner } from "./data";
 import { Date_, PlannedRecipe, ShoppingCart } from "./types";
-import { Measurement_Minus, Measurement_Plus, ZeroedMeasurement } from "../../primitives/measurement";
+import { Measurement, Measurement_Minus, Measurement_Plus, ZeroedMeasurement } from "../../primitives/measurement";
 import { PlannerProjection } from "./components/types";
 import { deepCopy } from "../../utils/object";
+import { Doc } from "../../../convex/_generated/dataModel";
 
 
 
 
-export async function createPlannerProjection() {
-    
+export function createPlannerProjection(AvailableIngredients: Doc<"pantryItems">[], initialMenu: Doc<"recipes">[]) {
     type RecipeProjection = {
         plannedRecipeReference: PlannedRecipe;
         multiplier: number;
         couldMake: boolean;
         scratchPadOfIngredientsNeededToUse: IngredientSet;
+        unfulfilledIngredients: {RequiredIngredient: RequiredIngredient, have: Measurement}[];
     };
-    const workingIngredientsForProjection: IngredientSet = deepCopy(getSecretPantry()); 
+    const workingIngredientsForProjection: IngredientSet = {}; 
+    const menu: RecipeCache = new Map<RecipeId, Recipe>();
+    {
+        //easier data to work with for projection
+        for (const ingredient of AvailableIngredients) {
+            workingIngredientsForProjection[ingredient.name_] = ingredient.Measurement;
+        }
+        for (const recipe of initialMenu) {
+            menu.set(`${recipe.title}@${recipe.version}`, recipe);
+        }
+    }
     const projection: Record<Date_, RecipeProjection[]> = {};
 
     function fillCart(cart: ShoppingCart) {
@@ -36,13 +47,13 @@ export async function createPlannerProjection() {
         console.log({date})
         for (const recipe of plannedDay.recipes) {
             console.log({recipe})
-            const { recipe: recipeName, overrideDayMultiplier } = recipe;
+            const { recipe: recipeId, overrideDayMultiplier } = recipe;
             const multiplier =  overrideDayMultiplier ?? plannedDay.multiplier
             
-            const recipeInMenu = await getOrSetRecipeByTitle(recipeName);
-            // const recipeInMenu = menu.get(recipeName);
+            const recipeInMenu = menu.get(recipeId);
+            // const recipeInMenu = menu.get(recipeId);
             console.log({recipeInMenu})
-            if (!recipeInMenu) throw new Error(`Recipe "${recipeName}" not found in menu.`);
+            if (!recipeInMenu) throw new Error(`Recipe "${recipeId}" not found in menu.`);
 
             const { unfulfilledIngredients, scratchPadOfIngredientsNeededToUse,substitutedIngredientUses } = recipeMakingProjection(recipeInMenu, workingIngredientsForProjection, multiplier);
             const couldMake = unfulfilledIngredients.length === 0;
@@ -58,6 +69,7 @@ export async function createPlannerProjection() {
                 multiplier,
                 couldMake,
                 scratchPadOfIngredientsNeededToUse,
+                unfulfilledIngredients
             });
         }
         projection[date] = daysProjection;
@@ -68,14 +80,12 @@ export async function createPlannerProjection() {
 
 export const projection: PlannerProjection = createMutable({});
 
-createPlannerProjection().then(projection_ => 
-    Object.assign(projection, projection_)
-);
+
 
 export function reSimulatePlannerProjection() {
-    createPlannerProjection().then(projection_ => 
-        Object.assign(projection, projection_)
-    );
+    // createPlannerProjection().then(projection_ => 
+    //     Object.assign(projection, projection_)
+    // );
 }
 
 

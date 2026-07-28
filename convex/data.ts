@@ -5,6 +5,16 @@ import { measurementT } from "./types";
 import { Measurement_Plus } from "../src/primitives/measurement";
 
 
+
+
+function make_object<K extends string | number | symbol, V>(keyValuePairs: [K, V][]): Record<K, V>{
+    const res = {} as Record<K, V>;
+    for (const [key, value] of keyValuePairs){
+        res[key] = value;
+    }
+    return res;
+}
+
 export const getAvailableIngredients = query({  
     args: {userId: v.string()},
     handler: async (ctx) => {
@@ -12,6 +22,14 @@ export const getAvailableIngredients = query({
     },  
 });
 
+
+export const getAvailableIngredients2 = query({  
+    args: {userId: v.string()},
+    handler: async (ctx) => {
+        const ingredients = await ctx.db.query("pantryItems").withIndex("userId").collect();
+        return make_object(ingredients.map((i) => [i.name_, i.Measurement]));
+    },  
+});
 
 export const updateAvailableIngredient = mutation({  
     args: {userId: v.string(), ingredientName: v.string(), measurement: measurementT},

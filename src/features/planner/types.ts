@@ -1,11 +1,11 @@
-import { IngredientSet, RecipeName } from "../../data";
+import { IngredientSet, RecipeId, RecipeName } from "../../data";
 
 
 
 
 
 export type PlannedRecipe = {
-    recipe: RecipeName;
+    recipe: RecipeId;
     overrideDayMultiplier?: number;
     id: string;
 };

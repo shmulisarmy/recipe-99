@@ -1,9 +1,9 @@
 import { createSignal, For, Show } from "solid-js";
 import { reSimulatePlannerProjection } from "../features/planner/logic";
 import { Measurement_Convert, Unit } from "../primitives/measurement";
-import { useMutation } from "convex-solidjs";
+import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
-import { getSecretPantry } from "../data";
+import { Doc } from "../../convex/_generated/dataModel";
 
 const ALL_UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
 
@@ -11,16 +11,15 @@ function fmt(n: number): string {
   return parseFloat(n.toPrecision(4)).toString();
 }
 
-function IngredientRow(props: { name: string }) {
+function IngredientRow(props: { ingredient: Doc<"pantryItems">}) {
   const updateIngredient = useMutation(api.data.updateAvailableIngredient);
-  const stored = () => getSecretPantry()[props.name];
 
-  const [amount, setAmount] = createSignal(stored().amount);
-  const [targetUnit, setTargetUnit] = createSignal<Unit>(stored().unit);
+  const [amount, setAmount] = createSignal(props.ingredient.Measurement.amount);
+  const [targetUnit, setTargetUnit] = createSignal<Unit>(props.ingredient.Measurement.unit);
 
-  const canConvert = () => targetUnit() !== stored().unit;
+  const canConvert = () => targetUnit() !== props.ingredient.Measurement.unit;
   const convertedPreview = () =>
-    canConvert() ? Measurement_Convert(stored(), targetUnit()) : null;
+    canConvert() ? Measurement_Convert(props.ingredient.Measurement, targetUnit()) : null;
 
   function applyAmount() {
     const v = amount();
@@ -28,10 +27,9 @@ function IngredientRow(props: { name: string }) {
     
     updateIngredient.mutate({
       userId: "shmuli", // Supply appropriate userId if available
-      ingredientName: props.name, 
-      measurement: getSecretPantry()[props.name] = { amount: v, unit: stored().unit },
+      ingredientName: props.ingredient.name_,
+      measurement: { amount: v, unit: targetUnit() },
     });
-    reSimulatePlannerProjection();
   }
 
   function applyConvert() {
@@ -39,23 +37,22 @@ function IngredientRow(props: { name: string }) {
     if (!converted) return;
     updateIngredient.mutate({
       userId: "shmuli", // Supply appropriate userId if available
-      ingredientName: props.name, 
-      measurement: getSecretPantry()[props.name] = converted,
+      ingredientName: props.ingredient.name_, 
+      measurement: converted,
     });
     setAmount(converted.amount);
     setTargetUnit(converted.unit);
-    reSimulatePlannerProjection();
   }
 
   return (
     <div class="flex flex-col gap-1.5 py-3 border-b border-stone-100 last:border-0">
       <div class="flex items-center justify-between">
-        <span class="text-sm font-medium capitalize text-stone-700">{props.name}</span>
+        <span class="text-sm font-medium capitalize text-stone-700">{props.ingredient.name_}</span>
         {/* Stored value — always visible so the "from" unit is never ambiguous */}
         <span class="text-xs text-stone-400">
           currently&nbsp;
           <span class="font-medium text-stone-500">
-            {fmt(stored().amount)} {stored().unit}
+            {fmt(props.ingredient.Measurement.amount)} {props.ingredient.Measurement.unit}
           </span>
         </span>
       </div>
@@ -79,7 +76,7 @@ function IngredientRow(props: { name: string }) {
           <For each={ALL_UNITS}>
             {(u) => (
               <option value={u}>
-                {u}{u === stored().unit ? " ✓" : ""}
+                {u}{u === targetUnit() ? " ✓" : ""}
               </option>
             )}
           </For>
@@ -100,7 +97,7 @@ function IngredientRow(props: { name: string }) {
             fallback="convert"
           >
             {(preview) =>
-              `${fmt(stored().amount)} ${stored().unit} → ${fmt(preview().amount)} ${preview().unit}`
+              `${fmt(props.ingredient.Measurement.amount)} ${props.ingredient.Measurement.unit} → ${fmt(preview().amount)} ${preview().unit}`
             }
           </Show>
         </button>
@@ -110,6 +107,9 @@ function IngredientRow(props: { name: string }) {
 }
 
 export function InventoryEditor() {
+  const pantry = useQuery(api.data.getAvailableIngredients, {
+    userId: "shmuli",
+  });
   return (
     <div class="mx-auto max-w-lg px-4 py-8">
       <h2 class="mb-1 text-lg font-semibold text-stone-900">Pantry</h2>
@@ -118,8 +118,8 @@ export function InventoryEditor() {
         the same quantity.
       </p>
       <div class="rounded-2xl bg-white px-4 shadow-sm ring-1 ring-stone-200">
-        <For each={Object.keys(getSecretPantry())}>
-          {(name) => <IngredientRow name={name} />}
+        <For each={pantry.data()}>
+          {(name) => <IngredientRow ingredient={name} />}
         </For>
       </div>
     </div>

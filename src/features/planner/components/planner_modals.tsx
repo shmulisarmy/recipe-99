@@ -1,5 +1,5 @@
 import { For, JSX, Show, onCleanup } from "solid-js";
-import { GetIngredientMeasurement, RequiredIngredient } from "../../../data";
+import { RequiredIngredient } from "../../../data";
 import type { RecipeProjection } from "./types";
 import { planner } from "../data";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../../../primitives/measurement";
 import { api } from "../../../../convex/_generated/api";
 import { useQuery } from "convex-solidjs";
+import { use } from "solid-js/web";
 
 // ---------- Formatting helpers ----------
 
@@ -87,6 +88,17 @@ export function RecipeModal(props: {
     const missing = () => (recipeInMenu()?.requiredIngredients ?? []).filter((ing) => !inScratchpad(ing));
     const scratchpadEntries = () => Object.entries(props.item.scratchPadOfIngredientsNeededToUse);
 
+
+    const pantry = useQuery(api.data.getAvailableIngredients, {userId: "shmuli"});
+
+    // function GetIngredientMeasurement(name: string): Measurement{
+    //     const pantryItems = pantry.data();
+    //     for (const ingredient of pantryItems) {
+    //         if (ingredient.name_ === name) return ingredient.Measurement;
+    //     }
+    //     throw new Error(`Ingredient ${name} not found in pantry`);
+    // }
+
     return (
         <Modal title={recipeName()} onClose={props.onClose}>
             <div class="mt-1 flex items-center gap-2">
@@ -127,18 +139,17 @@ export function RecipeModal(props: {
                 <div class="mt-4">
                     <div class="text-xs font-medium uppercase tracking-wide text-stone-400">Missing</div>
                     <ul class="mt-2 flex flex-col gap-3">
-                        <For each={missing()}>
+                        <For each={props.item.unfulfilledIngredients}>
                             {(ingredient) => {
-                                const need = () => Measurement_Times(ingredient.Measurement, props.item.multiplier);
-                                const have = () => GetIngredientMeasurement(ingredient.name) ?? ZeroedMeasurement();
-                                const haveInNeedUnit = () => Measurement_Convert(have(), need().unit);
+                                const need = () => Measurement_Times(ingredient.RequiredIngredient.Measurement, props.item.multiplier);
+                                const haveInNeedUnit = () => Measurement_Convert(ingredient.have, need().unit);
                                 const pct = () => need().amount === 0 ? 100
                                     : Math.min(100, Math.max(0, (haveInNeedUnit().amount / need().amount) * 100));
 
                                 return (
                                     <li>
                                         <div class="flex items-baseline justify-between gap-2">
-                                            <span class="font-medium capitalize text-red-700">{ingredient.name}</span>
+                                            <span class="font-medium capitalize text-red-700">{ingredient.RequiredIngredient.name}</span>
                                             <span class="text-sm tabular-nums text-red-700">
                                                 {formatMeasurement(haveInNeedUnit())}
                                                 <span class="text-red-400"> / {formatMeasurement(need())}</span>
@@ -150,7 +161,7 @@ export function RecipeModal(props: {
                                                 style={{ width: `${pct()}%` }}
                                             />
                                         </div>
-                                        <Show when={ingredient.substitute}>
+                                        <Show when={ingredient.RequiredIngredient.substitute}>
                                             {(substitute) => (
                                                 <div class="mt-1 text-xs text-stone-500">
                                                     substitute: {substitute().name} ({formatMeasurement(substitute().Measurement)})

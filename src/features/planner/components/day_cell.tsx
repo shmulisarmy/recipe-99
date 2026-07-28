@@ -45,7 +45,6 @@ export function DayCell(props: {
         const draggedId = e.dataTransfer!.getData("text/plain");
         if (draggedId) {
           InsertRecipeAtBeginningOfDate(draggedId, props.date);
-          reSimulatePlannerProjection();
         }
       }}
     >

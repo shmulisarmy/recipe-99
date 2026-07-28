@@ -8,8 +8,8 @@ export const planner = createMutable<Record<string, PlannedDay>>({
     [Morrow(-22).toDateString()]: {
         date: Morrow(-22),
         recipes: [
-            { recipe: 'mashed potatoes', overrideDayMultiplier: 1.5, id: genId() },
-            { recipe: 'chicken soup', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'mashed potatoes@1', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'chicken soup@1', overrideDayMultiplier: 1.5, id: genId() },
         ],
         multiplier: 1,
         shoppingCart: {
@@ -26,8 +26,8 @@ export const planner = createMutable<Record<string, PlannedDay>>({
     [Morrow(0).toDateString()]: {
         date: Morrow(0),
         recipes: [
-            { recipe: 'chocolate cake', id: genId() },
-            { recipe: 'pancakes', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'chocolate cake@1', id: genId() },
+            { recipe: 'pancakes@1', overrideDayMultiplier: 1.5, id: genId() },
         ],
         multiplier: 2,
         shoppingCart: {
@@ -43,8 +43,8 @@ export const planner = createMutable<Record<string, PlannedDay>>({
     [Morrow(1).toDateString()]: {
         date: Morrow(1),
         recipes: [
-            { recipe: 'scrambled eggs', overrideDayMultiplier: 1.5, id: genId() },
-            { recipe: 'grilled cheese', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'scrambled eggs@1', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'grilled cheese@1', overrideDayMultiplier: 1.5, id: genId() },
         ],
         multiplier: 1,
         shoppingCart: {
@@ -61,8 +61,8 @@ export const planner = createMutable<Record<string, PlannedDay>>({
     [Morrow(2).toDateString()]: {
         date: Morrow(2),
         recipes: [
-            { recipe: 'macaroni and cheese', overrideDayMultiplier: 1.5, id: genId() },
-            { recipe: 'tomato pasta', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'macaroni and cheese@1', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'tomato pasta@1', overrideDayMultiplier: 1.5, id: genId() },
         ],
         multiplier: 1,
         shoppingCart: {
@@ -78,8 +78,8 @@ export const planner = createMutable<Record<string, PlannedDay>>({
     [Morrow(3).toDateString()]: {
         date: Morrow(3),
         recipes: [
-            { recipe: 'mashed potatoes', overrideDayMultiplier: 1.5, id: genId() },
-            { recipe: 'chicken soup', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'mashed potatoes@1', overrideDayMultiplier: 1.5, id: genId() },
+            { recipe: 'chicken soup@1', overrideDayMultiplier: 1.5, id: genId() },
         ],
         multiplier: 1,
         shoppingCart: {

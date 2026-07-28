@@ -6,9 +6,9 @@ import {
   AvailableIngredientsBulkAddForm,
   type BulkAddIngredients,
 } from './features/available_ingredients_bulk_add_form/outside_feature_exports';
-import { useMutation, useQuery } from 'convex-solidjs';
+import { useQuery } from 'convex-solidjs';
 import { api } from '../convex/_generated/api';
-import { secretPantryAssign } from './data';
+import { createPlannerProjection, projection } from './features/planner/logic';
 const ingredientsToAdd: BulkAddIngredients = {
   milk: { amount: 1400, unit: 'grams' },
   butter: { amount: 100, unit: 'grams' },
@@ -23,18 +23,21 @@ const ingredientsToAdd: BulkAddIngredients = {
 
 const App: Component = () => {
   const pantry = useQuery(api.data.getAvailableIngredients, {userId: "shmuli"});
-
+  const menu = useQuery(api.data.getAllRecipes, {});
+  
   createEffect(() => {
-    const pantryItems = pantry.data();
-    if (pantryItems) secretPantryAssign(pantryItems);
+    const pd = pantry.data()
+    const md = menu.data()
+    if (!pd) {console.log("returning early"); return};
+    if (!md) {console.log("returning early"); return};
+      Object.assign(projection, createPlannerProjection(pd, md));
   });
-  pantry.isLoading
   return (
     <>
     <AvailableIngredientsBulkAddForm ingredientsToAdd={ingredientsToAdd} />
     <Planner />
     <InventoryEditor />
-    <Menu />
+    <Menu pantry={pantry.data()} />
     </>
   );
 };

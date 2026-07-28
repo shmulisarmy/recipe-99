@@ -1,3 +1,4 @@
+import { Doc } from '../convex/_generated/dataModel';
 import { IngredientSet, Recipe, RequiredIngredient } from './data';
 import { Measurement, Measurement_GTE, Measurement_Minus, Measurement_Plus, Measurement_Times, ZeroedMeasurement } from './primitives/measurement';
 
@@ -11,15 +12,15 @@ import { Measurement, Measurement_GTE, Measurement_Minus, Measurement_Plus, Meas
 
 
 
-export function recipeMakingProjection(recipe: Recipe, ingredients: IngredientSet, multiplier: number= 1) {
-  const unfulfilledIngredients: RequiredIngredient[] = [];
+export function recipeMakingProjection(recipe: Recipe, pantrySet: IngredientSet, multiplier: number= 1) {
+  const unfulfilledIngredients: {RequiredIngredient: RequiredIngredient, have: Measurement}[] = [];
   const scratchPadOfIngredientsNeededToUse: IngredientSet = {}; //this is needed because of substitutions
   type IngredientName = string;
   const substitutedIngredientUses: Record<IngredientName, IngredientName> = {};
   requiredIngredientsLoop: for (const requiredIngredient of recipe.requiredIngredients) {
     for (const IngredientToTry of [requiredIngredient, requiredIngredient.substitute]) {
       if (!IngredientToTry) break; //if there is no substitute, we don't need to try it
-      const have = ingredients[IngredientToTry.name] ?? ZeroedMeasurement();
+      const have = pantrySet[IngredientToTry.name] ?? ZeroedMeasurement();
       const inScratchPad = scratchPadOfIngredientsNeededToUse[IngredientToTry.name] ?? ZeroedMeasurement();
       if (Measurement_GTE(Measurement_Minus(have, inScratchPad), Measurement_Times(IngredientToTry.Measurement, multiplier))) {
         scratchPadOfIngredientsNeededToUse[IngredientToTry.name] =
@@ -31,7 +32,7 @@ export function recipeMakingProjection(recipe: Recipe, ingredients: IngredientSe
       }
   }
   //getting here means we tried the required ingredient and the substitute ingredient and didn't find enough
-  unfulfilledIngredients.push(requiredIngredient);
+  unfulfilledIngredients.push({RequiredIngredient: requiredIngredient, have: pantrySet[requiredIngredient.name]?? ZeroedMeasurement()});
 }
   return {
     unfulfilledIngredients,

@@ -1,6 +1,5 @@
 import { createMutable } from "solid-js/store";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { AvailableIngredients } from "../../data";
 import {
     Measurement,
     Measurement_GTE,
@@ -135,7 +134,6 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft);
         //
 
-        reSimulatePlannerProjection();
         setStep("form-template-with-data-structure");
     }
 

@@ -1,14 +1,16 @@
 import { createSignal, createMemo, For, Show } from "solid-js";
-import { getSecretPantry } from "../data";
-import type { Recipe, RequiredIngredient } from "../data";
+import type { IngredientSet, Recipe, RequiredIngredient } from "../data";
 import { recipeMakingProjection } from "../logic";
 import type { Measurement } from "../primitives/measurement";
 import { useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
+import { Doc, Id } from "../../convex/_generated/dataModel";
 
 type RecipeStatus =
   | { kind: "ready"; recipe: Recipe }
-  | { kind: "missing"; recipe: Recipe; unfulfilled: RequiredIngredient[] };
+  | { kind: "no-analytics-because-no-pantry"; recipe: Recipe }
+  | { kind: "missing"; recipe: Recipe; unfulfilled: {RequiredIngredient: RequiredIngredient, have: Measurement}[] };
+
 
 function formatMeasurement(m: Measurement): string {
   return `${m.amount} ${m.unit}`;
@@ -29,13 +31,18 @@ function imageForRecipe(title: string): string {
 }
 
 /** Build the readiness verdict for a single recipe. Guards the `false` return defensively. */
-function projectRecipe(recipe: Recipe): RecipeStatus {
-  const proj = recipeMakingProjection(recipe, getSecretPantry(), 1);
+function projectRecipe(recipe: Recipe, pantry: Doc<"pantryItems">[]): RecipeStatus {
+  const pantrySet: IngredientSet = {};
+  for (const ingredient of pantry) {
+    pantrySet[ingredient.name_] = ingredient.Measurement;
+  }
+  const proj = recipeMakingProjection(recipe, pantrySet, 1);
   if (proj && proj.unfulfilledIngredients.length === 0) {
     return { kind: "ready", recipe };
   }
   // false (unknown/blocked) OR unfulfilled ingredients present → MISSING.
-  const unfulfilled = proj ? proj.unfulfilledIngredients : recipe.requiredIngredients;
+  if (!proj) return { kind: "no-analytics-because-no-pantry", recipe };
+  const unfulfilled = proj.unfulfilledIngredients
   return { kind: "missing", recipe, unfulfilled };
 }
 
@@ -44,7 +51,7 @@ function RecipeCard(props: { status: RecipeStatus }) {
 
   const missingNames = createMemo(() => {
     if (props.status.kind !== "missing") return new Set<string>();
-    return new Set(props.status.unfulfilled.map((i) => i.name));
+    return new Set(props.status.unfulfilled.map((i) => i.RequiredIngredient.name));
   });
 
   const ownedIngredients = createMemo(() =>
@@ -115,16 +122,16 @@ function RecipeCard(props: { status: RecipeStatus }) {
                     <div class="flex items-baseline justify-between gap-3">
                       <span class="font-medium text-rose-700 capitalize">
                         <span aria-hidden="true">• </span>
-                        {ingredient.name}
+                        {ingredient.RequiredIngredient.name}
                       </span>
                       <span class="whitespace-nowrap text-xs text-rose-600">
-                        {formatMeasurement(ingredient.Measurement)}
+                        {formatMeasurement(ingredient.RequiredIngredient.Measurement)}
                       </span>
                     </div>
-                    <Show when={ingredient.substitute}>
+                    <Show when={ingredient.RequiredIngredient.substitute}>
                       {(sub) => (
                         <p class="mt-0.5 pl-3 text-xs text-stone-500">
-                          out of {ingredient.name}? substitute:{" "}
+                          out of {ingredient.RequiredIngredient.name}? substitute:{" "}
                           <span class="font-medium text-stone-600 capitalize">
                             {sub().name}
                           </span>{" "}
@@ -167,16 +174,18 @@ function RecipeCard(props: { status: RecipeStatus }) {
   );
 }
 
-export function Menu() {
+
+
+export function Menu(props: { pantry: Doc<"pantryItems">[] | undefined }) {
   const [query, setQuery] = createSignal("");
   const [readyOnly, setReadyOnly] = createSignal(false);
 
   // Compute readiness once per recipe (AvailableIngredients is static).
    const menu2 = useQuery(api.data.getAllRecipes, {});
   
-  const allStatuses = createMemo<RecipeStatus[]>(() =>
-    Array.from(menu2.data() ?? []).map((recipe) => projectRecipe(recipe))
-  );
+  const allStatuses = () => Array.from(menu2.data() ?? []).map((recipe) => {
+    if (!props.pantry) return { kind: "no-analytics-because-no-pantry", recipe } as const;
+    return projectRecipe(recipe, props.pantry ?? [])});
 
   const totalCount = createMemo(() => allStatuses().length);
 

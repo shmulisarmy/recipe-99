@@ -46,7 +46,7 @@ export function DayDetail(props: {
                 const draggedId = e.dataTransfer!.getData("text/plain");
                 if (draggedId) {
                     InsertRecipeAtBeginningOfDate(draggedId, date());
-                    reSimulatePlannerProjection();
+                    
                 }
             }}
         >

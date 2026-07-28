@@ -6,5 +6,4 @@ export function updateDayMultiplier(date: Date, multiplier: number): void {
     if (!day) throw new Error(`No planned day for ${date.toDateString()}`);
     day.multiplier = multiplier;
 
-    reSimulatePlannerProjection();
 }

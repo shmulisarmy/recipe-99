@@ -55,7 +55,6 @@ export function RecipePill(props: {
         const draggedId = e.dataTransfer!.getData("text/plain");
         if (draggedId && draggedId !== id()) {
           MoveRecipeOnTopOfOtherRecipe(draggedId, id());
-          reSimulatePlannerProjection();
         }
       }}
       onClick={() => props.onOpen()}

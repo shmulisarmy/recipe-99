@@ -1,12 +1,11 @@
 import { createSignal, For, Show } from "solid-js";
-import { createPlannerProjection, projection } from "../logic";
+import { projection } from "../logic";
 import { planner } from "../data";
 import { today } from "../types";
 import { RecipeModal, CartModal } from "./planner_modals";
 import { DayCell } from "./day_cell";
 import { DayDetail } from "./day_detail";
 import type { RecipeProjection } from "./types";
-import { Measurement } from "../../../primitives/measurement";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
