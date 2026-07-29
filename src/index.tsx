@@ -2,11 +2,12 @@
 import './index.css';
 import { render } from 'solid-js/web';
 import 'solid-devtools';
-import { ConvexProvider, setupConvex } from "convex-solidjs";
+import { ConvexProvider } from "convex-solidjs";
 
 
 import App from './App';
 import { convexClient } from './convex_client';
+import { GoogleAuthGate } from './auth/google';
 
 const root = document.getElementById('root');
 
@@ -23,6 +24,8 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 render(() =>
   <ConvexProvider client={convexClient}>
-    <App />
+    <GoogleAuthGate>
+      <App />
+    </GoogleAuthGate>
   </ConvexProvider>
 , root!);

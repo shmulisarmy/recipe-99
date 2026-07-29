@@ -29,7 +29,9 @@ const pantryItems = defineTable({
     name_: v.string(),
     Measurement: measurementT,
     userId: v.string(),
-}).index("userId", ["userId"]).index("myIngredient", ["userId", "name_"]);
+})
+    .index("by_userId", ["userId"])
+    .index("by_userId_and_name_", ["userId", "name_"]);
 
 export default defineSchema({
     recipes,

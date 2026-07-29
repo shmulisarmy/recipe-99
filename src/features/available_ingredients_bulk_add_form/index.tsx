@@ -126,7 +126,6 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         const entries = Object.entries(formData);
         if (entries.some(([, measurement]) => !Number.isFinite(measurement.amount) || measurement.amount < 0)) return;
         m.mutate({
-            userId: "shmuli",
             ingredientsToAdd: entries.map(([name, measurement]) => ({ name, Measurement: measurement })),
         });
 

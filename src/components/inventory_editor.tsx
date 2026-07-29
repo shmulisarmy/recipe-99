@@ -26,7 +26,6 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems">}) {
     if (isNaN(v) || v < 0) return;
     
     updateIngredient.mutate({
-      userId: "shmuli", // Supply appropriate userId if available
       ingredientName: props.ingredient.name_,
       measurement: { amount: v, unit: targetUnit() },
     });
@@ -36,7 +35,6 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems">}) {
     const converted = convertedPreview();
     if (!converted) return;
     updateIngredient.mutate({
-      userId: "shmuli", // Supply appropriate userId if available
       ingredientName: props.ingredient.name_, 
       measurement: converted,
     });
@@ -107,9 +105,7 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems">}) {
 }
 
 export function InventoryEditor() {
-  const pantry = useQuery(api.data.getAvailableIngredients, {
-    userId: "shmuli",
-  });
+  const pantry = useQuery(api.data.getAvailableIngredients, {});
   return (
     <div class="mx-auto max-w-lg px-4 py-8">
       <h2 class="mb-1 text-lg font-semibold text-stone-900">Pantry</h2>

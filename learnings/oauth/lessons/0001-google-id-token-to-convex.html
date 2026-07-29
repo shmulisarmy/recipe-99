@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>From Google ID token to a Convex-owned pantry</title>
+    <link rel="stylesheet" href="../assets/course.css">
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Recipe-99 OAuth · Lesson 1</p>
+      <h1>From Google login to a Convex-owned pantry</h1>
+      <p class="lede">
+        The browser proves identity with a short-lived token. Convex verifies
+        that proof and decides which pantry rows the request may access.
+      </p>
+
+      <div class="flow" aria-label="Authentication flow">
+        <div class="step">
+          <strong>1. Google</strong>
+          <span>Authenticates the account and signs an ID token.</span>
+        </div>
+        <div class="step">
+          <strong>2. SolidJS</strong>
+          <span>Gives the token to the existing Convex client connection.</span>
+        </div>
+        <div class="step">
+          <strong>3. Convex</strong>
+          <span>Checks issuer, signature, expiry, and client-ID audience.</span>
+        </div>
+        <div class="step">
+          <strong>4. Pantry query</strong>
+          <span>Uses the verified <code>tokenIdentifier</code> as owner.</span>
+        </div>
+      </div>
+
+      <h2>Two identifiers, two jobs</h2>
+      <p>
+        Google’s <code>subject</code> is the account’s OAuth ID for this issuer.
+        Recipe-99 exposes it through <code>getCurrentUserOAuthId</code> so the
+        identity can be inspected. Pantry ownership uses Convex’s
+        <code>tokenIdentifier</code>, which includes provider context and is the
+        safer cross-provider database key.
+      </p>
+
+      <div class="callout">
+        <strong>The authorization rule:</strong>
+        a browser never supplies the pantry owner ID. Every protected Convex
+        function calls <code>ctx.auth.getUserIdentity()</code> and derives the
+        owner on the server.
+      </div>
+
+      <h2>Why reload no longer means login again</h2>
+      <p>
+        The first implementation kept the ID token only in a module variable,
+        which disappears on reload. Recipe-99 now keeps the same short-lived
+        token in <code>sessionStorage</code>, checks its audience and expiry,
+        and reconnects Convex with it after reload. Sign-out removes it.
+      </p>
+      <p>
+        This is deliberately not a permanent session. Google ID tokens normally
+        expire quickly, and the app does not store a Google refresh token or
+        client secret. A longer-lived production session would normally use a
+        server-managed auth system.
+      </p>
+
+      <h2>Troubleshooting map</h2>
+      <ul>
+        <li><strong>Origin error:</strong> confirm Google allows exactly <code>http://localhost:3000</code>.</li>
+        <li><strong>Convex says unauthenticated:</strong> confirm <code>convex/auth.config.ts</code> has Google’s issuer and the same client ID.</li>
+        <li><strong>Reload signs out immediately:</strong> inspect token expiry and whether session storage was cleared.</li>
+        <li><strong>Wrong pantry appears:</strong> inspect <code>tokenIdentifier</code> ownership, never trust a client-provided ID.</li>
+      </ul>
+
+      <div class="exercise">
+        <strong>Retrieval check:</strong>
+        without looking above, explain why the public Google client ID is safe
+        in frontend code, but the client secret is not. Then explain why
+        <code>subject</code> is displayed while <code>tokenIdentifier</code>
+        owns pantry rows.
+      </div>
+
+      <h2>Primary sources</h2>
+      <ul>
+        <li><a href="https://developers.google.com/identity/gsi/web/guides/display-button">Google: Display the Sign in with Google button</a></li>
+        <li><a href="https://docs.convex.dev/auth/advanced/custom-auth">Convex: Custom OIDC provider</a></li>
+        <li><a href="https://docs.convex.dev/auth/functions-auth">Convex: Auth in functions</a></li>
+      </ul>
+
+      <p>Ask your Codex teacher about any step that is still unclear.</p>
+    </main>
+  </body>
+</html>

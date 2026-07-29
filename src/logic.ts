@@ -1,15 +1,5 @@
-import { Doc } from '../convex/_generated/dataModel';
 import { IngredientSet, Recipe, RequiredIngredient } from './data';
 import { Measurement, Measurement_GTE, Measurement_Minus, Measurement_Plus, Measurement_Times, ZeroedMeasurement } from './primitives/measurement';
-
-
-
-
-
-
-
-
-
 
 
 export function recipeMakingProjection(recipe: Recipe, pantrySet: IngredientSet, multiplier: number= 1) {
@@ -40,3 +30,5 @@ export function recipeMakingProjection(recipe: Recipe, pantrySet: IngredientSet,
     substitutedIngredientUses
   }
 }
+
+

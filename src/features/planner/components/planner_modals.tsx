@@ -89,7 +89,7 @@ export function RecipeModal(props: {
     const scratchpadEntries = () => Object.entries(props.item.scratchPadOfIngredientsNeededToUse);
 
 
-    const pantry = useQuery(api.data.getAvailableIngredients, {userId: "shmuli"});
+    const pantry = useQuery(api.data.getAvailableIngredients, {});
 
     // function GetIngredientMeasurement(name: string): Measurement{
     //     const pantryItems = pantry.data();

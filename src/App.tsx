@@ -22,7 +22,7 @@ const ingredientsToAdd: BulkAddIngredients = {
 
 
 const App: Component = () => {
-  const pantry = useQuery(api.data.getAvailableIngredients, {userId: "shmuli"});
+  const pantry = useQuery(api.data.getAvailableIngredients, {});
   const menu = useQuery(api.data.getAllRecipes, {});
   
   createEffect(() => {
@@ -41,5 +41,9 @@ const App: Component = () => {
     </>
   );
 };
+
+
+
+
 
 export default App;

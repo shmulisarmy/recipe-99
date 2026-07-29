@@ -1,40 +1,75 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { recipeValidator } from "./schema";
 import { measurementT } from "./types";
 import { Measurement_Plus } from "../src/primitives/measurement";
 
+async function authenticatedUserId(ctx: QueryCtx | MutationCtx): Promise<string> {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    return identity.tokenIdentifier;
+}
 
-
-
-function make_object<K extends string | number | symbol, V>(keyValuePairs: [K, V][]): Record<K, V>{
+function make_object<K extends string | number | symbol, V>(keyValuePairs: [K, V][]): Record<K, V> {
     const res = {} as Record<K, V>;
-    for (const [key, value] of keyValuePairs){
+    for (const [key, value] of keyValuePairs) {
         res[key] = value;
     }
     return res;
 }
 
-export const getAvailableIngredients = query({  
-    args: {userId: v.string()},
+export const getCurrentUserOAuthId = query({
+    args: {},
+    returns: v.object({
+        oauthId: v.string(),
+        tokenIdentifier: v.string(),
+        email: v.union(v.string(), v.null()),
+    }),
     handler: async (ctx) => {
-        return await ctx.db.query("pantryItems").withIndex("userId").collect();
-    },  
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Not authenticated");
+
+        return {
+            oauthId: identity.subject,
+            tokenIdentifier: identity.tokenIdentifier,
+            email: identity.email ?? null,
+        };
+    },
 });
 
-
-export const getAvailableIngredients2 = query({  
-    args: {userId: v.string()},
+export const getAvailableIngredients = query({
+    args: {},
     handler: async (ctx) => {
-        const ingredients = await ctx.db.query("pantryItems").withIndex("userId").collect();
+        const userId = await authenticatedUserId(ctx);
+        return await ctx.db
+            .query("pantryItems")
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
+            .collect();
+    },
+});
+
+export const getAvailableIngredients2 = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await authenticatedUserId(ctx);
+        const ingredients = await ctx.db
+            .query("pantryItems")
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
+            .collect();
         return make_object(ingredients.map((i) => [i.name_, i.Measurement]));
-    },  
+    },
 });
 
-export const updateAvailableIngredient = mutation({  
-    args: {userId: v.string(), ingredientName: v.string(), measurement: measurementT},
+export const updateAvailableIngredient = mutation({
+    args: {ingredientName: v.string(), measurement: measurementT},
     handler: async (ctx, args) => {
-        const ingredient = await ctx.db.query("pantryItems").withIndex("myIngredient", (q) => q.eq("userId", args.userId).eq("name_", args.ingredientName)).unique();
+        const userId = await authenticatedUserId(ctx);
+        const ingredient = await ctx.db
+            .query("pantryItems")
+            .withIndex("by_userId_and_name_", (q) =>
+                q.eq("userId", userId).eq("name_", args.ingredientName)
+            )
+            .unique();
         if (!ingredient) throw new Error(`Ingredient ${args.ingredientName} not found`);
         await ctx.db.patch(ingredient._id, { Measurement: args.measurement });
         return ingredient;
@@ -89,20 +124,20 @@ export const createRecipe = mutation({
 
 
 
-export const AvailableIngredientsBulkAdd = mutation({  
+export const AvailableIngredientsBulkAdd = mutation({
     args: {
-        userId: v.string(),
         ingredientsToAdd: v.array(v.object({
             name: v.string(),
             Measurement: measurementT,
         })),
     },
     handler: async (ctx, args) => {
+        const userId = await authenticatedUserId(ctx);
         for (const { name, Measurement } of args.ingredientsToAdd) {
             const ingredient = await ctx.db
                 .query("pantryItems")
-                .withIndex("myIngredient", (q) =>
-                    q.eq("userId", args.userId).eq("name_", name)
+                .withIndex("by_userId_and_name_", (q) =>
+                    q.eq("userId", userId).eq("name_", name)
                 )
                 .unique();
 
@@ -112,7 +147,7 @@ export const AvailableIngredientsBulkAdd = mutation({
                 });
             } else {
                 await ctx.db.insert("pantryItems", {
-                    userId: args.userId,
+                    userId,
                     name_: name,
                     Measurement,
                 });
