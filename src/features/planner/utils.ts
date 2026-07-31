@@ -1,7 +1,7 @@
-import { planner } from "./data";
 import { DayKind, PlannedRecipe, today } from "./types";
+import { PlannerType } from "./data";
 
-export function GetPlannedRecipe(recipeId: string): {recipe: PlannedRecipe, day: string} {
+export function GetPlannedRecipe(planner: PlannerType, recipeId: string): {recipe: PlannedRecipe, day: string} {
     for (const [date, plannedDay] of Object.entries(planner)) {
         const recipeInDay = plannedDay.recipes.find((r) => r.id === recipeId);
         if (!recipeInDay) continue;

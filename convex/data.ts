@@ -1,14 +1,9 @@
 import { v } from "convex/values";
-import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { recipeValidator } from "./schema";
 import { measurementT } from "./types";
 import { Measurement_Plus } from "../src/primitives/measurement";
-
-async function authenticatedUserId(ctx: QueryCtx | MutationCtx): Promise<string> {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-    return identity.tokenIdentifier;
-}
+import { authenticatedUserId } from "./utils/auth";
 
 function make_object<K extends string | number | symbol, V>(keyValuePairs: [K, V][]): Record<K, V> {
     const res = {} as Record<K, V>;
@@ -157,3 +152,5 @@ export const AvailableIngredientsBulkAdd = mutation({
         return null;
     },
 });
+
+export { usersPlanner } from "./tables/planner/queries";

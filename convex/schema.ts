@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { measurementT } from "./types";
+import { plannerTable } from "./tables/planner/table";
 
 
 
@@ -40,4 +41,5 @@ export default defineSchema({
         recipeTitle: v.string(),
         mostRecentVersion: v.number(),
     }).index("recipeTitle", ["recipeTitle"]),
+    plannerTable,
 });

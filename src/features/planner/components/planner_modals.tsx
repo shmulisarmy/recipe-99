@@ -1,7 +1,6 @@
 import { For, JSX, Show, onCleanup } from "solid-js";
-import { RequiredIngredient } from "../../../data";
+import { makeCacheKey, RequiredIngredient } from "../../../data";
 import type { RecipeProjection } from "./types";
-import { planner } from "../data";
 import {
     Measurement,
     Measurement_Convert,
@@ -14,6 +13,7 @@ import {
 import { api } from "../../../../convex/_generated/api";
 import { useQuery } from "convex-solidjs";
 import { use } from "solid-js/web";
+import { PlannerType } from "../data";
 
 // ---------- Formatting helpers ----------
 
@@ -75,9 +75,9 @@ export function RecipeModal(props: {
     item: RecipeProjection;
     onClose: () => void;
 }): JSX.Element {
-    const recipeName = () => props.item.plannedRecipeReference.recipe;
+    const recipeName = () => props.item.plannedRecipeReference.recipeId;
     // const recipeInMenu = () => menu.get(recipeName());
-    const recipeInMenu2 = useQuery(api.data.getRecipeByTitle, { recipeTitle: recipeName() });
+    const recipeInMenu2 = useQuery(api.data.getRecipeByTitle, { recipeTitle: makeCacheKey(recipeName()) });
     const recipeInMenu = () => recipeInMenu2.data();
 
     const inScratchpad = (ingredient: RequiredIngredient) => {
@@ -100,7 +100,7 @@ export function RecipeModal(props: {
     // }
 
     return (
-        <Modal title={recipeName()} onClose={props.onClose}>
+        <Modal title={makeCacheKey(recipeName())} onClose={props.onClose}>
             <div class="mt-1 flex items-center gap-2">
                 <Show
                     when={props.item.couldMake}
@@ -198,9 +198,10 @@ export function RecipeModal(props: {
 export function CartModal(props: {
     dateStr: string; // toDateString() key
     onClose: () => void;
+    plannerData: PlannerType
 }): JSX.Element {
     const plannedDay = () => {
-        const day = planner[props.dateStr];
+        const day = props.plannerData[props.dateStr];
         if (!day) throw new Error(`Could not find planned day for ${props.dateStr}`);
         return day;
     };

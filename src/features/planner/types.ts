@@ -1,11 +1,12 @@
 import { IngredientSet, RecipeId, RecipeName } from "../../data";
+import { Id } from "../../../convex/_generated/dataModel";
 
 
 
 
 
 export type PlannedRecipe = {
-    recipe: RecipeId;
+    recipeId: RecipeId;
     overrideDayMultiplier?: number;
     id: string;
 };
@@ -15,7 +16,10 @@ export type ShoppingCart = {
     alreadyGot: IngredientSet;
 };
 export type PlannedDay = {
-    date: Date;
+    userId: string;
+    _id: Id<"plannerTable">;
+    _creationTime: number;
+    date: string;
     recipes: PlannedRecipe[];
     multiplier: number;
     shoppingCart: ShoppingCart;

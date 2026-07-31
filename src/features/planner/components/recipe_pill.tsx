@@ -1,10 +1,8 @@
 import { createSignal } from "solid-js";
 import { MoveRecipeOnTopOfOtherRecipe } from "../actions/recipe";
-import { reSimulatePlannerProjection } from "../logic";
 import type { RecipeProjection } from "./types";
-
-/** Calendar cells only — the modal always shows the full name. */
-export const MAX_PILL_CHARS = 14;
+import { makeCacheKey } from "../../../data";
+import { MAX_PILL_CHARS } from "./_settings";
 
 function truncateName(name: string): string {
   return name.length > MAX_PILL_CHARS
@@ -21,9 +19,9 @@ export function RecipePill(props: {
   const [isDragOver, setIsDragOver] = createSignal(false);
 
   const id = () => props.item.plannedRecipeReference.id;
-  const recipeName = () => props.item.plannedRecipeReference.recipe;
+  const recipeName = () => props.item.plannedRecipeReference.recipeId;
   const name = () =>
-    props.truncate === false ? recipeName() : truncateName(recipeName());
+    props.truncate === false ? recipeName() : truncateName(makeCacheKey(recipeName()));
 
   return (
     <button

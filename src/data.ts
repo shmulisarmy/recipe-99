@@ -26,27 +26,34 @@ type Ingredient = {
   
 
 
-export type RecipeId = `${string}@${number}`
-export type RecipeCache = Map<RecipeId, Recipe>;
-const recipeCache: RecipeCache = new Map<RecipeId, Recipe>();
+export type RecipeId = {title: string, version: number}
+export type RecipeCache = Map<`${string}@${number}`, Recipe>;
+const recipeCache: RecipeCache = new Map();
+export function makeCacheKey(recipeId: RecipeId): `${string}@${number}` {
+  return `${recipeId.title}@${recipeId.version}`;
+}
+
+export function fromCacheKey(cacheKey: `${string}@${number}`): RecipeId {
+  const [title, version] = cacheKey.split('@');
+  return { title, version: parseInt(version) };
+}
 
 
   export async function getOrSetRecipeByTitle(recipeId: RecipeId): Promise<Recipe> {
-    const recipeTitle = recipeId.split('@')[0];
-    const version = JSON.parse(recipeId.split('@')[1]);
-    if (!recipeCache.has(recipeId)) {
-      const recipeInMenu = await convexClient.query(api.data.getRecipeByTitle, { recipeTitle, version });
-      if (!recipeInMenu) throw new Error(`Recipe "${recipeId}" not found in menu.`);
-      recipeCache.set(recipeId, recipeInMenu);
+    const cacheKey = makeCacheKey(recipeId);
+    if (!recipeCache.has(cacheKey)) {
+      const recipeInMenu = await convexClient.query(api.data.getRecipeByTitle, { recipeTitle: recipeId.title, version: recipeId.version });
+      if (!recipeInMenu) throw new Error(`Recipe "${cacheKey}" not found in menu.`);
+      recipeCache.set(cacheKey, recipeInMenu);
     }
-    return recipeCache.get(recipeId)!;
+    return recipeCache.get(cacheKey)!;
   }
 
 
   export async function loadRecipeCache() {
     const recipes = await convexClient.query(api.data.getAllRecipes, {});
     for (const recipe of recipes) {
-      recipeCache.set(`${recipe.title}@${recipe.version}`, recipe);
+      recipeCache.set(makeCacheKey({title: recipe.title, version: recipe.version}), recipe);
     }
   }
 

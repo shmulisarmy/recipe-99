@@ -16,16 +16,17 @@ import {
 } from "../planner/outside_feature_exports";
 import { AvailableIngredientsBulkAddFormProps, BulkAddIngredients, ShoppingCartAlreadyGotDraft } from "./types";
 import { FormTemplateWithDataStructure } from "./next_step";
-import { useMutation } from "convex-solidjs";
+import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../../convex/_generated/api";
+import { PlannerType } from "../planner/data";
 
 const UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
 
 
-function UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft: ShoppingCartAlreadyGotDraft) { 
+function UpdateShoppingCartAlreadyGot(plannerData: PlannerType, ShoppingCartAlreadyGotUpdateDraft: ShoppingCartAlreadyGotDraft) { 
     //for each ingredient in ShoppingCartAlreadyGotUpdateDraft it adds the amount to the shopping cart already got
     for (const [name, amount] of Object.entries(ShoppingCartAlreadyGotUpdateDraft)) {
-        todaysShoppingCart().alreadyGot[name] = Measurement_Plus(todaysShoppingCart().alreadyGot[name]||ZeroedMeasurement(), amount);
+        todaysShoppingCart(plannerData).alreadyGot[name] = Measurement_Plus(todaysShoppingCart(plannerData).alreadyGot[name]||ZeroedMeasurement(), amount);
     }
 }
 
@@ -43,8 +44,10 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
     const m = useMutation(api.data.AvailableIngredientsBulkAdd);
     let newIngredientNameInput!: HTMLInputElement;
 
-    function amountForShoppingCart(name: string): Measurement | undefined {
-        const cart = todaysShoppingCart();
+    const planner = useQuery(api.data.usersPlanner, {});
+
+    function amountForShoppingCart(plannerData: PlannerType, name: string): Measurement | undefined {
+        const cart = todaysShoppingCart(plannerData);
         const toGet = cart.toGet[name];
         if (!toGet) return;
 
@@ -60,7 +63,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
             return;
         }
 
-        const amount = amountForShoppingCart(name);
+        const amount = amountForShoppingCart(planner.data()!, name);
         if (amount) ShoppingCartAlreadyGotUpdateDraft[name] = { ...amount };
     }
 
@@ -68,9 +71,9 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         if (ShoppingCartAlreadyGotUpdateDraft[ingredientName]) setShoppingCartSelection(ingredientName, true);
     }
 
-    for (const name of Object.keys(formData)) {
-        setShoppingCartSelection(name, true);
-    }
+    // for (const name of Object.keys(formData)) {
+    //     setShoppingCartSelection(name, true);
+    // }
 
     function removeIngredient(name: string) {
         delete formData[name];
@@ -130,17 +133,19 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         });
 
         //
-        UpdateShoppingCartAlreadyGot(ShoppingCartAlreadyGotUpdateDraft);
+        UpdateShoppingCartAlreadyGot(planner.data()!, ShoppingCartAlreadyGotUpdateDraft);
         //
 
         setStep("form-template-with-data-structure");
     }
 
     return (
-        <Show
-            when={step() === "bulk-add"}
-            fallback={<FormTemplateWithDataStructure shoppingCartAlreadyGot={ShoppingCartAlreadyGotUpdateDraft} />}
-        >
+        <Show when={planner.data()} >
+            {(plannerData) => (
+            <Show
+                when={step() === "bulk-add"}
+                fallback={<FormTemplateWithDataStructure shoppingCartAlreadyGot={ShoppingCartAlreadyGotUpdateDraft} />}
+            >
             <section class="mx-auto max-w-2xl px-4 py-8 sm:py-10">
                 <div class="mb-5 flex items-center gap-3" aria-label="Step 1 of 2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white">1</span>
@@ -210,7 +215,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
                                                 </select>
                                             </div>
 
-                                            <Show when={amountForShoppingCart(name)}>
+                                            <Show when={amountForShoppingCart(plannerData(), name)}>
                                                 {(amount) => (
                                                     <label class="mt-3 flex min-h-11 cursor-pointer items-center gap-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
                                                         <input
@@ -332,5 +337,8 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
                 </div>
             </section>
         </Show>
+            )}
+        </Show>
+
     );
 }

@@ -24,13 +24,16 @@ const ingredientsToAdd: BulkAddIngredients = {
 const App: Component = () => {
   const pantry = useQuery(api.data.getAvailableIngredients, {});
   const menu = useQuery(api.data.getAllRecipes, {});
+  const planner = useQuery(api.data.usersPlanner, {});
   
   createEffect(() => {
     const pd = pantry.data()
     const md = menu.data()
+    const plannerData = planner.data()
     if (!pd) {console.log("returning early"); return};
     if (!md) {console.log("returning early"); return};
-      Object.assign(projection, createPlannerProjection(pd, md));
+    if (!plannerData) {console.log("returning early"); return};
+      Object.assign(projection, createPlannerProjection(plannerData, pd, md));
   });
   return (
     <>

@@ -1,17 +1,19 @@
 import { createMutable } from "solid-js/store";
-import { IngredientSet, Recipe, RecipeCache, RecipeId, RequiredIngredient } from "../../data";
+import { IngredientSet, makeCacheKey, Recipe, RecipeCache, RecipeId, RequiredIngredient } from "../../data";
 import { recipeMakingProjection } from "../../logic";
-import { planner } from "./data";
+
 import { Date_, PlannedRecipe, ShoppingCart } from "./types";
 import { Measurement, Measurement_Minus, Measurement_Plus, ZeroedMeasurement } from "../../primitives/measurement";
 import { PlannerProjection } from "./components/types";
 import { deepCopy } from "../../utils/object";
 import { Doc } from "../../../convex/_generated/dataModel";
+import { PlannerType } from "./data";
+import { sortDateStrings } from "../../utils/date";
 
 
 
 
-export function createPlannerProjection(AvailableIngredients: Doc<"pantryItems">[], initialMenu: Doc<"recipes">[]) {
+export function createPlannerProjection(planner: PlannerType, AvailableIngredients: Doc<"pantryItems">[], initialMenu: Doc<"recipes">[]) {
     type RecipeProjection = {
         plannedRecipeReference: PlannedRecipe;
         multiplier: number;
@@ -20,7 +22,7 @@ export function createPlannerProjection(AvailableIngredients: Doc<"pantryItems">
         unfulfilledIngredients: {RequiredIngredient: RequiredIngredient, have: Measurement}[];
     };
     const workingIngredientsForProjection: IngredientSet = {}; 
-    const menu: RecipeCache = new Map<RecipeId, Recipe>();
+    const menu: RecipeCache = new Map();
     {
         //easier data to work with for projection
         for (const ingredient of AvailableIngredients) {
@@ -39,18 +41,20 @@ export function createPlannerProjection(AvailableIngredients: Doc<"pantryItems">
                 Measurement_Plus(workingIngredientsForProjection[ingredientName] ?? ZeroedMeasurement(), notGottenYet);
         }
     }
+    
 
-    for (const [date, plannedDay] of Object.entries(planner)) {
+    for (const date of sortDateStrings(Object.keys(planner))) {
+        const plannedDay = planner[date];
         fillCart(plannedDay.shoppingCart);
         
         const daysProjection: RecipeProjection[] = [];
         console.log({date})
         for (const recipe of plannedDay.recipes) {
             console.log({recipe})
-            const { recipe: recipeId, overrideDayMultiplier } = recipe;
+            const { recipeId: recipeId, overrideDayMultiplier } = recipe;
             const multiplier =  overrideDayMultiplier ?? plannedDay.multiplier
             
-            const recipeInMenu = menu.get(recipeId);
+            const recipeInMenu = menu.get(makeCacheKey(recipeId));
             // const recipeInMenu = menu.get(recipeId);
             console.log({recipeInMenu})
             if (!recipeInMenu) throw new Error(`Recipe "${recipeId}" not found in menu.`);

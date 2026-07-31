@@ -1,11 +1,13 @@
 import { createSignal, For, Show } from "solid-js";
 import { projection } from "../logic";
-import { planner } from "../data";
+import { PlannerType, UsersPlannerQueryResult } from "../data";
 import { today } from "../types";
 import { RecipeModal, CartModal } from "./planner_modals";
 import { DayCell } from "./day_cell";
 import { DayDetail } from "./day_detail";
 import type { RecipeProjection } from "./types";
+import { api } from "../../../../convex/_generated/api";
+import { useQuery } from "convex-solidjs";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -35,17 +37,18 @@ function monthGridDays(): Date[] {
 }
 
 /** Cart entry count per planner day, keyed by the planner map's key `toDateString()`. */
-function cartCounts(): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const [date, plannedDay] of Object.entries(planner)) {
-    counts.set(date, Object.keys(plannedDay.shoppingCart.toGet).length);
-  }
-  return counts;
-}
+// function cartCounts(): Map<string, number> {
+//   const counts = new Map<string, number>();
+//   for (const [date, plannedDay] of Object.entries(planner)) {
+//     counts.set(date, Object.keys(plannedDay.shoppingCart.toGet).length);
+//   }
+//   return counts;
+// }
 
 export function Planner() {
   // Static data — compute the projection once.
   // const carts = cartCounts();
+  const planner = useQuery(api.data.usersPlanner, {})
   const days = monthGridDays();
   const todayStr = today.toDateString();
 
@@ -66,7 +69,9 @@ export function Planner() {
   });
 
   return (
-    <div class="min-h-screen bg-stone-50">
+    <Show when={planner.data()}>
+      {(plannerData) => (
+      <div class="min-h-screen bg-stone-50">
       <div class="mx-auto max-w-6xl px-4 py-8">
         {/* Calendar header */}
         <header class="mb-4">
@@ -103,7 +108,7 @@ export function Planner() {
                     isToday={dateStr === todayStr}
                     selected={selectedDay() === dateStr}
                     recipes={projection[dateStr] ?? []}
-                    cartCount={planner[dateStr]? Object.keys(planner[dateStr].shoppingCart.toGet).length: undefined} 
+                    cartCount={plannerData()[dateStr]? Object.keys(plannerData()[dateStr].shoppingCart.toGet).length: undefined} 
                     onSelectDay={() => setSelectedDay(dateStr)}
                     onOpenRecipe={(item) => setOpenRecipe(item)}
                     onOpenCart={() => setOpenCartDay(dateStr)}
@@ -118,7 +123,7 @@ export function Planner() {
         <DayDetail
           dateStr={selectedDay()}
           recipes={projection[selectedDay()] ?? []}
-          cartCount={planner[selectedDay()] ? Object.keys(planner[selectedDay()].shoppingCart.toGet).length : undefined}
+          cartCount={plannerData()[selectedDay()] ? Object.keys(plannerData()[selectedDay()].shoppingCart.toGet).length : undefined}
           onOpenRecipe={(item) => setOpenRecipe(item)}
           onOpenCart={() => setOpenCartDay(selectedDay())}
         />
@@ -130,9 +135,11 @@ export function Planner() {
       </Show>
       <Show when={openCartDay()}>
         {(dateStr) => (
-          <CartModal dateStr={dateStr()} onClose={() => setOpenCartDay(null)} />
+          <CartModal dateStr={dateStr()} onClose={() => setOpenCartDay(null)} plannerData={plannerData()} />
         )}
       </Show>
     </div>
+      )}
+    </Show>
   );
 }
