@@ -9,6 +9,10 @@
  */
 
 import type * as data from "../data.js";
+import type * as planner_exports from "../planner_exports.js";
+import type * as tables_planner_actions_cart from "../tables/planner/actions/cart.js";
+import type * as tables_planner_actions_day from "../tables/planner/actions/day.js";
+import type * as tables_planner_actions_recipe from "../tables/planner/actions/recipe.js";
 import type * as tables_planner_queries from "../tables/planner/queries.js";
 import type * as tables_planner_table from "../tables/planner/table.js";
 import type * as tables_planner_types from "../tables/planner/types.js";
@@ -23,6 +27,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   data: typeof data;
+  planner_exports: typeof planner_exports;
+  "tables/planner/actions/cart": typeof tables_planner_actions_cart;
+  "tables/planner/actions/day": typeof tables_planner_actions_day;
+  "tables/planner/actions/recipe": typeof tables_planner_actions_recipe;
   "tables/planner/queries": typeof tables_planner_queries;
   "tables/planner/table": typeof tables_planner_table;
   "tables/planner/types": typeof tables_planner_types;

@@ -1,8 +1,9 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { ShoppingCartAlreadyGotDraft } from "./types";
 import { StillNeedToGetToday, today, todaysShoppingCart } from "../planner/outside_feature_exports";
-import { Measurement_GT, Measurement_ToString, ZeroedMeasurement } from "../../primitives/measurement";
-import { PushOverIngredientShoppingItemForTheNextDay } from "../planner/actions/cart";
+import { Measurement, Measurement_GT, Measurement_ToString, ZeroedMeasurement } from "../../primitives/measurement";
+import { api } from "../../../convex/_generated/api";
+import { useMutation } from "convex-solidjs";
 
 
 
@@ -12,11 +13,30 @@ const actions: Record<IngredientName, "keep in todays cart" | "move to tomorrows
 
 
 function handleActions(){
-    for (const [name, action] of Object.entries(actions)){
-        if (action === "keep in todays cart") continue;
-        if (action === "move to tomorrows cart") PushOverIngredientShoppingItemForTheNextDay(name);
-        if (action === "remove from todays cart") todaysShoppingCart().toGet[name] = JSON.parse(JSON.stringify(todaysShoppingCart().alreadyGot[name]));
+    const toPushOver: string[] = [];
+    const toKeepInTodaysCart: string[] = [];
+    const toRemoveFromTodaysCart: string[] = [];
+
+    for (const [name, action] of Object.entries(actions)) {
+        switch (action) {
+            case "keep in todays cart":
+                toKeepInTodaysCart.push(name);
+                break;
+            case "move to tomorrows cart":
+                toPushOver.push(name);
+                break;
+            case "remove from todays cart":
+                toRemoveFromTodaysCart.push(name);
+                break;
+        }
     }
+
+    const m = useMutation(api.planner_exports.PushOverIngredientShoppingItemsForTheNextDay);
+    m.mutate({
+        ingredientNames: toPushOver,
+        dayAsString: today.toDateString(),
+    });
+
 }
 
 

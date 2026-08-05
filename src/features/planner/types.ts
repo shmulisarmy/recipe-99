@@ -31,7 +31,7 @@ export type DayKind = 'today' | 'past' | 'future';
 
 
 
-export const today = new Date();
+export const today = new Date("Fri Jul 31 2026");
 
 
 

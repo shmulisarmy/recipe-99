@@ -4,6 +4,7 @@ import { reSimulatePlannerProjection } from "../logic";
 import { CartButton } from "./cart_button";
 import { RecipePill } from "./recipe_pill";
 import type { RecipeProjection } from "./types";
+import { api } from "../../../../convex/_generated/api";
 
 export function DayCell(props: {
   date: Date;
