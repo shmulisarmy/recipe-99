@@ -1,4 +1,4 @@
-import { createSignal, onMount, type JSX } from "solid-js";
+import { Show, createContext, createEffect, createSignal, onMount, useContext, type Accessor, type JSX } from "solid-js";
 import { useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import { convexClient } from "../convex_client";
@@ -122,22 +122,51 @@ function loadGoogleIdentityServices(): Promise<GoogleIdentityServices> {
     });
 }
 
+type Identity = {
+    oauthId: string;
+    tokenIdentifier: string;
+    email: string | null;
+};
+
+type AuthContextValue = {
+    identity: Accessor<Identity | undefined>;
+    signOut: () => void;
+};
+
+const AuthContext = createContext<AuthContextValue>();
+
+export function useAuth(): AuthContextValue {
+    const value = useContext(AuthContext);
+    if (!value) throw new Error("useAuth must be used inside GoogleAuthGate");
+    return value;
+}
+
 function AuthenticatedApp(props: { children: JSX.Element; onSignOut(): void }) {
     const identity = useQuery(api.data.getCurrentUserOAuthId, {});
-    void identity;
-    void props;
-
-    return (<></>);
+    return (
+        <AuthContext.Provider value={{ identity: identity.data, signOut: props.onSignOut }}>
+            <Show
+                when={!identity.error()}
+                fallback={<main class="auth-page"><section class="sign-in-panel"><h1>Sign-in could not be confirmed.</h1><p>Return to sign-in and try again.</p><button class="button button-primary" type="button" onClick={props.onSignOut}>Return to sign-in</button></section></main>}
+            >
+                {props.children}
+            </Show>
+        </AuthContext.Provider>
+    );
 }
 
 export function GoogleAuthGate(props: { children: JSX.Element }) {
     const [isAuthenticated, setIsAuthenticated] = createSignal(false);
     const [authError, setAuthError] = createSignal<string>();
+    const [googleState, setGoogleState] = createSignal<"loading" | "ready" | "failed">("loading");
+    const [isSigningIn, setIsSigningIn] = createSignal(false);
     let googleButton!: HTMLDivElement;
+    let errorNotice: HTMLDivElement | undefined;
 
-    onMount(async () => {
+    const setupGoogle = async () => {
         if (!GOOGLE_CLIENT_ID) {
-            setAuthError("VITE_GOOGLE_CLIENT_ID is not configured.");
+            setAuthError("Google sign-in is not configured for this app.");
+            setGoogleState("failed");
             return;
         }
 
@@ -149,25 +178,53 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
                 callback: ({ credential }) => {
                     rememberGoogleIdToken(credential);
                     setAuthError(undefined);
+                    setIsSigningIn(true);
                     convexClient.setAuth(
                         fetchGoogleIdToken,
-                        setIsAuthenticated,
+                        (authenticated) => {
+                            setIsAuthenticated(authenticated);
+                            setIsSigningIn(false);
+                            if (!authenticated) setAuthError("Sign-in could not be completed. Try again.");
+                        },
                     );
                 },
             });
+            googleButton.replaceChildren();
             google.accounts.id.renderButton(googleButton, {
                 theme: "outline",
                 size: "large",
                 shape: "rectangular",
                 text: "signin_with",
             });
+            setGoogleState("ready");
 
             if (restoreGoogleIdToken()) {
-                convexClient.setAuth(fetchGoogleIdToken, setIsAuthenticated);
+                setIsSigningIn(true);
+                convexClient.setAuth(fetchGoogleIdToken, (authenticated) => {
+                    setIsAuthenticated(authenticated);
+                    setIsSigningIn(false);
+                });
             }
         } catch (error) {
-            setAuthError(error instanceof Error ? error.message : "Google sign-in failed to load.");
+            void error;
+            setAuthError("Google sign-in could not load. Check your connection and try again.");
+            setGoogleState("failed");
         }
+    };
+
+    onMount(() => {
+        if (window.location.pathname !== "/sign-in") window.history.replaceState(null, "", "/sign-in");
+        void setupGoogle();
+    });
+
+    createEffect(() => {
+        if (isAuthenticated() && (window.location.pathname === "/" || window.location.pathname === "/sign-in")) {
+            window.history.replaceState(null, "", "/planner");
+        }
+    });
+
+    createEffect(() => {
+        if (authError()) queueMicrotask(() => errorNotice?.focus());
     });
 
     function signOut() {
@@ -175,12 +232,29 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
         convexClient.setAuth(async () => null, setIsAuthenticated);
         setIsAuthenticated(false);
         window.google?.accounts.id.disableAutoSelect();
+        window.history.replaceState(null, "", "/sign-in");
     }
 
-    void isAuthenticated;
-    void authError;
-    void signOut;
-    void props;
-
-    return (<></>);
+    return (
+        <Show when={isAuthenticated()} fallback={
+            <main class="auth-page" id="main">
+                <section class="auth-thesis" aria-labelledby="sign-in-title">
+                    <a class="wordmark auth-wordmark" href="/sign-in"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>
+                    <h1 id="sign-in-title">Plan meals from what’s already in your kitchen.</h1>
+                    <p>Recipe 99 connects your pantry, recipes, calendar, and shopping needs.</p>
+                    <div class="auth-chain" aria-hidden="true"><span>Pantry</span><span>Recipes</span><span>Plan</span><span>Shopping</span></div>
+                </section>
+                <section class="sign-in-panel" aria-labelledby="sign-in-panel-title">
+                    <h2 id="sign-in-panel-title">Sign in to your kitchen plan</h2>
+                    <p>Your pantry, recipes, and shopping amounts stay with your account.</p>
+                    <div class="google-button-slot" classList={{ "is-loading": googleState() === "loading" }} ref={googleButton}/>
+                    <Show when={googleState() === "loading"}><p class="auth-status">Loading Google sign-in…</p></Show>
+                    <Show when={isSigningIn()}><p class="auth-status" aria-live="polite">Signing in…</p></Show>
+                    <Show when={authError()}>{(message) => <div ref={errorNotice} class="inline-notice notice-error" role="alert" tabindex="-1"><p>{message()}</p><Show when={googleState() === "failed" && !!GOOGLE_CLIENT_ID}><button class="button button-secondary" type="button" onClick={() => { setGoogleState("loading"); setAuthError(undefined); void setupGoogle(); }}>Try again</button></Show></div>}</Show>
+                </section>
+            </main>
+        }>
+            <AuthenticatedApp onSignOut={signOut}>{props.children}</AuthenticatedApp>
+        </Show>
+    );
 }

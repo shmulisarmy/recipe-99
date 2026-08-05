@@ -20,6 +20,8 @@ Use a flat responsive list/grid, not elevated dashboard cards. Each recipe is se
 4. compact ingredient summary;
 5. `View recipe`.
 
+Each recipe begins with a consistently cropped image in a fixed aspect ratio. Resolve images from the curated title map; recipes without a title match and failed images use a stable chalk-and-enamel recipe placeholder rather than repeating one generic food photograph. Keep readiness beside the title instead of over the crop. Lazy-loaded images reserve their final geometry and never expose broken media.
+
 Ready does not fill the whole item green. Missing lists at most two missing ingredient names and then `+n more`. While pantry data loads, show `Checking pantry…` without implying failure.
 
 ## Recipe-library detail

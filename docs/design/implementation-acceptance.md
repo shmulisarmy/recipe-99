@@ -43,6 +43,7 @@ app shell and routes
 - Keyboard lift/drop and explicit Move meal surfaces can perform every pointer move.
 - Failed moves restore confirmed order and expose retry.
 - Recipe search, ingredient matching, ready-only filter, URL state, result counts, loading, and empty states work.
+- Recipe imagery uses consistent responsive crops, a curated title map, a graceful fallback chain, and readable status placement without hiding text functionality.
 - Recipe library and planned recipe details use right drawers on desktop and full-height mobile drawers.
 - Pantry amount replacement remains inline and distinct from quantity-preserving conversion.
 - Pantry is flat; Intake and Reconciliation are separate full-page sequential workspaces.

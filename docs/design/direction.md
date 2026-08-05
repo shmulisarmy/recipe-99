@@ -23,7 +23,7 @@ The design makes this chain visible:
 
 ## Visual character
 
-The palette takes its cues from cool enamel cookware and clean household prep surfaces. The experience is calm, sturdy, and practical rather than industrial. Ordinary surfaces are flat, pale, and separated by spacing or light rules. There is no grid-paper background, glass blur, pervasive elevation, decorative gradient, food photography, or dashboard-card collage.
+The palette takes its cues from cool enamel cookware and clean household prep surfaces. The experience is calm, sturdy, and practical rather than industrial. Ordinary surfaces are flat, pale, and separated by spacing or light rules. There is no grid-paper background, glass blur, pervasive elevation, decorative gradient, or dashboard-card collage. Curated food photography is limited to the recipe library and recipe-library drawer, where it helps recipes read as distinct choices instead of acting as page decoration.
 
 Typography supplies most of the personality. Atkinson Hyperlegible Next carries the interface. Chivo appears only in the wordmark and major headings. IBM Plex Mono appears only where alignment materially helps dates, order, quantities, and counts.
 

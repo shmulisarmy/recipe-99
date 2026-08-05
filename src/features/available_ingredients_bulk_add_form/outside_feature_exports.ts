@@ -13,4 +13,5 @@ export {
 
 export {
     type BulkAddIngredients,
+    type IntakeHandoff,
 } from "./types";

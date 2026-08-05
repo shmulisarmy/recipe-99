@@ -4,9 +4,9 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 
 # Ownership
 
-- `index.tsx`, `App.tsx`, and `convex_client.ts` compose providers, authentication, queries, and top-level screens.
+- `index.tsx`, `App.tsx`, and `convex_client.ts` compose providers, authentication, planner projection, Solid Router destinations, and top-level screens.
 - `auth/` owns the Google authentication gate.
-- `components/` owns app-wide inventory and menu UI that is not feature-private.
+- `components/` owns the responsive application shell, local SVG/UI primitives, inventory editor, and recipe library UI that is not feature-private.
 - `data.ts`, `logic.ts`, `math.ts`, and `utils/` own shared client data helpers and calculations.
 - `features/` owns self-contained product workflows; `primitives/` owns cross-cutting domain values.
 
@@ -18,12 +18,13 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 - Preserve the provider order in `index.tsx`: Convex availability must wrap the authenticated application.
 - Shared code may depend on a feature only through that feature's documented integration surface.
 - `recipeMakingProjection` reports unfulfilled required and substitute measurements already scaled by the requested recipe multiplier.
+- Navigation-owned state belongs in Solid Router paths and search parameters; recipe and cart overlays must preserve their owning route in browser history.
 
 # Work Guidance
 
 - Put reusable domain operations in `primitives/` or an existing shared module only when more than one feature genuinely owns the use case.
 - Keep feature-local UI, projections, and interaction state inside the owning feature.
-- The browser is in a deliberate redesign reset: TSX components currently return empty fragments while retaining their queries, mutations, state, validation, and extracted interaction handlers. Rebuild their JSX around that logic rather than re-creating the behavior from scratch.
+- Keep the six-color enamel presentation, local SVG icons, visible focus treatment, and responsive shell aligned with `docs/design/`.
 
 # Verification
 

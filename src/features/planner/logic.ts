@@ -21,6 +21,7 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
         couldMake: boolean;
         scratchPadOfIngredientsNeededToUse: IngredientSet;
         unfulfilledIngredients: {RequiredIngredient: RequiredIngredient, have: Measurement}[];
+        substitutedIngredientUses: Record<string, string>;
     };
     const workingIngredientsForProjection: IngredientSet = {}; 
     const menu: RecipeCache = new Map();
@@ -49,15 +50,12 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
         fillCart(plannedDay.shoppingCart);
         
         const daysProjection: RecipeProjection[] = [];
-        console.log({date})
         for (const recipe of plannedDay.recipes) {
-            console.log({recipe})
             const { recipeId: recipeId, overrideDayMultiplier } = recipe;
             const multiplier =  overrideDayMultiplier ?? plannedDay.multiplier
             
             const recipeInMenu = menu.get(makeCacheKey(recipeId));
             // const recipeInMenu = menu.get(recipeId);
-            console.log({recipeInMenu})
             if (!recipeInMenu) throw new Error(`Recipe "${recipeId}" not found in menu.`);
 
             const { unfulfilledIngredients, scratchPadOfIngredientsNeededToUse,substitutedIngredientUses } = recipeMakingProjection(recipeInMenu, workingIngredientsForProjection, multiplier);
@@ -75,7 +73,8 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
                 dayMultiplier: plannedDay.multiplier,
                 couldMake,
                 scratchPadOfIngredientsNeededToUse,
-                unfulfilledIngredients
+                unfulfilledIngredients,
+                substitutedIngredientUses,
             });
         }
         projection[date] = daysProjection;

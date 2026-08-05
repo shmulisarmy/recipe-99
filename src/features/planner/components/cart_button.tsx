@@ -1,5 +1,7 @@
+import { Icon } from "../../../components/ui";
+
 function CartIcon() {
-  return (<></>);
+  return <Icon name="cart"/>;
 }
 
 export function CartButton(props: {
@@ -8,6 +10,5 @@ export function CartButton(props: {
   label: string;
   class?: string;
 }) {
-  void props;
-  return (<></>);
+  return <button class={`button button-secondary ${props.class ?? ""}`} type="button" aria-label={props.label} onClick={props.onOpen}><CartIcon/>{props.count}</button>;
 }

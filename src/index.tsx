@@ -1,5 +1,10 @@
 /* @refresh reload */
 import './index.css';
+import '@fontsource/atkinson-hyperlegible-next/latin-400.css';
+import '@fontsource/atkinson-hyperlegible-next/latin-600.css';
+import '@fontsource/chivo/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-600.css';
 import { render } from 'solid-js/web';
 import 'solid-devtools';
 import { ConvexProvider } from "convex-solidjs";

@@ -1,70 +1,145 @@
-import { createSignal } from "solid-js";
-import { Measurement_Convert, Unit } from "../primitives/measurement";
+import { A } from "@solidjs/router";
+import { For, Show, createEffect, createSignal } from "solid-js";
+import { Measurement_Convert, type Unit } from "../primitives/measurement";
 import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
-import { Doc } from "../../convex/_generated/dataModel";
+import type { Doc } from "../../convex/_generated/dataModel";
+import { ALL_UNITS, Amount, Icon, StatusText, formatAmount } from "./ui";
 
-const ALL_UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
-
-function fmt(n: number): string {
-  return parseFloat(n.toPrecision(4)).toString();
-}
-
-function IngredientRow(props: { ingredient: Doc<"pantryItems">}) {
+function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
   const updateIngredient = useMutation(api.data.updateAvailableIngredient);
+  const [editing, setEditing] = createSignal(false);
+  const [amountDraft, setAmountDraft] = createSignal(String(props.ingredient.Measurement.amount));
+  const [unitDraft, setUnitDraft] = createSignal<Unit>(props.ingredient.Measurement.unit);
+  const [fieldError, setFieldError] = createSignal("");
+  const [saveError, setSaveError] = createSignal("");
+  const [saved, setSaved] = createSignal(false);
+  const [conversionOpen, setConversionOpen] = createSignal(false);
+  const [convertUnit, setConvertUnit] = createSignal<Unit>(props.ingredient.Measurement.unit);
+  let amountInput!: HTMLInputElement;
 
-  const [amount, setAmount] = createSignal(props.ingredient.Measurement.amount);
-  const [targetUnit, setTargetUnit] = createSignal<Unit>(props.ingredient.Measurement.unit);
+  createEffect(() => {
+    if (editing()) return;
+    setAmountDraft(String(props.ingredient.Measurement.amount));
+    setUnitDraft(props.ingredient.Measurement.unit);
+  });
 
-  const canConvert = () => targetUnit() !== props.ingredient.Measurement.unit;
-  const convertedPreview = () =>
-    canConvert() ? Measurement_Convert(props.ingredient.Measurement, targetUnit()) : null;
+  const beginEdit = () => {
+    setAmountDraft(String(props.ingredient.Measurement.amount));
+    setUnitDraft(props.ingredient.Measurement.unit);
+    setFieldError("");
+    setSaveError("");
+    setEditing(true);
+    queueMicrotask(() => amountInput.focus());
+  };
 
-  function applyAmount() {
-    const v = amount();
-    if (isNaN(v) || v < 0) return;
-    
-    updateIngredient.mutate({
-      ingredientName: props.ingredient.name_,
-      measurement: { amount: v, unit: targetUnit() },
-    });
-  }
+  const cancelEdit = () => {
+    if (updateIngredient.isLoading()) return;
+    setEditing(false);
+    setFieldError("");
+    setSaveError("");
+  };
 
-  function applyConvert() {
-    const converted = convertedPreview();
-    if (!converted) return;
-    updateIngredient.mutate({
-      ingredientName: props.ingredient.name_, 
-      measurement: converted,
-    });
-    setAmount(converted.amount);
-    setTargetUnit(converted.unit);
-  }
+  const saveAmount = async () => {
+    const amount = Number(amountDraft());
+    if (!amountDraft().trim() || !Number.isFinite(amount) || amount < 0) {
+      setFieldError("Enter an amount of 0 or more.");
+      amountInput.focus();
+      return;
+    }
+    setFieldError("");
+    setSaveError("");
+    try {
+      await updateIngredient.mutate({ ingredientName: props.ingredient.name_, measurement: { amount, unit: unitDraft() } });
+      setEditing(false);
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 1800);
+    } catch {
+      setSaveError(`Couldn’t save ${props.ingredient.name_}. Try again.`);
+    }
+  };
 
-  function updateAmount(value: string) {
-    setAmount(Number.parseFloat(value));
-  }
+  const onEditKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      void saveAmount();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      cancelEdit();
+    }
+  };
 
-  function updateTargetUnit(unit: Unit) {
-    setTargetUnit(unit);
-  }
+  const convertedPreview = () => Measurement_Convert(props.ingredient.Measurement, convertUnit());
+  const applyConvert = async () => {
+    if (convertUnit() === props.ingredient.Measurement.unit) return;
+    setSaveError("");
+    try {
+      await updateIngredient.mutate({ ingredientName: props.ingredient.name_, measurement: convertedPreview() });
+      setConversionOpen(false);
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 1800);
+    } catch {
+      setSaveError(`Couldn’t convert ${props.ingredient.name_}. Try again.`);
+    }
+  };
 
-  function applyAmountOnEnter(event: KeyboardEvent) {
-    if (event.key === "Enter") applyAmount();
-  }
-
-  void ALL_UNITS;
-  void fmt;
-  void updateAmount;
-  void updateTargetUnit;
-  void applyAmountOnEnter;
-  void applyConvert;
-
-  return (<></>);
+  return (
+    <tr>
+      <th scope="row" data-label="Ingredient">{props.ingredient.name_}</th>
+      <td classList={{ "has-editor": editing() }} data-label="Stored amount">
+        <Show when={editing()} fallback={<Amount measurement={props.ingredient.Measurement}/> }>
+          <div class="inline-measurement" onKeyDown={onEditKeyDown}>
+            <label class="field"><span>Amount</span><input ref={amountInput} class="input" inputmode="decimal" value={amountDraft()} aria-invalid={!!fieldError()} aria-describedby={fieldError() ? `${props.ingredient._id}-amount-error` : undefined} onInput={(event) => setAmountDraft(event.currentTarget.value)}/></label>
+            <label class="field"><span>Unit</span><select class="select" value={unitDraft()} onChange={(event) => setUnitDraft(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
+          </div>
+          <Show when={fieldError()}><p class="field-error" id={`${props.ingredient._id}-amount-error`}>{fieldError()}</p></Show>
+        </Show>
+        <Show when={saved()}><StatusText kind="saved"/></Show>
+        <Show when={saveError()}><p class="field-error" role="alert">{saveError()}</p></Show>
+      </td>
+      <td data-label="Actions">
+        <div class="row-actions">
+          <Show when={editing()} fallback={
+            <>
+              <button class="button button-secondary" type="button" aria-label={`Edit ${props.ingredient.name_}`} onClick={beginEdit}><Icon name="edit"/>Edit amount</button>
+              <div class="anchored-control">
+                <button class="button button-quiet" type="button" aria-expanded={conversionOpen()} onClick={() => { setConvertUnit(props.ingredient.Measurement.unit); setConversionOpen((open) => !open); }}>Convert unit</button>
+                <Show when={conversionOpen()}>
+                  <div class="popover conversion-popover" role="dialog" aria-label={`Convert ${props.ingredient.name_}`}>
+                    <div class="popover-head"><h3>Convert unit</h3><button class="icon-button" type="button" aria-label="Close unit conversion" onClick={() => setConversionOpen(false)}><Icon name="close"/></button></div>
+                    <p>Current amount: <Amount measurement={props.ingredient.Measurement}/></p>
+                    <label class="field"><span>Target unit</span><select class="select" value={convertUnit()} onChange={(event) => setConvertUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
+                    <p class="conversion-preview"><Amount measurement={props.ingredient.Measurement}/> = <Amount measurement={convertedPreview()}/></p>
+                    <p class="helper-text">Conversion keeps the same quantity.</p>
+                    <button class="button button-primary" type="button" disabled={convertUnit() === props.ingredient.Measurement.unit || updateIngredient.isLoading()} onClick={() => void applyConvert()}>{updateIngredient.isLoading() ? "Converting…" : "Convert"}</button>
+                  </div>
+                </Show>
+              </div>
+            </>
+          }>
+            <button class="button button-primary" type="button" disabled={updateIngredient.isLoading()} onClick={() => void saveAmount()}>{updateIngredient.isLoading() ? "Saving…" : "Save amount"}</button>
+            <button class="button button-quiet" type="button" disabled={updateIngredient.isLoading()} onClick={cancelEdit}>Cancel</button>
+          </Show>
+        </div>
+      </td>
+    </tr>
+  );
 }
 
 export function InventoryEditor() {
   const pantry = useQuery(api.data.getAvailableIngredients, {});
-  void pantry;
-  return (<></>);
+  return (
+    <main class="main" id="main">
+      <header class="page-heading"><div><h1>Pantry</h1><p class="supporting-copy">Keep these amounts accurate so recipe readiness stays useful.</p></div><A class="button button-primary" href="/intake"><Icon name="intake"/>Add a batch</A></header>
+      <section class="section" aria-labelledby="pantry-list-title">
+        <div class="section-head"><div><h2 id="pantry-list-title">Stored ingredients</h2><Show when={pantry.data()}>{(items) => <p>{items().length} {items().length === 1 ? "ingredient" : "ingredients"}</p>}</Show></div></div>
+        <Show when={pantry.isLoading()}><div class="loading-ledger" aria-live="polite"><p>Checking your pantry…</p><For each={[1,2,3,4]}>{() => <div class="skeleton skeleton-row"/>}</For></div></Show>
+        <Show when={pantry.error()}><div class="empty-state notice-error"><h2>Your pantry couldn’t load.</h2><button class="button button-secondary" type="button" onClick={pantry.refetch}>Try again</button></div></Show>
+        <Show when={pantry.data() && pantry.data()!.length === 0}><div class="empty-state"><Icon name="pantry"/><h2>Your pantry is empty.</h2><p>Add a batch to start checking recipes.</p><A class="button button-primary" href="/intake">Start intake</A></div></Show>
+        <Show when={pantry.data() && pantry.data()!.length > 0}>
+          <table class="ledger"><thead><tr><th scope="col">Ingredient</th><th scope="col">Stored amount</th><th scope="col">Actions</th></tr></thead><tbody><For each={pantry.data()}>{(ingredient) => <IngredientRow ingredient={ingredient}/>}</For></tbody></table>
+        </Show>
+      </section>
+    </main>
+  );
 }

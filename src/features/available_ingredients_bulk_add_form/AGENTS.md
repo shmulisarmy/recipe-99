@@ -16,12 +16,13 @@ Own the multistep workflow for adding a batch of acquired ingredients to the pan
 - Keep pantry additions and shopping-cart reconciliation as separate user-confirmed steps.
 - The shopping-cart draft represents only the acquired amounts selected for reconciliation; do not apply it before the follow-up step.
 - Use generated Convex functions for persisted pantry and planner changes.
+- Treat the in-memory `IntakeHandoff` as route-local state: direct entry to reconciliation without it returns to Intake with guidance.
 
 # Work Guidance
 
 - Recompute cart selections when an edited batch amount changes.
 - Preserve measurement units and use shared measurement arithmetic for comparisons and subtraction.
-- The current empty fragments are a temporary redesign boundary. Preserve and reconnect the retained batch, validation, submission, and reconciliation logic when rebuilding the workflow.
+- Keep Intake and Reconciliation as separate full-page routes, and retain all editable rows after a failed submission.
 
 # Verification
 

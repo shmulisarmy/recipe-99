@@ -1,157 +1,130 @@
-import { createMutable } from "solid-js/store";
-import { createSignal } from "solid-js";
-import {
-    Measurement,
-    Measurement_GTE,
-    Measurement_Min,
-    Measurement_Minus,
-    Measurement_Plus,
-    Unit,
-    ZeroedMeasurement,
-} from "../../primitives/measurement";
-import { todaysShoppingCart } from "../planner/outside_feature_exports";
-import { AvailableIngredientsBulkAddFormProps, BulkAddIngredients, ShoppingCartAlreadyGotDraft } from "./types";
+import { For, Show, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
+import { Measurement_GTE, Measurement_Min, Measurement_Minus, type Measurement, type Unit, ZeroedMeasurement } from "../../primitives/measurement";
 import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../../convex/_generated/api";
-import { PlannerType } from "../planner/data";
+import type { AvailableIngredientsBulkAddFormProps, ShoppingCartAlreadyGotDraft } from "./types";
+import { ALL_UNITS, Amount, Icon } from "../../components/ui";
+import { today } from "../planner/outside_feature_exports";
 
-function UpdateShoppingCartAlreadyGot(plannerData: PlannerType, ShoppingCartAlreadyGotUpdateDraft: ShoppingCartAlreadyGotDraft) { 
-    //for each ingredient in ShoppingCartAlreadyGotUpdateDraft it adds the amount to the shopping cart already got
-    for (const [name, amount] of Object.entries(ShoppingCartAlreadyGotUpdateDraft)) {
-        todaysShoppingCart(plannerData).alreadyGot[name] = Measurement_Plus(todaysShoppingCart(plannerData).alreadyGot[name]||ZeroedMeasurement(), amount);
-    }
-}
+type IntakeRow = {
+  id: string;
+  name: string;
+  amount: string;
+  unit: Unit;
+  nameError: string;
+  amountError: string;
+  cartSelected: boolean;
+};
 
-
+const newId = () => crypto.randomUUID();
 
 export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkAddFormProps) {
-    const formData = createMutable<BulkAddIngredients>(structuredClone(props.ingredientsToAdd));
-    const ShoppingCartAlreadyGotUpdateDraft = createMutable<ShoppingCartAlreadyGotDraft>({});
-    const [step, setStep] = createSignal<"bulk-add" | "form-template-with-data-structure">("bulk-add");
-    const [isAddingIngredient, setIsAddingIngredient] = createSignal(false);
-    const [newIngredientName, setNewIngredientName] = createSignal("");
-    const [newIngredientAmount, setNewIngredientAmount] = createSignal(1);
-    const [newIngredientUnit, setNewIngredientUnit] = createSignal<Unit>("grams");
-    const [addIngredientError, setAddIngredientError] = createSignal("");
-    const m = useMutation(api.data.AvailableIngredientsBulkAdd);
-    let newIngredientNameInput!: HTMLInputElement;
+  const initialRows = Object.entries(structuredClone(props.ingredientsToAdd)).map(([name, measurement]) => ({ id: newId(), name, amount: String(measurement.amount), unit: measurement.unit, nameError: "", amountError: "", cartSelected: false }));
+  const [rows, setRows] = createStore<IntakeRow[]>(initialRows.length ? initialRows : [{ id: newId(), name: "", amount: "", unit: "grams", nameError: "", amountError: "", cartSelected: false }]);
+  const [isAddingIngredient, setIsAddingIngredient] = createSignal(false);
+  const [newName, setNewName] = createSignal("");
+  const [newAmount, setNewAmount] = createSignal("1");
+  const [newUnit, setNewUnit] = createSignal<Unit>("grams");
+  const [addError, setAddError] = createSignal("");
+  const [submitError, setSubmitError] = createSignal("");
+  const addPantryBatch = useMutation(api.data.AvailableIngredientsBulkAdd);
+  const planner = useQuery(api.data.usersPlanner, {});
+  let newNameInput!: HTMLInputElement;
 
-    const planner = useQuery(api.data.usersPlanner, {});
+  const plannedToday = () => planner.data()?.[today.toDateString()];
+  const allocationFor = (row: IntakeRow): Measurement | undefined => {
+    const name = row.name.trim().toLowerCase();
+    const target = plannedToday()?.shoppingCart.toGet[name];
+    if (!target) return;
+    const amount = Number(row.amount);
+    if (!Number.isFinite(amount) || amount < 0) return;
+    const already = plannedToday()?.shoppingCart.alreadyGot[name] ?? ZeroedMeasurement();
+    if (Measurement_GTE(already, target)) return;
+    return Measurement_Min(Measurement_Minus(target, already), { amount, unit: row.unit });
+  };
 
-    function amountForShoppingCart(plannerData: PlannerType, name: string): Measurement | undefined {
-        const cart = todaysShoppingCart(plannerData);
-        const toGet = cart.toGet[name];
-        if (!toGet) return;
+  const normalizeRowName = (index: number) => {
+    const name = rows[index].name.trim().toLowerCase();
+    const duplicate = rows.some((row, candidate) => candidate !== index && row.name.trim().toLowerCase() === name && name !== "");
+    setRows(index, "name", name);
+    setRows(index, "nameError", !name ? "Enter an ingredient name." : duplicate ? `${name} is already in this batch.` : "");
+    if (!allocationFor(rows[index])) setRows(index, "cartSelected", false);
+  };
 
-        const alreadyGot = cart.alreadyGot[name] ?? ZeroedMeasurement();
-        if (Measurement_GTE(alreadyGot, toGet)) return;
+  const validateAmount = (index: number) => {
+    const amount = Number(rows[index].amount);
+    setRows(index, "amountError", !rows[index].amount.trim() || !Number.isFinite(amount) || amount < 0 ? "Enter an amount of 0 or more." : "");
+    if (!allocationFor(rows[index])) setRows(index, "cartSelected", false);
+  };
 
-        return Measurement_Min(Measurement_Minus(toGet, alreadyGot), formData[name]);
+  const validateRows = () => {
+    rows.forEach((_, index) => { normalizeRowName(index); validateAmount(index); });
+    return rows.length > 0 && rows.every((row) => !row.nameError && !row.amountError && !!row.name.trim());
+  };
+
+  const removeIngredient = (index: number) => setRows(rows.filter((_, candidate) => candidate !== index));
+  const openAddIngredient = () => { setIsAddingIngredient(true); queueMicrotask(() => newNameInput.focus()); };
+  const closeAddIngredient = () => { setIsAddingIngredient(false); setNewName(""); setNewAmount("1"); setNewUnit("grams"); setAddError(""); };
+  const addIngredient = () => {
+    const name = newName().trim().toLowerCase();
+    const amount = Number(newAmount());
+    if (!name) { setAddError("Enter an ingredient name."); newNameInput.focus(); return; }
+    if (rows.some((row) => row.name.trim().toLowerCase() === name)) { setAddError(`${name} is already in this batch.`); newNameInput.focus(); return; }
+    if (!newAmount().trim() || !Number.isFinite(amount) || amount < 0) { setAddError("Enter an amount of 0 or more."); return; }
+    setRows(rows.length, { id: newId(), name, amount: newAmount(), unit: newUnit(), nameError: "", amountError: "", cartSelected: false });
+    closeAddIngredient();
+  };
+
+  const submitIngredients = async (event: SubmitEvent) => {
+    event.preventDefault();
+    if (!validateRows()) {
+      queueMicrotask(() => document.querySelector<HTMLElement>(".intake-row [aria-invalid='true']")?.focus());
+      return;
     }
-
-    function setShoppingCartSelection(name: string, selected: boolean) {
-        if (!selected) {
-            delete ShoppingCartAlreadyGotUpdateDraft[name];
-            return;
-        }
-
-        const amount = amountForShoppingCart(planner.data()!, name);
-        if (amount) ShoppingCartAlreadyGotUpdateDraft[name] = { ...amount };
+    setSubmitError("");
+    const ingredientsToAdd = rows.map((row) => ({ name: row.name.trim().toLowerCase(), Measurement: { amount: Number(row.amount), unit: row.unit } }));
+    try {
+      await addPantryBatch.mutate({ ingredientsToAdd });
+      const allocations: ShoppingCartAlreadyGotDraft = {};
+      for (const row of rows) {
+        const allocation = allocationFor(row);
+        if (row.cartSelected && allocation) allocations[row.name.trim().toLowerCase()] = allocation;
+      }
+      props.onComplete({ allocations });
+    } catch {
+      setSubmitError("The pantry wasn’t updated. Try again.");
     }
+  };
 
-    function refreshShoppingCartSelection(ingredientName: string) {
-        if (ShoppingCartAlreadyGotUpdateDraft[ingredientName]) setShoppingCartSelection(ingredientName, true);
-    }
-
-    // for (const name of Object.keys(formData)) {
-    //     setShoppingCartSelection(name, true);
-    // }
-
-    function removeIngredient(name: string) {
-        delete formData[name];
-        delete ShoppingCartAlreadyGotUpdateDraft[name];
-    }
-
-    function updateIngredientAmount(name: string, amount: number) {
-        formData[name].amount = amount;
-        refreshShoppingCartSelection(name);
-    }
-
-    function updateIngredientUnit(name: string, unit: Unit) {
-        formData[name].unit = unit;
-        refreshShoppingCartSelection(name);
-    }
-
-    function openAddIngredient() {
-        setIsAddingIngredient(true);
-        queueMicrotask(() => newIngredientNameInput.focus());
-    }
-
-    function closeAddIngredient() {
-        setIsAddingIngredient(false);
-        setNewIngredientName("");
-        setNewIngredientAmount(1);
-        setNewIngredientUnit("grams");
-        setAddIngredientError("");
-    }
-
-    function addIngredient() {
-        const name = newIngredientName().trim().toLowerCase();
-        if (!name) {
-            setAddIngredientError("Enter an ingredient name.");
-            newIngredientNameInput.focus();
-            return;
-        }
-        if (formData[name]) {
-            setAddIngredientError(`${name} is already in this batch.`);
-            newIngredientNameInput.focus();
-            return;
-        }
-        if (!Number.isFinite(newIngredientAmount()) || newIngredientAmount() < 0) {
-            setAddIngredientError("Enter an amount of zero or more.");
-            return;
-        }
-
-        formData[name] = {
-            amount: newIngredientAmount(),
-            unit: newIngredientUnit(),
-        };
-        setShoppingCartSelection(name, true);
-        closeAddIngredient();
-    }
-
-    function addIngredientOnEnter(event: KeyboardEvent) {
-        if (event.key !== "Enter") return;
-        event.preventDefault();
-        addIngredient();
-    }
-
-    function submitIngredients(event: SubmitEvent) {
-        event.preventDefault();
-        const entries = Object.entries(formData);
-        if (entries.some(([, measurement]) => !Number.isFinite(measurement.amount) || measurement.amount < 0)) return;
-        m.mutate({
-            ingredientsToAdd: entries.map(([name, measurement]) => ({ name, Measurement: measurement })),
-        });
-
-        //
-        UpdateShoppingCartAlreadyGot(planner.data()!, ShoppingCartAlreadyGotUpdateDraft);
-        //
-
-        setStep("form-template-with-data-structure");
-    }
-
-    void step;
-    void isAddingIngredient;
-    void addIngredientError;
-    void removeIngredient;
-    void updateIngredientAmount;
-    void updateIngredientUnit;
-    void openAddIngredient;
-    void closeAddIngredient;
-    void addIngredient;
-    void addIngredientOnEnter;
-    void submitIngredients;
-
-    return (<></>);
+  return (
+    <main class="main workspace-narrow" id="main">
+      <div class="stepper" aria-label="Intake progress"><div class="step active" aria-current="step">1 Review ingredients</div><div class="step">2 Reconcile today’s cart</div></div>
+      <header class="page-heading"><div><h1>Add a batch</h1><p class="supporting-copy">Review what came into the kitchen before updating the pantry.</p></div></header>
+      <form onSubmit={submitIngredients} novalidate>
+        <div class="intake-list">
+          <For each={rows}>{(row, index) => (
+            <div class="intake-row">
+              <label class="field ingredient-field"><span>Ingredient</span><input class="input" value={row.name} aria-invalid={!!row.nameError} aria-describedby={row.nameError ? `${row.id}-name-error` : undefined} onInput={(event) => setRows(index(), "name", event.currentTarget.value)} onBlur={() => normalizeRowName(index())}/><Show when={row.nameError}><span class="field-error" id={`${row.id}-name-error`}>{row.nameError}</span></Show></label>
+              <label class="field"><span>Amount</span><input class="input" inputmode="decimal" value={row.amount} aria-invalid={!!row.amountError} aria-describedby={row.amountError ? `${row.id}-amount-error` : undefined} onInput={(event) => setRows(index(), "amount", event.currentTarget.value)} onBlur={() => validateAmount(index())}/><Show when={row.amountError}><span class="field-error" id={`${row.id}-amount-error`}>{row.amountError}</span></Show></label>
+              <label class="field"><span>Unit</span><select class="select" value={row.unit} onChange={(event) => { setRows(index(), "unit", event.currentTarget.value as Unit); if (!allocationFor(rows[index()])) setRows(index(), "cartSelected", false); }}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
+              <div class="remove-control"><button class="button button-quiet" type="button" aria-label={`Remove ${row.name || "ingredient"}`} onClick={() => removeIngredient(index())}>Remove</button></div>
+              <Show when={allocationFor(row)}>{(allocation) => <label class="cart-match"><input type="checkbox" checked={row.cartSelected} onChange={(event) => setRows(index(), "cartSelected", event.currentTarget.checked)}/><span>Count up to <Amount measurement={allocation()}/> toward today’s cart</span></label>}</Show>
+            </div>
+          )}</For>
+        </div>
+        <Show when={rows.length === 0}><div class="empty-state"><h2>No ingredients in this batch.</h2><p>Add an ingredient before updating the pantry.</p></div></Show>
+        <Show when={isAddingIngredient()}>
+          <div class="add-ingredient-panel" role="dialog" aria-label="Add ingredient" onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addIngredient(); } if (event.key === "Escape") closeAddIngredient(); }}>
+            <div class="popover-head"><h2>Add ingredient</h2><button class="icon-button" type="button" aria-label="Close add ingredient" onClick={closeAddIngredient}><Icon name="close"/></button></div>
+            <div class="add-ingredient-fields"><label class="field ingredient-field"><span>Name</span><input ref={newNameInput} class="input" value={newName()} onInput={(event) => setNewName(event.currentTarget.value)}/></label><label class="field"><span>Amount</span><input class="input" inputmode="decimal" value={newAmount()} onInput={(event) => setNewAmount(event.currentTarget.value)}/></label><label class="field"><span>Unit</span><select class="select" value={newUnit()} onChange={(event) => setNewUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label></div>
+            <Show when={addError()}><p class="field-error" role="alert">{addError()}</p></Show>
+            <button class="button button-primary" type="button" onClick={addIngredient}>Add ingredient</button>
+          </div>
+        </Show>
+        <Show when={submitError()}><p class="inline-notice notice-error" role="alert">{submitError()}</p></Show>
+        <div class="form-actions"><button class="button button-secondary" type="button" onClick={openAddIngredient}><Icon name="plus"/>Add ingredient</button><button class="button button-primary" type="submit" disabled={addPantryBatch.isLoading() || rows.length === 0}>{addPantryBatch.isLoading() ? "Adding to pantry…" : "Add to pantry"}</button></div>
+      </form>
+    </main>
+  );
 }
