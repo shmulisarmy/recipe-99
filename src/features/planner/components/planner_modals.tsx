@@ -106,7 +106,7 @@ export function RecipeModal(props: { item: RecipeProjection; dateStr: string; on
   );
 }
 
-export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; plannerData: PlannerType; onClose: () => void }) {
+export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; plannerData: PlannerType; onMoved: (dateStr: string, position: number, total: number) => void; onClose: () => void }) {
   const [targetDate, setTargetDate] = createSignal(props.dateStr);
   const [position, setPosition] = createSignal("first");
   const [saving, setSaving] = createSignal(false);
@@ -124,6 +124,8 @@ export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; 
     try {
       if (position() === "first") await insertBeginning.mutate({ recipeId: props.item.plannedRecipeReference.id, toDate: targetDate() });
       else await moveBefore.mutate({ recipeId: props.item.plannedRecipeReference.id, otherRecipeId: position() });
+      const targetPosition = position() === "first" ? 1 : targetMeals().findIndex((meal) => meal.id === position()) + 1;
+      props.onMoved(targetDate(), targetPosition, targetMeals().length + 1);
       props.onClose();
     } catch { setError("Couldn’t move the meal. Try again."); }
     finally { setSaving(false); }

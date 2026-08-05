@@ -81,7 +81,7 @@ export function DayCell(props: {
           <For each={visibleRecipes()}>{(recipe) => <span class="meal-summary" classList={{ "status-ready": recipe.couldMake, "status-missing": !recipe.couldMake }}><Icon name={recipe.couldMake ? "check" : "warning"}/><span>{recipe.plannedRecipeReference.recipeId.title}</span></span>}</For>
           <Show when={props.recipes.length > 2}><span class="more-meals">+{props.recipes.length - 2} more</span></Show>
         </span>
-        <span class="mobile-status" aria-hidden="true"><Show when={readyCount()}><span class="ready-count"><Icon name="check"/>{readyCount()}</span></Show><Show when={missingCount()}><span class="missing-count"><Icon name="warning"/>{missingCount()}</span></Show><Show when={props.recipes.length > 2}><span>+{props.recipes.length - 2}</span></Show></span>
+        <span class="mobile-status" aria-hidden="true"><Show when={readyCount()}><span class="ready-count"><Icon name="check"/>{readyCount()}</span></Show><Show when={missingCount()}><span class="missing-count"><Icon name="warning"/>{missingCount()}</span></Show></span>
         <span class="cell-meta"><span><Show when={props.peopleCount !== undefined}><Icon name="people"/>{props.peopleCount}</Show></span><span><Show when={props.cartCount}><Icon name="cart"/>{props.cartCount}</Show></span></span>
       </button>
       <Show when={moveError()}><span class="drop-error" role="status"><StatusText kind="error">{moveError()}</StatusText></span></Show>

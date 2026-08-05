@@ -39,6 +39,7 @@ export function Planner() {
   const [moveError, setMoveError] = createSignal("");
   const [pointerRetry, setPointerRetry] = createSignal<(() => Promise<void>)>();
   const [isRetryingMove, setIsRetryingMove] = createSignal(false);
+  const [pendingMealFocus, setPendingMealFocus] = createSignal<string>();
   const dayButtons: HTMLButtonElement[] = [];
   const mealRows = new Map<string, HTMLLIElement>();
 
@@ -85,9 +86,11 @@ export function Planner() {
       if (move.position === 0 || !targets[move.position - 1]) await insertBeginning.mutate({ recipeId: move.item.plannedRecipeReference.id, toDate: move.targetDate });
       else await moveBefore.mutate({ recipeId: move.item.plannedRecipeReference.id, otherRecipeId: targets[move.position - 1].plannedRecipeReference.id });
       const dateLabel = new Date(move.targetDate).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
-      announce(`Moved ${move.item.plannedRecipeReference.recipeId.title} to ${dateLabel}, position ${move.position + 1}.`);
+      announce(`Moved ${move.item.plannedRecipeReference.recipeId.title} to ${dateLabel}, position ${move.position + 1} of ${targets.length + 1}.`);
+      setPendingMealFocus(move.item.plannedRecipeReference.id);
       setKeyboardMove(undefined);
-      window.setTimeout(() => mealRows.get(move.item.plannedRecipeReference.id)?.focus(), 250);
+      if (move.targetDate !== selectedDateStr()) navigate(`/planner/day/${toRouteDate(new Date(move.targetDate))}`);
+      else queueMicrotask(() => { const row = mealRows.get(move.item.plannedRecipeReference.id); if (row) { row.focus(); setPendingMealFocus(undefined); } });
     } catch {
       setMoveError("Couldn’t move the meal. Try again.");
       announce("Move failed. The confirmed meal order was restored.");
@@ -132,7 +135,7 @@ export function Planner() {
   };
 
   return (
-    <main class="main" id="main">
+    <main class="main planner-page" id="main">
       <header class="page-heading"><div><h1>{monthTitle}</h1><p class="supporting-copy">Plan meals from what is on hand.</p></div></header>
       <Show when={planner.isLoading()}><div aria-live="polite"><p>Loading your meal plan…</p><div class="skeleton skeleton-calendar"/></div></Show>
       <Show when={planner.error()}><div class="empty-state notice-error"><h2>Your meal plan couldn’t load.</h2><button class="button button-secondary" type="button" onClick={planner.refetch}>Try again</button></div></Show>
@@ -143,14 +146,14 @@ export function Planner() {
             <div class="calendar-note"><strong id="calendar-title">Month plan</strong><span>Select a date. Use the Day Ticket for actions.</span></div>
             <table class="calendar" aria-label={`${monthTitle} meal plan`}><thead><tr><For each={WEEKDAYS}>{(weekday) => <th scope="col"><span class="weekday-long">{weekday}</span><span class="weekday-short" aria-hidden="true">{weekday[0]}</span></th>}</For></tr></thead><tbody><For each={Array.from({ length: days.length / 7 }, (_, row) => row)}>{(row) => <tr><For each={days.slice(row * 7, row * 7 + 7)}>{(date, column) => { const index = row * 7 + column(); const dateStr = date.toDateString(); const day = () => planner.data()?.[dateStr]; return <td><DayCell date={date} inMonth={date.getMonth() === today.getMonth()} isToday={dateStr === today.toDateString()} selected={dateStr === selectedDateStr()} recipes={projection[dateStr] ?? []} cartCount={cartCount(dateStr)} peopleCount={day()?.multiplier} onSelectDay={() => selectDay(date)} onFocusKey={(event) => onDayFocusKey(index, event)} registerButton={(element) => { dayButtons[index] = element; }} onMoveFailure={onPointerMoveFailure}/></td>; }}</For></tr>}</For></tbody></table>
           </section>
-          <DayDetail dateStr={selectedDateStr()} plannedDay={selectedDay()} recipes={selectedRecipes()} onOpenRecipe={openRecipe} onOpenAmount={setAmountItem} onMoveRecipe={setMoveItem} onMoveKeyDown={onMoveKeyDown} isLifted={(item) => keyboardMove()?.item.plannedRecipeReference.id === item.plannedRecipeReference.id} moveLabel={moveLabel} registerRow={(item, element) => mealRows.set(item.plannedRecipeReference.id, element)} onOpenCart={openCart} onMoveFailure={onPointerMoveFailure}/>
+          <DayDetail dateStr={selectedDateStr()} plannedDay={selectedDay()} recipes={selectedRecipes()} onOpenRecipe={openRecipe} onOpenAmount={setAmountItem} onMoveRecipe={setMoveItem} onMoveKeyDown={onMoveKeyDown} isLifted={(item) => keyboardMove()?.item.plannedRecipeReference.id === item.plannedRecipeReference.id} moveLabel={moveLabel} registerRow={(item, element) => { const id = item.plannedRecipeReference.id; mealRows.set(id, element); if (pendingMealFocus() === id) queueMicrotask(() => { element.focus(); setPendingMealFocus(undefined); }); }} onOpenCart={openCart} onMoveFailure={onPointerMoveFailure}/>
         </div>
       </Show>
       <Show when={routeRecipe()}>{(item) => <RecipeModal item={item()} dateStr={selectedDateStr()} onClose={closeOverlay}/>}</Show>
       <Show when={params.plannedRecipeId && !routeRecipe() && !planner.isLoading()}><div class="inline-notice notice-error overlay-route-error"><Icon name="warning"/>That planned recipe is not available.<button class="button button-secondary" type="button" onClick={closeOverlay}>Back to day</button></div></Show>
       <Show when={isCartOpen() && planner.data()}><CartModal dateStr={selectedDateStr()} plannerData={planner.data()!} onClose={closeOverlay}/></Show>
       <Show when={amountItem()}>{(item) => <AmountToMakeSurface item={item()} onClose={() => setAmountItem(undefined)}/>}</Show>
-      <Show when={moveItem()}>{(item) => <Show when={planner.data()}>{(plannerData) => <MoveMealModal item={item()} dateStr={selectedDateStr()} plannerData={plannerData()} onClose={() => setMoveItem(undefined)}/>}</Show>}</Show>
+      <Show when={moveItem()}>{(item) => <Show when={planner.data()}>{(plannerData) => <MoveMealModal item={item()} dateStr={selectedDateStr()} plannerData={plannerData()} onMoved={(dateStr, position, total) => announce(`Moved ${item().plannedRecipeReference.recipeId.title} to ${new Date(dateStr).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}, position ${position} of ${total}.`)} onClose={() => setMoveItem(undefined)}/>}</Show>}</Show>
     </main>
   );
 }
