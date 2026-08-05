@@ -64,7 +64,7 @@ The planner's calendar and 320px Day Ticket sit side by side only when the viewp
 │ August 2026               │
 │ S  M  T  W  T  F  S       │
 │       3  4 [5] 6  7       │
-│       check 2 warn 1 +2   │
+│       check 4 warn 1      │
 │                           │
 │ ┌───────────────────────┐ │
 │ │ Wed, Aug 5  People 3  │ │
@@ -76,6 +76,6 @@ The planner's calendar and 320px Day Ticket sit side by side only when the viewp
 └───────────────────────────┘
 ```
 
-Mobile calendar cells are at least 52px high and remain within seven equal columns. They show a day number plus compact shape-and-count summaries such as check `2`, warning `1`, and `+2`; color is supplementary. Meal names and all actions live in the Day Ticket.
+Mobile calendar cells are at least 52px high and remain within seven equal columns. At 320px, the calendar alone may span through the 16px content gutters so every date target remains at least 44 by 44px without horizontal page scrolling; the Day Ticket stays aligned to the normal gutters. Cells show a day number plus complete Ready and Missing shape-and-count totals such as check `4` and warning `1`; there is no `+n`, and color is supplementary. Meal names and all actions live in the Day Ticket. Mobile heading and calendar instructions stay compact so the selected-day Ticket appears promptly.
 
 Recipes are three columns only when content width supports them, two at intermediate widths, and one on mobile. Pantry remains a ledger that reflows into labeled rows. Intake and reconciliation are separate full-page, single-column workspaces on mobile.
