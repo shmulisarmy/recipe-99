@@ -20,6 +20,8 @@ Reject non-numeric and negative values with `Enter an amount of 0 or more.` Ente
 
 `Convert unit` opens an anchored popover on desktop and bottom sheet on mobile. Show current amount, target unit, and preview such as `500 grams = 0.5 kilograms`. Disable Convert when target and current units match. Helper: `Conversion keeps the same quantity.`
 
+Opening conversion moves focus into its named panel. Escape and the close action dismiss it and restore focus to the invoking `Convert unit` control. On mobile the sheet is modal: background content is inert, focus remains contained, and the sheet has a dismissible backdrop. On desktop the anchored popover remains contextual and non-modal.
+
 Supported units are grams, kilograms, ounces, and pounds.
 
 ### Pantry states
@@ -50,6 +52,8 @@ The editable table contains Ingredient, Amount, Unit, Today's cart, and Remove. 
 - empty name: `Enter an ingredient name.`;
 - invalid amount: `Enter an amount of 0 or more.`
 
+In add-ingredient entry, associate each validation message with its invalid control using `aria-describedby`, set `aria-invalid="true"`, and focus the first invalid control after an unsuccessful add attempt.
+
 When an ingredient is still needed today, offer `Count up to 250 grams toward today’s cart`. Default unchecked. Allocation is the minimum of acquired amount and current remainder and updates when amount or unit changes.
 
 Submission updates the pantry only. Pending: `Adding to pantry…`. Failure retains all rows and says `The pantry wasn’t updated. Try again.` Success keeps the cart allocation handoff and opens `/intake/reconcile`.
@@ -63,9 +67,9 @@ Submission updates the pantry only. Pending: `Adding to pantry…`. Failure reta
 
 Each allocated ingredient shows Obtained, Still needed, and a required choice:
 
-- `Keep on today’s cart`;
-- `Move to tomorrow’s cart`;
-- `Remove from today’s cart`.
+- `Keep remainder on today’s cart`;
+- `Move remainder to tomorrow’s cart`;
+- `Remove remainder from today’s cart`.
 
 Default Keep. Primary action: `Finish reconciliation`.
 

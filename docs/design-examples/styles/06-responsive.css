@@ -77,13 +77,17 @@
   .ledger td.has-editor::before { display: block; margin-bottom: 7px; }
   .inline-measurement { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .row-actions .button { min-height: 44px; }
+  .ledger td[data-label="Actions"] .row-actions { width: 100%; }
+  .ledger td[data-label="Actions"] .button-secondary { border-color: var(--enamel); color: var(--enamel); }
+  .ledger td[data-label="Actions"] .button-primary { color: var(--porcelain); background: var(--enamel); }
 
   .stepper { margin-bottom: 22px; }
   .step { font-size: 12px; }
   .intake-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .intake-row .ingredient-field, .intake-row .remove-control { grid-column: 1 / -1; }
-  .intake-row .remove-control .button { width: 100%; }
-  .form-actions { flex-direction: column-reverse; }
+  .intake-row .remove-control { display: flex; justify-content: flex-end; }
+  .intake-row .remove-control .button { width: auto; min-height: 44px; }
+  .form-actions { flex-direction: column; }
   .form-actions .button { width: 100%; }
 
   .inspection-overlay, .transaction-overlay { align-items: end; grid-template-columns: minmax(0, 1fr); padding: 0; }
