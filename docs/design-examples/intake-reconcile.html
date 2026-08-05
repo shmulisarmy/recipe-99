@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="Static Recipe 99 cart reconciliation redesign prototype"><title>Recipe 99 prototype - Reconciliation</title>
+  <link rel="stylesheet" href="styles/01-tokens-base.css"><link rel="stylesheet" href="styles/02-shell.css"><link rel="stylesheet" href="styles/03-shared.css"><link rel="stylesheet" href="styles/04-destinations.css"><link rel="stylesheet" href="styles/05-overlays.css"><link rel="stylesheet" href="styles/06-responsive.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Recipe 99 navigation"><a class="wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><nav class="primary-nav" aria-label="Primary"><a class="nav-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="nav-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="nav-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="nav-link" aria-current="page" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav><p class="prototype-note">Static sample data. Nothing is saved.</p></aside>
+    <div class="app-content">
+      <header class="topbar"><a class="wordmark mobile-wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><span class="route-label">Intake</span><nav class="tablet-nav" aria-label="Primary"><a class="tablet-link" href="planner.html">Planner</a><a class="tablet-link" href="recipes.html">Recipes</a><a class="tablet-link" href="pantry.html">Pantry</a><a class="tablet-link" aria-current="page" href="intake.html">Intake</a></nav><button class="account-button" type="button" aria-label="Open account menu for Shmuli"><span class="avatar" aria-hidden="true">SH</span><span class="account-label">Shmuli</span><span class="icon icon-chevron" aria-hidden="true"></span></button></header>
+      <main class="main workspace-narrow" id="main">
+        <div class="stepper" aria-label="Intake progress"><div class="step">1 Review ingredients</div><div class="step active" aria-current="step">2 Reconcile today’s cart</div></div>
+        <header class="page-heading"><div><h1>Finish today’s shopping list</h1><p class="supporting-copy">Choose what should happen to each amount that is still needed.</p></div></header>
+        <form>
+          <div class="reconcile-list">
+            <section class="reconcile-row" aria-labelledby="spinach-heading"><div><h2 id="spinach-heading">Spinach</h2><div class="amount-triplet"><span>Obtained 200 g</span><span>Still needed 100 g</span></div></div><fieldset class="radio-list"><legend class="field-label">What should happen to the remainder?</legend><label><input type="radio" name="spinach-action" checked>Keep on today’s cart</label><label><input type="radio" name="spinach-action">Move to tomorrow’s cart</label><label><input type="radio" name="spinach-action">Remove from today’s cart</label></fieldset></section>
+            <section class="reconcile-row" aria-labelledby="lentils-heading"><div><h2 id="lentils-heading">Red lentils</h2><div class="amount-triplet"><span>Obtained 300 g</span><span>Still needed 200 g</span></div></div><fieldset class="radio-list"><legend class="field-label">What should happen to the remainder?</legend><label><input type="radio" name="lentils-action" checked>Keep on today’s cart</label><label><input type="radio" name="lentils-action">Move to tomorrow’s cart</label><label><input type="radio" name="lentils-action">Remove from today’s cart</label></fieldset></section>
+          </div>
+          <div class="form-actions"><a class="button button-secondary" href="intake.html">Back</a><a class="button button-primary" href="pantry.html">Finish reconciliation</a></div>
+        </form>
+      </main>
+    </div>
+  </div>
+  <nav class="bottom-nav" aria-label="Primary"><a class="bottom-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="bottom-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="bottom-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="bottom-link" aria-current="page" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav>
+</body>
+</html>

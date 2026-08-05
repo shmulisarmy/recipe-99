@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Static Recipe 99 planner redesign prototype">
+  <title>Recipe 99 prototype - Planner</title>
+  <link rel="stylesheet" href="styles/01-tokens-base.css">
+  <link rel="stylesheet" href="styles/02-shell.css">
+  <link rel="stylesheet" href="styles/03-shared.css">
+  <link rel="stylesheet" href="styles/04-destinations.css">
+  <link rel="stylesheet" href="styles/05-overlays.css">
+  <link rel="stylesheet" href="styles/06-responsive.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Recipe 99 navigation">
+      <a class="wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a class="nav-link" aria-current="page" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a>
+        <a class="nav-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a>
+        <a class="nav-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a>
+        <a class="nav-link" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a>
+      </nav>
+      <p class="prototype-note">Static sample data. Nothing is saved.</p>
+    </aside>
+
+    <div class="app-content">
+      <header class="topbar">
+        <a class="wordmark mobile-wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>
+        <span class="route-label">Planner</span>
+        <nav class="tablet-nav" aria-label="Primary"><a class="tablet-link" aria-current="page" href="planner.html">Planner</a><a class="tablet-link" href="recipes.html">Recipes</a><a class="tablet-link" href="pantry.html">Pantry</a><a class="tablet-link" href="intake.html">Intake</a></nav>
+        <button class="account-button" type="button" aria-label="Open account menu for Shmuli"><span class="avatar" aria-hidden="true">SH</span><span class="account-label">Shmuli</span><span class="icon icon-chevron" aria-hidden="true"></span></button>
+      </header>
+
+      <main class="main" id="main">
+        <header class="page-heading"><div><h1>August 2026</h1><p class="supporting-copy">Plan meals from what is on hand.</p></div></header>
+
+        <div class="planner-layout">
+          <section class="calendar-wrap" aria-labelledby="calendar-title">
+            <div class="calendar-note"><strong id="calendar-title">Month plan</strong><span>Select a date. Use the Day Ticket for actions.</span></div>
+            <table class="calendar" aria-label="August 2026 meal plan">
+              <thead><tr><th scope="col"><span class="weekday-long">Sun</span><span aria-hidden="true">S</span></th><th scope="col"><span class="weekday-long">Mon</span><span aria-hidden="true">M</span></th><th scope="col"><span class="weekday-long">Tue</span><span aria-hidden="true">T</span></th><th scope="col"><span class="weekday-long">Wed</span><span aria-hidden="true">W</span></th><th scope="col"><span class="weekday-long">Thu</span><span aria-hidden="true">T</span></th><th scope="col"><span class="weekday-long">Fri</span><span aria-hidden="true">F</span></th><th scope="col"><span class="weekday-long">Sat</span><span aria-hidden="true">S</span></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="day-cell outside"><button class="day-button" aria-label="Sunday, July 26">26</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Monday, July 27">27</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Tuesday, July 28">28</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Wednesday, July 29">29</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Thursday, July 30">30</button></div></td>
+                  <td><div class="day-cell outside"><button class="day-button" aria-label="Friday, July 31, two meals, one ready, one missing, two people, two shopping items">31</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Tomato pasta</span></div><div class="meal-summary status-missing"><span class="icon icon-warning" aria-hidden="true"></span><span>Lentil soup</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>1</span><span class="missing-count"><span class="icon icon-warning" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>2 people</span><span>cart 2</span></div></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Saturday, August 1, one ready meal, two people">1</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Spinach omelet</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>2 people</span><span></span></div></div></td>
+                </tr>
+                <tr>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Sunday, August 2">2</button></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Monday, August 3, one ready meal, one person">3</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Sesame noodles</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>1 person</span><span></span></div></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Tuesday, August 4, two missing meals, two people, four shopping items">4</button><div class="desktop-meals"><div class="meal-summary status-missing"><span class="icon icon-warning" aria-hidden="true"></span><span>Chicken soup</span></div><div class="meal-summary status-missing"><span class="icon icon-warning" aria-hidden="true"></span><span>Mashed potatoes</span></div></div><div class="mobile-status"><span class="missing-count"><span class="icon icon-warning" aria-hidden="true"></span>2</span></div><div class="cell-meta"><span>2 people</span><span>cart 4</span></div></div></td>
+                  <td><div class="day-cell selected"><button class="day-button today" aria-current="date" aria-pressed="true" aria-label="Wednesday, August 5, today, selected, five meals, four ready, one missing, three people, two shopping items">5</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Tomato pasta</span></div><div class="meal-summary status-missing"><span class="icon icon-warning" aria-hidden="true"></span><span>Lentil soup</span></div><div class="more-meals">+3 more</div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>2</span><span class="missing-count"><span class="icon icon-warning" aria-hidden="true"></span>1</span><span>+2</span></div><div class="cell-meta"><span>3 people</span><span>cart 2</span></div></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Thursday, August 6, two ready meals, four people">6</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Grilled cheese</span></div><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Tomato soup</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>2</span></div><div class="cell-meta"><span>4 people</span><span></span></div></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Friday, August 7, one missing meal, one shopping item">7</button><div class="desktop-meals"><div class="meal-summary status-missing"><span class="icon icon-warning" aria-hidden="true"></span><span>Chocolate cake</span></div></div><div class="mobile-status"><span class="missing-count"><span class="icon icon-warning" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>2 people</span><span>cart 1</span></div></div></td>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Saturday, August 8">8</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="day-cell"><button class="day-button" aria-label="Sunday, August 9">9</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Monday, August 10, one ready meal">10</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Rice and beans</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>2 people</span><span></span></div></div></td><td><div class="day-cell"><button class="day-button" aria-label="Tuesday, August 11">11</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Wednesday, August 12, three meals, two ready, one missing">12</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Pancakes</span></div><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Vegetable curry</span></div><div class="more-meals">+1 more</div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>2</span><span class="missing-count"><span class="icon icon-warning" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>3 people</span><span>cart 3</span></div></div></td><td><div class="day-cell"><button class="day-button" aria-label="Thursday, August 13">13</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Friday, August 14, one ready meal">14</button><div class="desktop-meals"><div class="meal-summary status-ready"><span class="icon icon-check" aria-hidden="true"></span><span>Mac and cheese</span></div></div><div class="mobile-status"><span class="ready-count"><span class="icon icon-check" aria-hidden="true"></span>1</span></div><div class="cell-meta"><span>2 people</span><span></span></div></div></td><td><div class="day-cell"><button class="day-button" aria-label="Saturday, August 15">15</button></div></td>
+                </tr>
+                <tr><td><div class="day-cell"><button class="day-button" aria-label="Sunday, August 16">16</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Monday, August 17">17</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Tuesday, August 18">18</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Wednesday, August 19">19</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Thursday, August 20">20</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Friday, August 21">21</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Saturday, August 22">22</button></div></td></tr>
+                <tr><td><div class="day-cell"><button class="day-button" aria-label="Sunday, August 23">23</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Monday, August 24">24</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Tuesday, August 25">25</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Wednesday, August 26">26</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Thursday, August 27">27</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Friday, August 28">28</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Saturday, August 29">29</button></div></td></tr>
+                <tr><td><div class="day-cell"><button class="day-button" aria-label="Sunday, August 30">30</button></div></td><td><div class="day-cell"><button class="day-button" aria-label="Monday, August 31">31</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Tuesday, September 1">1</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Wednesday, September 2">2</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Thursday, September 3">3</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Friday, September 4">4</button></div></td><td><div class="day-cell outside"><button class="day-button" aria-label="Saturday, September 5">5</button></div></td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <div class="ticket-shell">
+            <aside class="day-ticket" aria-labelledby="ticket-title">
+              <header class="ticket-head"><div><p class="ticket-date">Wed, Aug 5</p><p class="prototype-note">Today</p></div><label class="people-control"><span class="icon icon-people" aria-hidden="true"></span><span>People</span><input class="people-number" aria-label="People eating Wednesday, August 5" type="number" min="0" step="1" value="3"></label></header>
+              <div class="ticket-body">
+                <div class="ticket-summary"><h2 id="ticket-title">Meals</h2><span class="status-text status-missing"><span class="icon icon-warning" aria-hidden="true"></span>1 missing</span></div>
+                <ol class="ticket-meals">
+                  <li class="ticket-meal"><span class="meal-order">1</span><a class="meal-title" href="overlays.html#recipe-overlay">Tomato pasta</a><span class="meal-row-actions"><span class="status-text status-ready"><span class="icon icon-check" aria-hidden="true"></span>Ready</span><button class="icon-button drag-control" aria-label="Move Tomato pasta" type="button"><span class="icon icon-grip" aria-hidden="true"></span></button><button class="icon-button" aria-label="More actions for Tomato pasta" type="button"><span class="icon icon-more" aria-hidden="true"></span></button></span></li>
+                  <li class="ticket-meal"><span class="meal-order">2</span><a class="meal-title" href="overlays.html#recipe-overlay">Lentil soup</a><span class="meal-row-actions"><span class="status-text status-missing"><span class="icon icon-warning" aria-hidden="true"></span>Missing</span><button class="icon-button drag-control" aria-label="Move Lentil soup" type="button"><span class="icon icon-grip" aria-hidden="true"></span></button><button class="icon-button" aria-label="More actions for Lentil soup" type="button"><span class="icon icon-more" aria-hidden="true"></span></button></span></li>
+                  <li class="ticket-meal"><span class="meal-order">3</span><span class="meal-title">Sesame noodles</span><span class="meal-row-actions"><span class="status-text status-ready"><span class="icon icon-check" aria-hidden="true"></span>Ready</span><button class="icon-button drag-control" aria-label="Move Sesame noodles" type="button"><span class="icon icon-grip" aria-hidden="true"></span></button><button class="icon-button" aria-label="More actions for Sesame noodles" type="button"><span class="icon icon-more" aria-hidden="true"></span></button></span></li>
+                  <li class="ticket-meal"><span class="meal-order">4</span><span class="meal-title">Spinach omelet</span><span class="meal-row-actions"><span class="status-text status-ready"><span class="icon icon-check" aria-hidden="true"></span>Ready</span><button class="icon-button" aria-label="More actions for Spinach omelet" type="button"><span class="icon icon-more" aria-hidden="true"></span></button></span></li>
+                  <li class="ticket-meal"><span class="meal-order">5</span><span class="meal-title">Rice and beans</span><span class="meal-row-actions"><span class="status-text status-ready"><span class="icon icon-check" aria-hidden="true"></span>Ready</span><button class="icon-button" aria-label="More actions for Rice and beans" type="button"><span class="icon icon-more" aria-hidden="true"></span></button></span></li>
+                </ol>
+                <details class="disclosure"><summary>How readiness works</summary><p>Recipe 99 adds what is still expected from each day’s cart, then subtracts ingredients as meals use them in plan order.</p></details>
+                <div class="ticket-cart"><div class="ticket-cart-line"><strong>Shopping</strong><span>2 items, 65% obtained</span></div><div class="progress" role="progressbar" aria-label="Shopping progress for Wednesday, August 5" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65"><span style="width:65%"></span></div></div>
+                <div class="ticket-actions"><a class="button button-primary" href="overlays.html#cart-overlay"><span class="icon icon-cart" aria-hidden="true"></span>Open shopping cart</a><button class="button button-secondary" type="button">Move a meal</button></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary"><a class="bottom-link" aria-current="page" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="bottom-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="bottom-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="bottom-link" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav>
+</body>
+</html>

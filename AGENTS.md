@@ -29,6 +29,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 
 # Child DOX Index
 
+- `docs/AGENTS.md` — product behavior, redesign specifications, and static design examples.
 - `src/AGENTS.md` — browser application, shared frontend modules, and feature boundaries.
 - `convex/AGENTS.md` — Convex schema, functions, authentication, and generated API conventions.
 

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="Static Recipe 99 pantry redesign prototype"><title>Recipe 99 prototype - Pantry</title>
+  <link rel="stylesheet" href="styles/01-tokens-base.css"><link rel="stylesheet" href="styles/02-shell.css"><link rel="stylesheet" href="styles/03-shared.css"><link rel="stylesheet" href="styles/04-destinations.css"><link rel="stylesheet" href="styles/05-overlays.css"><link rel="stylesheet" href="styles/06-responsive.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Recipe 99 navigation"><a class="wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><nav class="primary-nav" aria-label="Primary"><a class="nav-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="nav-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="nav-link" aria-current="page" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="nav-link" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav><p class="prototype-note">Static sample data. Nothing is saved.</p></aside>
+    <div class="app-content">
+      <header class="topbar"><a class="wordmark mobile-wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><span class="route-label">Pantry</span><nav class="tablet-nav" aria-label="Primary"><a class="tablet-link" href="planner.html">Planner</a><a class="tablet-link" href="recipes.html">Recipes</a><a class="tablet-link" aria-current="page" href="pantry.html">Pantry</a><a class="tablet-link" href="intake.html">Intake</a></nav><button class="account-button" type="button" aria-label="Open account menu for Shmuli"><span class="avatar" aria-hidden="true">SH</span><span class="account-label">Shmuli</span><span class="icon icon-chevron" aria-hidden="true"></span></button></header>
+      <main class="main" id="main">
+        <header class="page-heading"><div><h1>Pantry</h1><p class="supporting-copy">Keep these amounts accurate so recipe readiness stays useful.</p></div><a class="button button-primary" href="intake.html">Add a batch</a></header>
+        <section class="section" aria-labelledby="pantry-list-title"><div class="section-head"><div><h2 id="pantry-list-title">Stored ingredients</h2><p>12 ingredients, updated just now</p></div></div>
+          <table class="ledger"><thead><tr><th scope="col">Ingredient</th><th scope="col">Stored amount</th><th scope="col">Actions</th></tr></thead><tbody>
+            <tr><td data-label="Ingredient">Black beans</td><td data-label="Stored amount">900 grams</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+            <tr><td data-label="Ingredient">Butter</td><td class="has-editor" data-label="Stored amount"><div class="inline-measurement"><div class="field"><label class="screen-reader-only" for="butter-amount">Butter amount</label><input class="input" id="butter-amount" type="number" min="0" value="8"></div><div class="field"><label class="screen-reader-only" for="butter-unit">Butter unit</label><select class="select" id="butter-unit"><option>grams</option><option>kilograms</option><option selected>ounces</option><option>pounds</option></select></div></div></td><td data-label="Actions"><div class="row-actions"><button class="button button-primary" type="button">Save amount</button><button class="button button-quiet" type="button">Cancel</button></div></td></tr>
+            <tr><td data-label="Ingredient">Crushed tomatoes</td><td data-label="Stored amount">1.2 kilograms</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+            <tr><td data-label="Ingredient">Flour</td><td data-label="Stored amount">2.4 kilograms</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+            <tr><td data-label="Ingredient">Lentils</td><td data-label="Stored amount">680 grams</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+            <tr><td data-label="Ingredient">Milk</td><td data-label="Stored amount">1.5 kilograms</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+            <tr><td data-label="Ingredient">Spaghetti</td><td data-label="Stored amount">750 grams</td><td data-label="Actions"><div class="row-actions"><button class="button button-secondary" type="button">Edit amount</button><button class="button button-quiet" type="button">Convert unit</button></div></td></tr>
+          </tbody></table>
+        </section>
+      </main>
+    </div>
+  </div>
+  <nav class="bottom-nav" aria-label="Primary"><a class="bottom-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="bottom-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="bottom-link" aria-current="page" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="bottom-link" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav>
+</body>
+</html>

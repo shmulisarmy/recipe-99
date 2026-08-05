@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="Static Recipe 99 batch intake redesign prototype"><title>Recipe 99 prototype - Intake</title>
+  <link rel="stylesheet" href="styles/01-tokens-base.css"><link rel="stylesheet" href="styles/02-shell.css"><link rel="stylesheet" href="styles/03-shared.css"><link rel="stylesheet" href="styles/04-destinations.css"><link rel="stylesheet" href="styles/05-overlays.css"><link rel="stylesheet" href="styles/06-responsive.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Recipe 99 navigation"><a class="wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><nav class="primary-nav" aria-label="Primary"><a class="nav-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="nav-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="nav-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="nav-link" aria-current="page" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav><p class="prototype-note">Static sample data. Nothing is saved.</p></aside>
+    <div class="app-content">
+      <header class="topbar"><a class="wordmark mobile-wordmark" href="planner.html"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a><span class="route-label">Intake</span><nav class="tablet-nav" aria-label="Primary"><a class="tablet-link" href="planner.html">Planner</a><a class="tablet-link" href="recipes.html">Recipes</a><a class="tablet-link" href="pantry.html">Pantry</a><a class="tablet-link" aria-current="page" href="intake.html">Intake</a></nav><button class="account-button" type="button" aria-label="Open account menu for Shmuli"><span class="avatar" aria-hidden="true">SH</span><span class="account-label">Shmuli</span><span class="icon icon-chevron" aria-hidden="true"></span></button></header>
+      <main class="main workspace-narrow" id="main">
+        <div class="stepper" aria-label="Intake progress"><div class="step active" aria-current="step">1 Review ingredients</div><div class="step">2 Reconcile today’s cart</div></div>
+        <header class="page-heading"><div><h1>Add a batch</h1><p class="supporting-copy">Review what came into the kitchen before updating the pantry.</p></div></header>
+        <form>
+          <div class="intake-list">
+            <div class="intake-row"><div class="field ingredient-field"><label for="name-1">Ingredient</label><input class="input" id="name-1" value="red lentils"></div><div class="field"><label for="amount-1">Amount</label><input class="input" id="amount-1" type="number" min="0" value="500"></div><div class="field"><label for="unit-1">Unit</label><select class="select" id="unit-1"><option selected>grams</option><option>kilograms</option><option>ounces</option><option>pounds</option></select></div><div class="remove-control"><button class="button button-quiet" type="button">Remove</button></div></div>
+            <div class="intake-row"><div class="field ingredient-field"><label for="name-2">Ingredient</label><input class="input" id="name-2" value="spinach"></div><div class="field"><label for="amount-2">Amount</label><input class="input" id="amount-2" type="number" min="0" value="250"></div><div class="field"><label for="unit-2">Unit</label><select class="select" id="unit-2"><option selected>grams</option><option>kilograms</option><option>ounces</option><option>pounds</option></select></div><div class="remove-control"><button class="button button-quiet" type="button">Remove</button></div></div>
+            <div class="intake-row"><div class="field ingredient-field"><label for="name-3">Ingredient</label><input class="input" id="name-3" value="cheddar"></div><div class="field"><label for="amount-3">Amount</label><input class="input" id="amount-3" type="number" min="0" value="8"></div><div class="field"><label for="unit-3">Unit</label><select class="select" id="unit-3"><option>grams</option><option>kilograms</option><option selected>ounces</option><option>pounds</option></select></div><div class="remove-control"><button class="button button-quiet" type="button">Remove</button></div></div>
+          </div>
+          <label class="cart-match"><input type="checkbox"><span><strong>Count up to 200 grams of spinach toward today’s cart</strong><br>Today still needs 200 grams.</span></label>
+          <div class="form-actions"><button class="button button-secondary" type="button">Add ingredient</button><a class="button button-primary" href="intake-reconcile.html">Add to pantry</a></div>
+        </form>
+      </main>
+    </div>
+  </div>
+  <nav class="bottom-nav" aria-label="Primary"><a class="bottom-link" href="planner.html"><span class="icon icon-calendar" aria-hidden="true"></span>Planner</a><a class="bottom-link" href="recipes.html"><span class="icon icon-recipes" aria-hidden="true"></span>Recipes</a><a class="bottom-link" href="pantry.html"><span class="icon icon-pantry" aria-hidden="true"></span>Pantry</a><a class="bottom-link" aria-current="page" href="intake.html"><span class="icon icon-intake" aria-hidden="true"></span>Intake</a></nav>
+</body>
+</html>
