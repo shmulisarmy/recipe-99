@@ -26,6 +26,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 
 - Keep mutation loading and error state visible at the control that initiated the write.
 - Maintain accessible names, focus-visible affordances, dialog semantics, and usable mobile layouts.
+- The current empty fragments are a temporary redesign boundary. Preserve and reconnect the existing controller logic, including extracted drag handlers, when rebuilding each component.
 
 # Verification
 

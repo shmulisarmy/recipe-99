@@ -27,45 +27,37 @@ export function RecipePill(props: {
   const name = () =>
     props.truncate === false ? recipeName() : truncateName(makeCacheKey(recipeName()));
 
-  return (
-    <button
-      type="button"
-      draggable={true}
-      class={`block w-full truncate rounded-md text-left font-medium capitalize ${
-        props.class ?? "px-1.5 py-0.5 text-xs"
-      }`}
-      classList={{
-        "bg-green-100 text-green-800 hover:bg-green-200": props.item.couldMake && !isDragOver(),
-        "bg-red-100 text-red-800 hover:bg-red-200": !props.item.couldMake && !isDragOver(),
-        "ring-2 ring-stone-400 opacity-60": isDragOver(),
-      }}
-      onDragStart={(e) => {
-        e.dataTransfer!.setData("text/plain", id());
-        e.dataTransfer!.effectAllowed = "move";
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        e.dataTransfer!.dropEffect = "move";
-        setIsDragOver(true);
-      }}
-      onDragLeave={() => setIsDragOver(false)}
-      onDragEnd={() => setIsDragOver(false)}
-      onDrop={async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragOver(false);
-        const draggedId = e.dataTransfer!.getData("text/plain");
-        if (draggedId && draggedId !== id()) {
-          await moveRecipeOnTopOfOtherRecipe.mutate({
-            recipeId: draggedId,
-            otherRecipeId: id(),
-          });
-        }
-      }}
-      onClick={() => props.onOpen()}
-    >
-      {name()}
-      {props.item.multiplier !== 1 ? ` ×${props.item.multiplier}` : ""}
-    </button>
-  );
+  const handleDragStart = (event: DragEvent) => {
+    event.dataTransfer?.setData("text/plain", id());
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (event: DragEvent) => {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+    setIsDragOver(true);
+  };
+
+  const clearDragState = () => setIsDragOver(false);
+
+  const handleDrop = async (event: DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(false);
+    const draggedId = event.dataTransfer?.getData("text/plain");
+    if (!draggedId || draggedId === id()) return;
+    await moveRecipeOnTopOfOtherRecipe.mutate({
+      recipeId: draggedId,
+      otherRecipeId: id(),
+    });
+  };
+
+  void isDragOver;
+  void name;
+  void handleDragStart;
+  void handleDragOver;
+  void clearDragState;
+  void handleDrop;
+
+  return (<></>);
 }

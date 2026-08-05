@@ -23,6 +23,7 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 
 - Put reusable domain operations in `primitives/` or an existing shared module only when more than one feature genuinely owns the use case.
 - Keep feature-local UI, projections, and interaction state inside the owning feature.
+- The browser is in a deliberate redesign reset: TSX components currently return empty fragments while retaining their queries, mutations, state, validation, and extracted interaction handlers. Rebuild their JSX around that logic rather than re-creating the behavior from scratch.
 
 # Verification
 

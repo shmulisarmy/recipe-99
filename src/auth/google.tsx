@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, type JSX } from "solid-js";
+import { createSignal, onMount, type JSX } from "solid-js";
 import { useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import { convexClient } from "../convex_client";
@@ -124,31 +124,10 @@ function loadGoogleIdentityServices(): Promise<GoogleIdentityServices> {
 
 function AuthenticatedApp(props: { children: JSX.Element; onSignOut(): void }) {
     const identity = useQuery(api.data.getCurrentUserOAuthId, {});
+    void identity;
+    void props;
 
-    return (
-        <>
-            <header class="sticky top-0 z-50 border-b border-stone-200 bg-white/95 px-4 py-3 backdrop-blur">
-                <div class="mx-auto flex max-w-6xl items-center justify-between gap-4">
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-stone-900">
-                            Signed in{identity.data()?.email ? ` as ${identity.data()?.email}` : ""}
-                        </p>
-                        <p class="truncate text-xs text-stone-500">
-                            Google OAuth ID: {identity.data()?.oauthId ?? "Checking…"}
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        class="shrink-0 rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-100"
-                        onClick={props.onSignOut}
-                    >
-                        Sign out
-                    </button>
-                </div>
-            </header>
-            {props.children}
-        </>
-    );
+    return (<></>);
 }
 
 export function GoogleAuthGate(props: { children: JSX.Element }) {
@@ -198,38 +177,10 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
         window.google?.accounts.id.disableAutoSelect();
     }
 
-    return (
-        <>
-            <main
-                class="grid min-h-screen place-items-center bg-stone-50 px-4"
-                classList={{ hidden: isAuthenticated() }}
-            >
-                <section class="w-full max-w-sm rounded-2xl bg-white p-7 text-center shadow-sm ring-1 ring-stone-200">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                        Recipe-99
-                    </p>
-                    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-                        Sign in to your pantry
-                    </h1>
-                    <p class="mt-2 text-sm leading-6 text-stone-500">
-                        Your Google identity keeps your pantry separate from other users.
-                    </p>
-                    <div class="mt-6 flex justify-center" ref={googleButton} />
-                    <Show when={authError()}>
-                        {(message) => (
-                            <p class="mt-4 text-sm text-red-700" role="alert">
-                                {message()}
-                            </p>
-                        )}
-                    </Show>
-                </section>
-            </main>
+    void isAuthenticated;
+    void authError;
+    void signOut;
+    void props;
 
-            <Show when={isAuthenticated()}>
-                <AuthenticatedApp onSignOut={signOut}>
-                    {props.children}
-                </AuthenticatedApp>
-            </Show>
-        </>
-    );
+    return (<></>);
 }

@@ -21,6 +21,7 @@ Own the multistep workflow for adding a batch of acquired ingredients to the pan
 
 - Recompute cart selections when an edited batch amount changes.
 - Preserve measurement units and use shared measurement arithmetic for comparisons and subtraction.
+- The current empty fragments are a temporary redesign boundary. Preserve and reconnect the retained batch, validation, submission, and reconciliation logic when rebuilding the workflow.
 
 # Verification
 
