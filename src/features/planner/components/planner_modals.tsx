@@ -1,4 +1,4 @@
-import { For, JSX, Show, onCleanup } from "solid-js";
+import { createSignal, For, JSX, Show, onCleanup } from "solid-js";
 import { makeCacheKey, RequiredIngredient } from "../../../data";
 import type { RecipeProjection } from "./types";
 import {
@@ -11,8 +11,7 @@ import {
     ZeroedMeasurement,
 } from "../../../primitives/measurement";
 import { api } from "../../../../convex/_generated/api";
-import { useQuery } from "convex-solidjs";
-import { use } from "solid-js/web";
+import { useMutation, useQuery } from "convex-solidjs";
 import { PlannerType } from "../data";
 
 // ---------- Formatting helpers ----------
@@ -34,7 +33,12 @@ function dayLabel(dateStr: string): string {
 
 // ---------- Modal shell ----------
 
-function Modal(props: { title: string; onClose: () => void; children: JSX.Element }) {
+function Modal(props: {
+    title: string;
+    onClose: () => void;
+    headerAction?: JSX.Element;
+    children: JSX.Element;
+}) {
     const onKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") props.onClose();
     };
@@ -52,16 +56,19 @@ function Modal(props: { title: string; onClose: () => void; children: JSX.Elemen
                 class="w-full max-w-none rounded-t-2xl rounded-b-none bg-white p-6 shadow-xl sm:max-w-md sm:rounded-2xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div class="flex items-start justify-between">
+                <div class="flex items-start justify-between gap-3">
                     <h2 class="text-lg font-semibold capitalize text-stone-900">{props.title}</h2>
-                    <button
-                        type="button"
-                        class="rounded-md p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
-                        aria-label="Close"
-                        onClick={() => props.onClose()}
-                    >
-                        ×
-                    </button>
+                    <div class="flex items-center gap-1">
+                        {props.headerAction}
+                        <button
+                            type="button"
+                            class="rounded-md p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                            aria-label="Close"
+                            onClick={() => props.onClose()}
+                        >
+                            ×
+                        </button>
+                    </div>
                 </div>
                 {props.children}
             </div>
@@ -76,6 +83,62 @@ export function RecipeModal(props: {
     onClose: () => void;
 }): JSX.Element {
     const recipeName = () => props.item.plannedRecipeReference.recipeId;
+    const recipeId = () => props.item.plannedRecipeReference.id;
+    const initialOverride = props.item.plannedRecipeReference.overrideDayMultiplier;
+    const initialMultiplier = initialOverride ?? props.item.dayMultiplier;
+    const [multiplierMenuOpen, setMultiplierMenuOpen] = createSignal(false);
+    const [currentMultiplier, setCurrentMultiplier] = createSignal(initialMultiplier);
+    const [multiplierDraft, setMultiplierDraft] = createSignal(String(initialMultiplier));
+    const [usingDayDefault, setUsingDayDefault] = createSignal(initialOverride === undefined);
+    const [isSavingMultiplier, setIsSavingMultiplier] = createSignal(false);
+    const [multiplierError, setMultiplierError] = createSignal("");
+    const updateRecipeMultiplier = useMutation(
+        api.planner_exports.updateRecipeOverrideMultiplier,
+    );
+
+    const saveMultiplier = async (event: SubmitEvent) => {
+        event.preventDefault();
+        const multiplier = Number(multiplierDraft());
+        if (!multiplierDraft().trim() || !Number.isFinite(multiplier) || multiplier <= 0) {
+            setMultiplierError("Enter a multiplier greater than 0.");
+            return;
+        }
+
+        setIsSavingMultiplier(true);
+        setMultiplierError("");
+        try {
+            await updateRecipeMultiplier.mutate({
+                recipeId: recipeId(),
+                multiplier,
+            });
+            setCurrentMultiplier(multiplier);
+            setUsingDayDefault(false);
+            setMultiplierMenuOpen(false);
+        } catch {
+            setMultiplierError("Couldn't update the amount. Try again.");
+        } finally {
+            setIsSavingMultiplier(false);
+        }
+    };
+
+    const useDayDefault = async () => {
+        setIsSavingMultiplier(true);
+        setMultiplierError("");
+        try {
+            await updateRecipeMultiplier.mutate({
+                recipeId: recipeId(),
+                multiplier: null,
+            });
+            setCurrentMultiplier(props.item.dayMultiplier);
+            setMultiplierDraft(String(props.item.dayMultiplier));
+            setUsingDayDefault(true);
+            setMultiplierMenuOpen(false);
+        } catch {
+            setMultiplierError("Couldn't use the day default. Try again.");
+        } finally {
+            setIsSavingMultiplier(false);
+        }
+    };
     // const recipeInMenu = () => menu.get(recipeName());
     const recipeInMenu2 = useQuery(api.data.getRecipeByTitle, { recipeTitle: makeCacheKey(recipeName()) });
     const recipeInMenu = () => recipeInMenu2.data();
@@ -100,7 +163,90 @@ export function RecipeModal(props: {
     // }
 
     return (
-        <Modal title={makeCacheKey(recipeName())} onClose={props.onClose}>
+        <Modal
+            title={makeCacheKey(recipeName())}
+            onClose={props.onClose}
+            headerAction={
+                <div
+                    class="relative"
+                    onKeyDown={(event) => {
+                        if (event.key === "Escape" && multiplierMenuOpen()) {
+                            event.stopPropagation();
+                            setMultiplierMenuOpen(false);
+                        }
+                    }}
+                >
+                    <button
+                        type="button"
+                        class="flex h-7 w-7 items-center justify-center rounded-md text-stone-500 hover:bg-stone-100 hover:text-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                        aria-label="Recipe options"
+                        aria-haspopup="dialog"
+                        aria-expanded={multiplierMenuOpen()}
+                        onClick={() => setMultiplierMenuOpen((open) => !open)}
+                    >
+                        <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                            <circle cx="4" cy="10" r="1.5" />
+                            <circle cx="10" cy="10" r="1.5" />
+                            <circle cx="16" cy="10" r="1.5" />
+                        </svg>
+                    </button>
+                    <Show when={multiplierMenuOpen()}>
+                        <div
+                            role="dialog"
+                            aria-label="Amount to make"
+                            class="absolute right-0 top-9 z-10 w-64 rounded-xl border border-stone-200 bg-white p-3 shadow-lg"
+                        >
+                            <form onSubmit={saveMultiplier}>
+                                <label
+                                    for="recipe-amount-to-make"
+                                    class="text-xs font-semibold uppercase tracking-wide text-stone-500"
+                                >
+                                    Amount to make
+                                </label>
+                                <p class="mt-1 text-xs text-stone-500">
+                                    {usingDayDefault()
+                                        ? `Using day default (×${currentMultiplier()})`
+                                        : `Custom amount ×${currentMultiplier()}`}
+                                </p>
+                                <div class="mt-3 flex gap-2">
+                                    <input
+                                        id="recipe-amount-to-make"
+                                        type="number"
+                                        min="0.1"
+                                        step="0.1"
+                                        required
+                                        value={multiplierDraft()}
+                                        onInput={(event) => setMultiplierDraft(event.currentTarget.value)}
+                                        class="min-w-0 flex-1 rounded-lg border border-stone-300 px-3 py-1.5 text-sm tabular-nums text-stone-900 outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-200"
+                                        aria-describedby={multiplierError() ? "recipe-multiplier-error" : undefined}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={isSavingMultiplier()}
+                                        class="rounded-lg bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-700 disabled:cursor-wait disabled:opacity-60"
+                                    >
+                                        {isSavingMultiplier() ? "Saving…" : "Save"}
+                                    </button>
+                                </div>
+                                <Show when={multiplierError()}>
+                                    <p id="recipe-multiplier-error" class="mt-2 text-xs text-red-600" role="alert">
+                                        {multiplierError()}
+                                    </p>
+                                </Show>
+                                <button
+                                    type="button"
+                                    disabled={isSavingMultiplier() || usingDayDefault()}
+                                    class="mt-3 w-full rounded-lg border border-stone-200 px-3 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-50 disabled:cursor-default disabled:text-stone-400"
+                                    onClick={useDayDefault}
+                                >
+                                    {usingDayDefault() ? "Using day default" : "Use day default"}
+                                </button>
+                            </form>
+                        </div>
+                    </Show>
+                </div>
+            }
+        >
             <div class="mt-1 flex items-center gap-2">
                 <Show
                     when={props.item.couldMake}

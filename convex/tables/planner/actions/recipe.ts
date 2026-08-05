@@ -149,8 +149,9 @@ export const MoveRecipeOnTopOfOtherRecipe = mutation({
 export const updateRecipeOverrideMultiplier = mutation({
     args: {
         recipeId: v.string(),
-        multiplier: v.number(),
+        multiplier: v.union(v.number(), v.null()),
     },
+    returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
         const { day } = await getPlannedRecipe(ctx, userId, args.recipeId);
@@ -163,10 +164,13 @@ export const updateRecipeOverrideMultiplier = mutation({
         }
 
         const recipes = [...day.recipes];
-        recipes[recipeIndex] = {
-            ...recipes[recipeIndex],
-            overrideDayMultiplier: args.multiplier,
-        };
+        const { overrideDayMultiplier: _, ...recipeWithoutOverride } = recipes[recipeIndex];
+        recipes[recipeIndex] = args.multiplier === null
+            ? recipeWithoutOverride
+            : {
+                ...recipeWithoutOverride,
+                overrideDayMultiplier: args.multiplier,
+            };
 
         await ctx.db.patch(day._id, { recipes });
         return null;

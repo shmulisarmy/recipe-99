@@ -1,8 +1,9 @@
 import { createSignal } from "solid-js";
-import { MoveRecipeOnTopOfOtherRecipe } from "../actions/recipe";
+import { useMutation } from "convex-solidjs";
 import type { RecipeProjection } from "./types";
 import { makeCacheKey } from "../../../data";
 import { MAX_PILL_CHARS } from "./_settings";
+import { api } from "../../../../convex/_generated/api";
 
 function truncateName(name: string): string {
   return name.length > MAX_PILL_CHARS
@@ -17,6 +18,9 @@ export function RecipePill(props: {
   class?: string;
 }) {
   const [isDragOver, setIsDragOver] = createSignal(false);
+  const moveRecipeOnTopOfOtherRecipe = useMutation(
+    api.planner_exports.MoveRecipeOnTopOfOtherRecipe,
+  );
 
   const id = () => props.item.plannedRecipeReference.id;
   const recipeName = () => props.item.plannedRecipeReference.recipeId;
@@ -46,13 +50,16 @@ export function RecipePill(props: {
       }}
       onDragLeave={() => setIsDragOver(false)}
       onDragEnd={() => setIsDragOver(false)}
-      onDrop={(e) => {
+      onDrop={async (e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
         const draggedId = e.dataTransfer!.getData("text/plain");
         if (draggedId && draggedId !== id()) {
-          MoveRecipeOnTopOfOtherRecipe(draggedId, id());
+          await moveRecipeOnTopOfOtherRecipe.mutate({
+            recipeId: draggedId,
+            otherRecipeId: id(),
+          });
         }
       }}
       onClick={() => props.onOpen()}

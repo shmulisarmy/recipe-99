@@ -17,6 +17,7 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
     type RecipeProjection = {
         plannedRecipeReference: PlannedRecipe;
         multiplier: number;
+        dayMultiplier: number;
         couldMake: boolean;
         scratchPadOfIngredientsNeededToUse: IngredientSet;
         unfulfilledIngredients: {RequiredIngredient: RequiredIngredient, have: Measurement}[];
@@ -71,6 +72,7 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
             daysProjection.push({
                 plannedRecipeReference: recipe,
                 multiplier,
+                dayMultiplier: plannedDay.multiplier,
                 couldMake,
                 scratchPadOfIngredientsNeededToUse,
                 unfulfilledIngredients

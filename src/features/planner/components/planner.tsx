@@ -109,6 +109,7 @@ export function Planner() {
                     selected={selectedDay() === dateStr}
                     recipes={projection[dateStr] ?? []}
                     cartCount={plannerData()[dateStr]? Object.keys(plannerData()[dateStr].shoppingCart.toGet).length: undefined} 
+                    peopleCount={plannerData()[dateStr]?.multiplier}
                     onSelectDay={() => setSelectedDay(dateStr)}
                     onOpenRecipe={(item) => setOpenRecipe(item)}
                     onOpenCart={() => setOpenCartDay(dateStr)}

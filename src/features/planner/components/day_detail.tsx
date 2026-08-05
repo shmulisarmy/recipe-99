@@ -1,9 +1,9 @@
 import { createSignal, For, JSX, Show } from "solid-js";
-import { InsertRecipeAtBeginningOfDate } from "../actions/recipe";
-import { reSimulatePlannerProjection } from "../logic";
+import { useMutation } from "convex-solidjs";
 import { CartButton } from "./cart_button";
 import { RecipePill } from "./recipe_pill";
 import type { RecipeProjection } from "./types";
+import { api } from "../../../../convex/_generated/api";
 
 function dayLabel(dateStr: string): string {
     const date = new Date(dateStr);
@@ -25,6 +25,9 @@ export function DayDetail(props: {
 }): JSX.Element {
     const [isDragOver, setIsDragOver] = createSignal(false);
     const date = () => new Date(props.dateStr);
+    const insertRecipeAtBeginningOfDate = useMutation(
+        api.planner_exports.InsertRecipeAtBeginningOfDate,
+    );
 
     return (
         <div
@@ -40,13 +43,15 @@ export function DayDetail(props: {
                     setIsDragOver(false);
                 }
             }}
-            onDrop={(e) => {
+            onDrop={async (e) => {
                 e.preventDefault();
                 setIsDragOver(false);
                 const draggedId = e.dataTransfer!.getData("text/plain");
                 if (draggedId) {
-                    InsertRecipeAtBeginningOfDate(draggedId, date());
-                    
+                    await insertRecipeAtBeginningOfDate.mutate({
+                        recipeId: draggedId,
+                        toDate: date().toDateString(),
+                    });
                 }
             }}
         >
