@@ -19,6 +19,8 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 - Shared code may depend on a feature only through that feature's documented integration surface.
 - `recipeMakingProjection` reports unfulfilled required and substitute measurements already scaled by the requested recipe multiplier.
 - Navigation-owned state belongs in Solid Router paths and search parameters; recipe and cart overlays must preserve their owning route in browser history.
+- Shared overlays make the application behind them inert, trap focus while open, close on Escape when safe, and restore focus to the invoking control.
+- The recipe library keeps recipe imagery prominent, combines search and readiness filters in the URL, and uses a responsive image-led stream with a route-owned detail drawer.
 
 # Work Guidance
 

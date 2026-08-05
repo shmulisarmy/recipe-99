@@ -17,6 +17,8 @@ Own the multistep workflow for adding a batch of acquired ingredients to the pan
 - The shopping-cart draft represents only the acquired amounts selected for reconciliation; do not apply it before the follow-up step.
 - Use generated Convex functions for persisted pantry and planner changes.
 - Treat the in-memory `IntakeHandoff` as route-local state: direct entry to reconciliation without it returns to Intake with guidance.
+- On mobile, keep `Add ingredient` before the primary `Add to pantry` action in both DOM and visual order; row removal remains a quiet secondary action.
+- New-entry validation identifies and focuses the invalid name field, and reconciliation copy distinguishes the acquired remainder from the original cart amount.
 
 # Work Guidance
 

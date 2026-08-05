@@ -22,6 +22,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - Escape closes a modal normally, but a cart modal with unsaved measurement drafts must ask for confirmation first.
 - Interactive controls inside a day cell or modal must not accidentally trigger the parent selection or backdrop-close handler.
 - Calendar cells have one focusable date target; the selected-day Day Ticket owns people, meal, cart, and movement actions.
+- Mobile calendar cells expose complete `Ready` and `Missing` meal totals without listing meal names or using an additional-count suffix; dates remain at least 44 by 44 pixels and the selected Day Ticket follows the calendar directly.
 - Planned-recipe and cart overlays are route-owned; amount and explicit-move surfaces remain local overlays over the selected day.
 
 # Work Guidance
@@ -29,6 +30,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - Keep mutation loading and error state visible at the control that initiated the write.
 - Maintain accessible names, focus-visible affordances, dialog semantics, and usable mobile layouts.
 - Keep pointer dragging, keyboard lift/drop, and the explicit move surface wired to the same generated move mutations.
+- Announce successful explicit moves and return focus through registered day rows rather than timing-dependent delays.
 
 # Verification
 
