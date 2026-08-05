@@ -213,12 +213,11 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     };
 
     onMount(() => {
-        if (window.location.pathname !== "/sign-in") window.history.replaceState(null, "", "/sign-in");
         void setupGoogle();
     });
 
     createEffect(() => {
-        if (isAuthenticated() && (window.location.pathname === "/" || window.location.pathname === "/sign-in")) {
+        if (isAuthenticated() && window.location.pathname === "/sign-in") {
             window.history.replaceState(null, "", "/planner");
         }
     });

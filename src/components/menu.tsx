@@ -57,26 +57,29 @@ function RecipeDetail(props: { status: RecipeStatus; pantry: Doc<"pantryItems">[
     <Overlay kind="inspection" title={props.status.recipe.title} eyebrow="Recipe library" onClose={props.onClose} footer={<button class="button button-secondary" type="button" onClick={props.onClose}>Close</button>}>
       <div class="recipe-detail-intro"><div class="detail-status"><Show when={props.status.kind === "ready"}><StatusText kind="ready"/></Show><Show when={props.status.kind === "missing"}><StatusText kind="missing"/></Show><Show when={props.status.kind === "checking"}><StatusText kind="checking"/></Show></div><p class="recipe-detail-description">{props.status.recipe.description}</p></div>
       <div class="recipe-detail-media"><RecipeImage title={props.status.recipe.title}/></div>
-      <section class="ingredient-group ready" aria-labelledby="recipe-have-heading"><h3 id="recipe-have-heading">You have</h3><For each={owned()}>{(ingredient) => <div class="ingredient-line"><strong>{ingredient.name}</strong><span>Need <Amount measurement={ingredient.Measurement}/></span><span>Available <Amount measurement={pantryMeasurement(ingredient.name)}/></span></div>}</For><Show when={owned().length === 0}><p class="helper-text">No required ingredients are fully covered.</p></Show></section>
-      <Show when={missing().length > 0}><section class="ingredient-group missing" aria-labelledby="recipe-missing-heading"><h3 id="recipe-missing-heading">Still needed</h3><For each={missing()}>{(item) => <div class="ingredient-line"><strong>{item.RequiredIngredient.name}</strong><span>Need <Amount measurement={item.RequiredIngredient.Measurement}/></span><span>Available <Amount measurement={item.have}/></span></div>}</For></section></Show>
-      <Show when={substitutes().length > 0}><section class="ingredient-group" aria-labelledby="recipe-substitute-heading"><h3 id="recipe-substitute-heading">Substitutes</h3><For each={substitutes()}>{(ingredient) => <div class="ingredient-line"><strong>{ingredient.substitute!.name}</strong><span>Instead of {ingredient.name}</span><span>Available <Amount measurement={pantryMeasurement(ingredient.substitute!.name)}/></span></div>}</For></section></Show>
+      <Show when={props.status.kind !== "checking"} fallback={<section class="ingredient-group" aria-labelledby="recipe-pantry-heading"><h3 id="recipe-pantry-heading">Pantry status unavailable</h3><p class="helper-text">Ingredient availability is still being checked. No ingredients are marked as on hand yet.</p></section>}>
+        <section class="ingredient-group ready" aria-labelledby="recipe-have-heading"><h3 id="recipe-have-heading">You have</h3><For each={owned()}>{(ingredient) => <div class="ingredient-line"><strong>{ingredient.name}</strong><span>Need <Amount measurement={ingredient.Measurement}/></span><span>Available <Amount measurement={pantryMeasurement(ingredient.name)}/></span></div>}</For><Show when={owned().length === 0}><p class="helper-text">No required ingredients are fully covered.</p></Show></section>
+        <Show when={missing().length > 0}><section class="ingredient-group missing" aria-labelledby="recipe-missing-heading"><h3 id="recipe-missing-heading">Still needed</h3><For each={missing()}>{(item) => <div class="ingredient-line"><strong>{item.RequiredIngredient.name}</strong><span>Need <Amount measurement={item.RequiredIngredient.Measurement}/></span><span>Available <Amount measurement={item.have}/></span></div>}</For></section></Show>
+        <Show when={substitutes().length > 0}><section class="ingredient-group" aria-labelledby="recipe-substitute-heading"><h3 id="recipe-substitute-heading">Substitutes</h3><For each={substitutes()}>{(ingredient) => <div class="ingredient-line"><strong>{ingredient.substitute!.name}</strong><span>Instead of {ingredient.name}</span><span>Available <Amount measurement={pantryMeasurement(ingredient.substitute!.name)}/></span></div>}</For></section></Show>
+      </Show>
     </Overlay>
   );
 }
 
 function RecipeCard(props: { status: RecipeStatus; onOpen: () => void }) {
   const missingNames = () => props.status.kind === "missing" ? props.status.unfulfilled.map((item) => item.RequiredIngredient.name) : [];
-  const ingredientState = (name: string) => props.status.kind === "checking" ? "checking" : missingNames().includes(name) ? "missing" : "ready";
   return (
     <article class="recipe-card" classList={{ "is-ready": props.status.kind === "ready", "is-missing": props.status.kind === "missing" }}>
       <div class="recipe-card-media"><RecipeImage title={props.status.recipe.title}/></div>
-      <div class="recipe-card-head"><h2>{props.status.recipe.title}</h2><div class="recipe-card-status"><Show when={props.status.kind === "ready"}><StatusText kind="ready">Ready to make</StatusText></Show><Show when={props.status.kind === "missing"}><StatusText kind="missing">Missing {missingNames().length}</StatusText></Show><Show when={props.status.kind === "checking"}><StatusText kind="checking">Checking pantry</StatusText></Show></div></div>
-      <p class="recipe-description">{props.status.recipe.description}</p>
-      <ul class="ingredient-preview">
-        <For each={props.status.recipe.requiredIngredients.slice(0, 3)}>{(ingredient) => <li><span class={`ingredient-name ingredient-${ingredientState(ingredient.name)}`}><Show when={ingredientState(ingredient.name) !== "checking"}><Icon name={ingredientState(ingredient.name) === "ready" ? "check" : "warning"}/></Show>{ingredient.name}</span><Amount measurement={ingredient.Measurement}/></li>}</For>
-      </ul>
-      <Show when={props.status.kind === "missing"}><p class="missing-summary">Missing {missingNames().slice(0, 2).join(", ")}{missingNames().length > 2 ? ` +${missingNames().length - 2} more` : ""}</p></Show>
-      <button class="button button-secondary recipe-view-action" type="button" onClick={props.onOpen}>View recipe<Icon name="arrow-right"/></button>
+      <div class="recipe-card-content">
+        <div class="recipe-card-head"><h2>{props.status.recipe.title}</h2><span class="recipe-card-status"><Show when={props.status.kind === "ready"}><StatusText kind="ready">Ready</StatusText></Show><Show when={props.status.kind === "missing"}><StatusText kind="missing">Missing {missingNames().length}</StatusText></Show><Show when={props.status.kind === "checking"}><StatusText kind="checking">Checking pantry</StatusText></Show></span></div>
+        <p class="recipe-description">{props.status.recipe.description}</p>
+        <ul class="ingredient-preview">
+          <For each={props.status.recipe.requiredIngredients.slice(0, 3)}>{(ingredient) => <li><span>{ingredient.name}</span><Amount measurement={ingredient.Measurement}/></li>}</For>
+        </ul>
+        <Show when={props.status.kind === "missing"}><p class="missing-summary">Missing {missingNames().slice(0, 2).join(", ")}{missingNames().length > 2 ? ` +${missingNames().length - 2} more` : ""}</p></Show>
+        <button class="recipe-view-action" type="button" onClick={props.onOpen}>View recipe<Icon name="arrow-right"/></button>
+      </div>
     </article>
   );
 }
@@ -90,6 +93,16 @@ export function Menu() {
   const [searchParams, setSearchParams] = useSearchParams<{ q?: string; ready?: string }>();
   const [query, setQuery] = createSignal(searchParams.q ?? "");
   const [readyOnly, setReadyOnly] = createSignal(searchParams.ready === "1");
+  let observedSearch = location.search;
+
+  createEffect(() => {
+    const nextSearch = location.search;
+    if (nextSearch === observedSearch) return;
+    observedSearch = nextSearch;
+    const nextParams = new URLSearchParams(nextSearch);
+    setQuery(nextParams.get("q") ?? "");
+    setReadyOnly(nextParams.get("ready") === "1");
+  });
 
   createEffect(() => {
     const value = query().trim();
@@ -117,8 +130,11 @@ export function Menu() {
       return undefined;
     }
   });
-  const openRecipe = (status: RecipeStatus) => navigate(`/recipes/${encodeURIComponent(makeCacheKey({ title: status.recipe.title, version: status.recipe.version }))}${location.search}`);
-  const closeRecipe = () => navigate(`/recipes${location.search}`);
+  const openRecipe = (status: RecipeStatus) => navigate(`/recipes/${encodeURIComponent(makeCacheKey({ title: status.recipe.title, version: status.recipe.version }))}${location.search}`, { state: { recipeOverlay: true } });
+  const closeRecipe = () => {
+    if ((location.state as { recipeOverlay?: boolean } | undefined)?.recipeOverlay) navigate(-1);
+    else navigate(`/recipes${location.search}`, { replace: true });
+  };
 
   return (
     <main class="main recipes-page" id="main">
@@ -133,7 +149,7 @@ export function Menu() {
       <Show when={recipes.data()}>
         <Show when={allStatuses().length > 0} fallback={<div class="empty-state"><h2>No recipes are available yet.</h2></div>}>
           <Show when={filtered().length > 0} fallback={
-            <div class="empty-state"><Icon name="search"/><h2>{query().trim() ? `No recipes match “${query().trim()}”.` : "Nothing is ready with your current pantry."}</h2><button class="button button-secondary" type="button" onClick={() => query().trim() ? setQuery("") : setReadyOnly(false)}>{query().trim() ? "Clear search" : "Show all recipes"}</button></div>
+            <div class="empty-state"><Icon name="search"/><h2>{query().trim() && readyOnly() ? `No ready recipes match “${query().trim()}”.` : query().trim() ? `No recipes match “${query().trim()}”.` : "Nothing is ready with your current pantry."}</h2><button class="button button-secondary" type="button" onClick={() => { if (query().trim() && readyOnly()) { setQuery(""); setReadyOnly(false); } else if (query().trim()) setQuery(""); else setReadyOnly(false); }}>{query().trim() && readyOnly() ? "Clear filters" : query().trim() ? "Clear search" : "Show all recipes"}</button></div>
           }>
             <section class="recipe-grid" aria-label="Recipe results"><For each={filtered()}>{(status) => <RecipeCard status={status} onOpen={() => openRecipe(status)}/>}</For></section>
           </Show>

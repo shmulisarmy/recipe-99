@@ -120,6 +120,27 @@ export function MeasurementEditor(props: {
 
 type OverlayKind = "inspection" | "transaction" | "compact" | "sheet";
 
+const activeOverlayRoots: HTMLElement[] = [];
+const originalBodyChildInert = new Map<HTMLElement, boolean>();
+
+function syncOverlayBackgroundInert() {
+  for (const [element, inert] of originalBodyChildInert) {
+    if (element.isConnected) element.inert = inert;
+  }
+
+  const activeRoot = activeOverlayRoots[activeOverlayRoots.length - 1];
+  if (!activeRoot) {
+    originalBodyChildInert.clear();
+    return;
+  }
+
+  for (const child of Array.from(document.body.children)) {
+    if (!(child instanceof HTMLElement)) continue;
+    if (!originalBodyChildInert.has(child)) originalBodyChildInert.set(child, child.inert);
+    child.inert = !child.contains(activeRoot);
+  }
+}
+
 export function Overlay(props: {
   title: string;
   eyebrow?: string;
@@ -136,6 +157,8 @@ export function Overlay(props: {
   let backdropDown = false;
   let opener: Element | null = null;
   let previousOverflow = "";
+  let registered = false;
+  let disposed = false;
 
   const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
   const onKeyDown = (event: KeyboardEvent) => {
@@ -170,11 +193,23 @@ export function Overlay(props: {
     previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown, true);
-    queueMicrotask(() => dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus() ?? dialog.focus());
+    queueMicrotask(() => {
+      if (disposed) return;
+      activeOverlayRoots.push(overlayRoot);
+      registered = true;
+      syncOverlayBackgroundInert();
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus() ?? dialog.focus();
+    });
   });
 
   onCleanup(() => {
+    disposed = true;
     document.body.style.overflow = previousOverflow;
+    if (registered) {
+      const index = activeOverlayRoots.lastIndexOf(overlayRoot);
+      if (index >= 0) activeOverlayRoots.splice(index, 1);
+      syncOverlayBackgroundInert();
+    }
     window.removeEventListener("keydown", onKeyDown, true);
     const elementToRestore = opener;
     if (elementToRestore instanceof HTMLElement && elementToRestore.isConnected) queueMicrotask(() => elementToRestore.focus());
