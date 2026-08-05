@@ -192,7 +192,8 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .ledger td[data-label="Stored amount"] { font-family: var(--values); font-size: 13px; }
 .ledger td:last-child { width: 300px; }
 .row-actions { display: flex; justify-content: flex-end; gap: 5px; }
-.row-actions .button { min-height: 36px; padding: 6px 9px; border-color: transparent; background: transparent; font-size: 13px; }
+.row-actions .button { min-height: 36px; padding: 6px 9px; border-color: transparent; font-size: 13px; }
+.row-actions > .button-secondary, .row-actions > .button-quiet, .row-actions .anchored-control > .button-quiet { background: transparent; }
 .inline-measurement { display: grid; grid-template-columns: 100px 140px; gap: 8px; }
 .inline-measurement .input, .inline-measurement .select { min-height: 36px; padding-block: 5px; font-family: var(--body); font-size: 14px; }
 .popover { position: absolute; z-index: 45; top: calc(100% + 6px); right: 0; width: min(360px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--rule); border-radius: 8px; background: var(--porcelain); box-shadow: var(--drawer-shadow); }
@@ -405,18 +406,23 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
   .inline-measurement { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .row-actions { flex-wrap: wrap; }
   .row-actions .button { min-height: 44px; }
-  .popover { position: fixed; z-index: 70; top: auto; right: 0; bottom: 0; left: 0; width: 100%; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); border-radius: 12px 12px 0 0; box-shadow: var(--modal-shadow); }
+  .ledger td[data-label="Actions"] { display: block; }
+  .ledger td[data-label="Actions"]::before { display: block; margin-bottom: 7px; }
+  .ledger td[data-label="Actions"] .row-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); width: 100%; }
+  .ledger td[data-label="Actions"] .row-actions > .button, .ledger td[data-label="Actions"] .anchored-control, .ledger td[data-label="Actions"] .anchored-control > .button { width: 100%; }
+  .ledger td[data-label="Actions"] .row-actions > .button-secondary { border-color: var(--enamel); background: var(--enamel-soft); }
 
   .stepper { margin-bottom: 22px; }
   .step { font-size: 12px; }
   .intake-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .intake-row .ingredient-field, .intake-row .remove-control, .intake-row .cart-match { grid-column: 1 / -1; }
   .remove-control { padding-top: 0; }
-  .remove-control .button { width: 100%; }
+  .remove-control { display: flex; justify-content: flex-end; }
+  .remove-control .button { width: auto; min-height: 44px; }
   .add-ingredient-panel { position: fixed; z-index: 70; right: 0; bottom: 0; left: 0; margin: 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); border-radius: 12px 12px 0 0; box-shadow: var(--modal-shadow); }
   .add-ingredient-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .add-ingredient-fields .ingredient-field { grid-column: 1 / -1; }
-  .form-actions { flex-direction: column-reverse; }
+  .form-actions { flex-direction: column; }
   .form-actions .button { width: 100%; }
   .reconcile-row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .reconcile-row .radio-list { grid-template-columns: minmax(0, 1fr); }

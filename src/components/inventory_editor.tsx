@@ -1,10 +1,10 @@
 import { A } from "@solidjs/router";
-import { For, Show, createEffect, createSignal } from "solid-js";
+import { For, Show, createEffect, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 import { Measurement_Convert, type Unit } from "../primitives/measurement";
 import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
-import { ALL_UNITS, Amount, Icon, StatusText, formatAmount } from "./ui";
+import { ALL_UNITS, Amount, Icon, Overlay, StatusText } from "./ui";
 
 function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
   const updateIngredient = useMutation(api.data.updateAvailableIngredient);
@@ -16,7 +16,20 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
   const [saved, setSaved] = createSignal(false);
   const [conversionOpen, setConversionOpen] = createSignal(false);
   const [convertUnit, setConvertUnit] = createSignal<Unit>(props.ingredient.Measurement.unit);
+  const [mobileConversion, setMobileConversion] = createSignal(false);
+  const conversionId = createUniqueId();
+  const conversionTitleId = `${conversionId}-title`;
   let amountInput!: HTMLInputElement;
+  let convertButton!: HTMLButtonElement;
+  let conversionSelect!: HTMLSelectElement;
+
+  onMount(() => {
+    const media = window.matchMedia("(max-width: 700px)");
+    const updateMobileConversion = () => setMobileConversion(media.matches);
+    updateMobileConversion();
+    media.addEventListener("change", updateMobileConversion);
+    onCleanup(() => media.removeEventListener("change", updateMobileConversion));
+  });
 
   createEffect(() => {
     if (editing()) return;
@@ -70,12 +83,21 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
   };
 
   const convertedPreview = () => Measurement_Convert(props.ingredient.Measurement, convertUnit());
+  const openConversion = () => {
+    setConvertUnit(props.ingredient.Measurement.unit);
+    setConversionOpen(true);
+    queueMicrotask(() => conversionSelect?.focus());
+  };
+  const closeConversion = () => {
+    setConversionOpen(false);
+    queueMicrotask(() => convertButton?.focus());
+  };
   const applyConvert = async () => {
     if (convertUnit() === props.ingredient.Measurement.unit) return;
     setSaveError("");
     try {
       await updateIngredient.mutate({ ingredientName: props.ingredient.name_, measurement: convertedPreview() });
-      setConversionOpen(false);
+      closeConversion();
       setSaved(true);
       window.setTimeout(() => setSaved(false), 1800);
     } catch {
@@ -103,16 +125,26 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
             <>
               <button class="button button-secondary" type="button" aria-label={`Edit ${props.ingredient.name_}`} onClick={beginEdit}><Icon name="edit"/>Edit amount</button>
               <div class="anchored-control">
-                <button class="button button-quiet" type="button" aria-expanded={conversionOpen()} onClick={() => { setConvertUnit(props.ingredient.Measurement.unit); setConversionOpen((open) => !open); }}>Convert unit</button>
-                <Show when={conversionOpen()}>
-                  <div class="popover conversion-popover" role="dialog" aria-label={`Convert ${props.ingredient.name_}`}>
-                    <div class="popover-head"><h3>Convert unit</h3><button class="icon-button" type="button" aria-label="Close unit conversion" onClick={() => setConversionOpen(false)}><Icon name="close"/></button></div>
+                <button ref={convertButton} class="button button-quiet" type="button" aria-expanded={conversionOpen()} aria-controls={conversionId} onClick={() => conversionOpen() ? closeConversion() : openConversion()}>Convert unit</button>
+                <Show when={conversionOpen() && !mobileConversion()}>
+                  <div id={conversionId} class="popover conversion-popover" role="dialog" aria-labelledby={conversionTitleId} onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); closeConversion(); } }}>
+                    <div class="popover-head"><h3 id={conversionTitleId}>Convert unit</h3><button class="icon-button" type="button" aria-label="Close unit conversion" onClick={closeConversion}><Icon name="close"/></button></div>
                     <p>Current amount: <Amount measurement={props.ingredient.Measurement}/></p>
-                    <label class="field"><span>Target unit</span><select class="select" value={convertUnit()} onChange={(event) => setConvertUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
+                    <label class="field"><span>Target unit</span><select ref={conversionSelect} class="select" value={convertUnit()} onChange={(event) => setConvertUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
                     <p class="conversion-preview"><Amount measurement={props.ingredient.Measurement}/> = <Amount measurement={convertedPreview()}/></p>
                     <p class="helper-text">Conversion keeps the same quantity.</p>
                     <button class="button button-primary" type="button" disabled={convertUnit() === props.ingredient.Measurement.unit || updateIngredient.isLoading()} onClick={() => void applyConvert()}>{updateIngredient.isLoading() ? "Converting…" : "Convert"}</button>
                   </div>
+                </Show>
+                <Show when={conversionOpen() && mobileConversion()}>
+                  <Overlay title="Convert unit" eyebrow={props.ingredient.name_} kind="sheet" onClose={closeConversion} footer={<button class="button button-primary" type="button" disabled={convertUnit() === props.ingredient.Measurement.unit || updateIngredient.isLoading()} onClick={() => void applyConvert()}>{updateIngredient.isLoading() ? "Converting…" : "Convert"}</button>}>
+                    <div id={conversionId} class="conversion-sheet-content">
+                      <p>Current amount: <Amount measurement={props.ingredient.Measurement}/></p>
+                      <label class="field"><span>Target unit</span><select ref={conversionSelect} data-autofocus class="select" value={convertUnit()} onChange={(event) => setConvertUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
+                      <p class="conversion-preview"><Amount measurement={props.ingredient.Measurement}/> = <Amount measurement={convertedPreview()}/></p>
+                      <p class="helper-text">Conversion keeps the same quantity.</p>
+                    </div>
+                  </Overlay>
                 </Show>
               </div>
             </>

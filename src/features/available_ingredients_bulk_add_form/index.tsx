@@ -26,11 +26,13 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
   const [newName, setNewName] = createSignal("");
   const [newAmount, setNewAmount] = createSignal("1");
   const [newUnit, setNewUnit] = createSignal<Unit>("grams");
-  const [addError, setAddError] = createSignal("");
+  const [newNameError, setNewNameError] = createSignal("");
+  const [newAmountError, setNewAmountError] = createSignal("");
   const [submitError, setSubmitError] = createSignal("");
   const addPantryBatch = useMutation(api.data.AvailableIngredientsBulkAdd);
   const planner = useQuery(api.data.usersPlanner, {});
   let newNameInput!: HTMLInputElement;
+  let newAmountInput!: HTMLInputElement;
 
   const plannedToday = () => planner.data()?.[today.toDateString()];
   const allocationFor = (row: IntakeRow): Measurement | undefined => {
@@ -65,13 +67,16 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
 
   const removeIngredient = (index: number) => setRows(rows.filter((_, candidate) => candidate !== index));
   const openAddIngredient = () => { setIsAddingIngredient(true); queueMicrotask(() => newNameInput.focus()); };
-  const closeAddIngredient = () => { setIsAddingIngredient(false); setNewName(""); setNewAmount("1"); setNewUnit("grams"); setAddError(""); };
+  const closeAddIngredient = () => { setIsAddingIngredient(false); setNewName(""); setNewAmount("1"); setNewUnit("grams"); setNewNameError(""); setNewAmountError(""); };
   const addIngredient = () => {
     const name = newName().trim().toLowerCase();
     const amount = Number(newAmount());
-    if (!name) { setAddError("Enter an ingredient name."); newNameInput.focus(); return; }
-    if (rows.some((row) => row.name.trim().toLowerCase() === name)) { setAddError(`${name} is already in this batch.`); newNameInput.focus(); return; }
-    if (!newAmount().trim() || !Number.isFinite(amount) || amount < 0) { setAddError("Enter an amount of 0 or more."); return; }
+    const nameError = !name ? "Enter an ingredient name." : rows.some((row) => row.name.trim().toLowerCase() === name) ? `${name} is already in this batch.` : "";
+    const amountError = !newAmount().trim() || !Number.isFinite(amount) || amount < 0 ? "Enter an amount of 0 or more." : "";
+    setNewNameError(nameError);
+    setNewAmountError(amountError);
+    if (nameError) { newNameInput.focus(); return; }
+    if (amountError) { newAmountInput.focus(); return; }
     setRows(rows.length, { id: newId(), name, amount: newAmount(), unit: newUnit(), nameError: "", amountError: "", cartSelected: false });
     closeAddIngredient();
   };
@@ -117,8 +122,7 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
         <Show when={isAddingIngredient()}>
           <div class="add-ingredient-panel" role="dialog" aria-label="Add ingredient" onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addIngredient(); } if (event.key === "Escape") closeAddIngredient(); }}>
             <div class="popover-head"><h2>Add ingredient</h2><button class="icon-button" type="button" aria-label="Close add ingredient" onClick={closeAddIngredient}><Icon name="close"/></button></div>
-            <div class="add-ingredient-fields"><label class="field ingredient-field"><span>Name</span><input ref={newNameInput} class="input" value={newName()} onInput={(event) => setNewName(event.currentTarget.value)}/></label><label class="field"><span>Amount</span><input class="input" inputmode="decimal" value={newAmount()} onInput={(event) => setNewAmount(event.currentTarget.value)}/></label><label class="field"><span>Unit</span><select class="select" value={newUnit()} onChange={(event) => setNewUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label></div>
-            <Show when={addError()}><p class="field-error" role="alert">{addError()}</p></Show>
+            <div class="add-ingredient-fields"><label class="field ingredient-field"><span>Name</span><input ref={newNameInput} class="input" value={newName()} aria-invalid={!!newNameError()} aria-describedby={newNameError() ? "new-ingredient-name-error" : undefined} onInput={(event) => { setNewName(event.currentTarget.value); setNewNameError(""); }}/><Show when={newNameError()}><span class="field-error" id="new-ingredient-name-error">{newNameError()}</span></Show></label><label class="field"><span>Amount</span><input ref={newAmountInput} class="input" inputmode="decimal" value={newAmount()} aria-invalid={!!newAmountError()} aria-describedby={newAmountError() ? "new-ingredient-amount-error" : undefined} onInput={(event) => { setNewAmount(event.currentTarget.value); setNewAmountError(""); }}/><Show when={newAmountError()}><span class="field-error" id="new-ingredient-amount-error">{newAmountError()}</span></Show></label><label class="field"><span>Unit</span><select class="select" value={newUnit()} onChange={(event) => setNewUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label></div>
             <button class="button button-primary" type="button" onClick={addIngredient}>Add ingredient</button>
           </div>
         </Show>
