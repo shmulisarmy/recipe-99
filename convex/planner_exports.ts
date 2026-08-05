@@ -10,8 +10,8 @@ export {
   PushOverIngredientShoppingItemsForTheNextDay,
   UpdateCartToGet,
   UpdateCartAlreadyGot,
-  BulkUpdateCartToGet
+  BulkUpdateCartToGet,
+  BulkSetCartToGet,
 } from "./tables/planner/actions/cart";
     
-
 

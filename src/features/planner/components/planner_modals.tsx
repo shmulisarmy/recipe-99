@@ -8,6 +8,7 @@ import {
     Measurement_GTE,
     Measurement_Minus,
     Measurement_Times,
+    type Unit,
     ZeroedMeasurement,
 } from "../../../primitives/measurement";
 import { api } from "../../../../convex/_generated/api";
@@ -36,11 +37,15 @@ function dayLabel(dateStr: string): string {
 function Modal(props: {
     title: string;
     onClose: () => void;
+    confirmEscape?: () => boolean;
     headerAction?: JSX.Element;
+    wide?: boolean;
     children: JSX.Element;
 }) {
     const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") props.onClose();
+        if (e.key !== "Escape") return;
+        if (props.confirmEscape && !props.confirmEscape()) return;
+        props.onClose();
     };
     window.addEventListener("keydown", onKeyDown);
     onCleanup(() => window.removeEventListener("keydown", onKeyDown));
@@ -53,7 +58,11 @@ function Modal(props: {
             onClick={() => props.onClose()}
         >
             <div
-                class="w-full max-w-none rounded-t-2xl rounded-b-none bg-white p-6 shadow-xl sm:max-w-md sm:rounded-2xl"
+                class="w-full max-w-none rounded-t-2xl rounded-b-none bg-white p-6 shadow-xl transition-[max-width] sm:rounded-2xl"
+                classList={{
+                    "sm:max-w-md": !props.wide,
+                    "sm:max-w-xl": props.wide,
+                }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div class="flex items-start justify-between gap-3">
@@ -346,6 +355,16 @@ export function CartModal(props: {
     onClose: () => void;
     plannerData: PlannerType
 }): JSX.Element {
+    type MeasurementDraft = {
+        amount: string;
+        unit: Unit;
+    };
+
+    const [measurementDrafts, setMeasurementDrafts] = createSignal<Record<string, MeasurementDraft>>({});
+    const [isSavingCart, setIsSavingCart] = createSignal(false);
+    const [cartSaveError, setCartSaveError] = createSignal("");
+    const saveCartMeasurements = useMutation(api.planner_exports.BulkSetCartToGet);
+
     const plannedDay = () => {
         const day = props.plannerData[props.dateStr];
         if (!day) throw new Error(`Could not find planned day for ${props.dateStr}`);
@@ -353,6 +372,60 @@ export function CartModal(props: {
     };
 
     const toGetEntries = () => Object.entries(plannedDay().shoppingCart.toGet);
+    const hasMeasurementDrafts = () => Object.keys(measurementDrafts()).length > 0;
+
+    const beginMeasurementEdit = (name: string, measurement: Measurement) => {
+        setMeasurementDrafts((drafts) => drafts[name]
+            ? drafts
+            : {
+                ...drafts,
+                [name]: {
+                    amount: String(measurement.amount),
+                    unit: measurement.unit,
+                },
+            });
+    };
+
+    const updateMeasurementDraft = (name: string, update: Partial<MeasurementDraft>) => {
+        setMeasurementDrafts((drafts) => ({
+            ...drafts,
+            [name]: {
+                ...drafts[name],
+                ...update,
+            },
+        }));
+    };
+
+    const saveMeasurementDrafts = async () => {
+        const ingredients = Object.entries(measurementDrafts()).map(([name, draft]) => ({
+            name,
+            measurement: {
+                amount: Number(draft.amount),
+                unit: draft.unit,
+            },
+        }));
+
+        if (ingredients.some(({ measurement }) =>
+            !Number.isFinite(measurement.amount) || measurement.amount < 0
+        )) {
+            setCartSaveError("Enter a valid amount of 0 or more.");
+            return;
+        }
+
+        setIsSavingCart(true);
+        setCartSaveError("");
+        try {
+            await saveCartMeasurements.mutate({
+                date: props.dateStr,
+                ingredients,
+            });
+            setMeasurementDrafts({});
+        } catch {
+            setCartSaveError("Couldn't save the shopping amounts. Try again.");
+        } finally {
+            setIsSavingCart(false);
+        }
+    };
 
     const alreadyGot = (name: string) => plannedDay()?.shoppingCart.alreadyGot[name];
 
@@ -368,7 +441,14 @@ export function CartModal(props: {
     };
 
     return (
-        <Modal title={`Shopping — ${dayLabel(props.dateStr)}`} onClose={props.onClose}>
+        <Modal
+            title={`Shopping — ${dayLabel(props.dateStr)}`}
+            onClose={props.onClose}
+            confirmEscape={() =>
+                !hasMeasurementDrafts() || window.confirm("Discard unsaved shopping changes?")
+            }
+            wide={hasMeasurementDrafts()}
+        >
             <Show
                 when={toGetEntries().length > 0}
                 fallback={
@@ -381,7 +461,69 @@ export function CartModal(props: {
                             <li>
                                 <div class="flex items-baseline justify-between gap-2">
                                     <span class="text-sm font-medium capitalize text-stone-900">{name}</span>
-                                    <span class="text-sm text-stone-600">{formatMeasurement(measurement)}</span>
+                                    <Show
+                                        when={measurementDrafts()[name]}
+                                        fallback={
+                                            <button
+                                                type="button"
+                                                class="group relative text-sm text-stone-600 hover:text-stone-900 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                                                aria-label={`Edit ${name} shopping amount`}
+                                                onClick={() => beginMeasurementEdit(name, measurement)}
+                                            >
+                                                <svg
+                                                    aria-hidden="true"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.7"
+                                                    class="absolute right-full top-1/2 mr-1 h-3.5 w-3.5 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                                                >
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m13.5 3.5 3 3L7 16H4v-3l9.5-9.5Z" />
+                                                </svg>
+                                                {formatMeasurement(measurement)}
+                                            </button>
+                                        }
+                                    >
+                                        {(draft) => (
+                                            <div class="flex items-center gap-2">
+                                                <span class="whitespace-nowrap text-sm tabular-nums text-stone-500">
+                                                    {formatMeasurement(measurement)}
+                                                </span>
+                                                <svg
+                                                    aria-hidden="true"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.7"
+                                                    class="h-4 w-4 shrink-0 text-stone-400"
+                                                >
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h13m-4-4 4 4-4 4" />
+                                                </svg>
+                                                <div class="flex overflow-hidden rounded-lg border border-stone-300 bg-white shadow-sm focus-within:border-stone-500 focus-within:ring-2 focus-within:ring-stone-200">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="any"
+                                                        value={draft().amount}
+                                                        aria-label={`New amount for ${name}`}
+                                                        class="w-20 border-0 bg-transparent px-2.5 py-1.5 text-right text-sm tabular-nums text-stone-900 outline-none"
+                                                        onInput={(event) => updateMeasurementDraft(name, { amount: event.currentTarget.value })}
+                                                    />
+                                                    <select
+                                                        value={draft().unit}
+                                                        aria-label={`New unit for ${name}`}
+                                                        class="border-0 border-l border-stone-200 bg-stone-50 px-2 py-1.5 text-sm text-stone-700 outline-none"
+                                                        onChange={(event) => updateMeasurementDraft(name, { unit: event.currentTarget.value as Unit })}
+                                                    >
+                                                        <option value="grams">grams</option>
+                                                        <option value="kilograms">kilograms</option>
+                                                        <option value="ounces">ounces</option>
+                                                        <option value="pounds">pounds</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Show>
                                 </div>
                                 <div
                                     role="progressbar"
@@ -411,6 +553,23 @@ export function CartModal(props: {
                         )}
                     </For>
                 </ul>
+                <Show when={hasMeasurementDrafts()}>
+                    <div class="mt-5 border-t border-stone-200 pt-4">
+                        <Show when={cartSaveError()}>
+                            {(message) => (
+                                <p class="mb-3 text-sm text-red-600" role="alert">{message()}</p>
+                            )}
+                        </Show>
+                        <button
+                            type="button"
+                            disabled={isSavingCart()}
+                            class="w-full rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                            onClick={saveMeasurementDrafts}
+                        >
+                            {isSavingCart() ? "Saving…" : "Save changes"}
+                        </button>
+                    </div>
+                </Show>
             </Show>
         </Modal>
     );

@@ -1,26 +1,30 @@
 # Purpose
 
-Own the multistep workflow for adding a batch of acquired ingredients to the pantry.
+Own the multistep workflow for adding a batch of acquired ingredients to the pantry and reconciling them with today's shopping cart.
 
 # Ownership
 
-This feature owns the editable bulk-add form, its shopping-cart draft, and the transition to the next form step.
+- `index.tsx` owns the editable batch and pantry submission.
+- `next_step.tsx` owns the follow-up shopping-cart reconciliation step.
+- `types.ts` owns workflow input and draft shapes.
+- `outside_feature_exports.ts` is the feature's public integration surface.
 
 # Local Contracts
 
-- `AvailableIngredientsBulkAddForm` receives the ingredient batch through `ingredientsToAdd` and edits a local clone.
-- Users can add named amount/unit rows or remove rows before committing the batch; new names are normalized to lowercase and must be unique within the batch.
-- Submission adds each batch quantity to `AvailableIngredients`, then calls `reSimulatePlannerProjection()` once.
-- `shoppingCartAlreadyGot` tracks only the amounts proposed for addition to today's shopping-cart `alreadyGot`; this feature does not apply that draft yet.
-- Pass `shoppingCartAlreadyGot` into `FormTemplateWithDataStructure` so the next step can continue the workflow.
-- Code outside this feature imports its public values and types from `outside_feature_exports.ts`.
+- Clone `ingredientsToAdd` before editing; never mutate the caller's input.
+- Normalize new ingredient names to lowercase and keep names unique within the batch.
+- Keep pantry additions and shopping-cart reconciliation as separate user-confirmed steps.
+- The shopping-cart draft represents only the acquired amounts selected for reconciliation; do not apply it before the follow-up step.
+- Use generated Convex functions for persisted pantry and planner changes.
 
 # Work Guidance
 
-- Keep pantry mutation and shopping-cart mutation as separate steps.
+- Recompute cart selections when an edited batch amount changes.
+- Preserve measurement units and use shared measurement arithmetic for comparisons and subtraction.
 
 # Verification
 
-- Run `npm run build` after changing the workflow.
+- Run `npm run build` after changing either workflow step or its exported types.
+- Verify both the pantry submission and the shopping-cart handoff with an authenticated planner day.
 
 # Child DOX Index

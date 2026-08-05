@@ -1,25 +1,29 @@
 # Purpose
 
-Keep application features isolated behind explicit public APIs.
+Keep product workflows cohesive while making their cross-feature dependencies explicit.
 
 # Ownership
 
-Each direct child directory is a self-contained feature that owns its internal logic and components.
+- Each direct child directory owns one user-facing workflow, including its local types, state, logic, and components.
+- A feature's `outside_feature_exports.ts` is its explicit integration surface where one exists.
 
 # Local Contracts
 
-- Every feature must contain an `outside_feature_exports.ts` file.
-- Code outside a feature must import from that file instead of importing the feature's internal files directly.
-- Export only the functionality that the feature intentionally exposes to the rest of the application.
+- Prefer imports from `outside_feature_exports.ts` when consuming a feature from another feature.
+- Export only values and types that external consumers need; keep implementation helpers private.
+- Cross-feature calls must preserve the owning feature's data semantics instead of mutating its internal state opportunistically.
+- Backend persistence belongs in generated Convex queries and mutations, not in duplicated client action modules.
 
 # Work Guidance
 
-- Add public exports to `outside_feature_exports.ts` as the feature's external API evolves.
+- Evolve the integration surface in the same change as a new external consumer.
+- Put shared value semantics in `src/primitives/`, not in a feature chosen arbitrarily.
 
 # Verification
 
-- Run `npm run build` after changing feature exports or their consumers.
+- Run `npm run build` after changing a feature, its exports, or its consumers.
 
 # Child DOX Index
 
-- `available_ingredients_bulk_add_form/AGENTS.md` — bulk pantry intake and shopping-cart draft handoff.
+- `available_ingredients_bulk_add_form/AGENTS.md` — batch pantry intake and shopping-cart handoff.
+- `planner/AGENTS.md` — planner queries, projections, calendar behavior, and planner UI ownership.

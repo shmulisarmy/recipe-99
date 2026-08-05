@@ -1,24 +1,35 @@
 # Purpose
 
-Repository-wide development instructions for Recipe-99.
+Define the repository-wide contract for Recipe-99, a SolidJS meal-planning application backed by Convex.
 
 # Ownership
 
-This file owns project-wide conventions. More specific subtree rules live in child `AGENTS.md` files.
+- `src/` owns the browser application, UI composition, client-side projections, and shared frontend domain utilities.
+- `convex/` owns persisted data, authentication-aware queries and mutations, schema validators, and the generated client API boundary.
+- Root configuration files own build tooling, dependency versions, and environment wiring.
 
 # Local Contracts
 
-- Follow the nearest child `AGENTS.md` without weakening this root contract.
+- Read this file and every nearer `AGENTS.md` before changing a governed path; the nearest file adds local rules without weakening its parents.
+- Treat `src` and `convex` as one typed system: schema or function changes must be reflected through generated Convex APIs rather than handwritten parallel interfaces.
+- Preserve user-owned work already present in a dirty worktree and keep unrelated edits out of the current task.
+- Never edit files under `convex/_generated/` by hand.
 
 # Work Guidance
+
+- After every meaningful application change, perform a DOX pass: update the closest owning `AGENTS.md`, refresh affected parent indexes, and remove stale contracts.
+- Create a child `AGENTS.md` only for a durable ownership boundary with rules that are more specific than its parent.
+- Keep durable behavior and architecture here; keep implementation details in the closest child contract.
 
 # Verification
 
 - Run `npm run build` after application code changes.
+- Add the verification required by the nearest child `AGENTS.md` for the paths changed.
 
 # Child DOX Index
 
-- `src/features/AGENTS.md` — feature boundaries and public exports.
+- `src/AGENTS.md` — browser application, shared frontend modules, and feature boundaries.
+- `convex/AGENTS.md` — Convex schema, functions, authentication, and generated API conventions.
 
 <!-- convex-ai-start -->
 
