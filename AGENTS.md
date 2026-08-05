@@ -6,6 +6,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 
 - `src/` owns the browser application, UI composition, client-side projections, and shared frontend domain utilities.
 - `convex/` owns persisted data, authentication-aware queries and mutations, schema validators, and the generated client API boundary.
+- `docs/` owns durable product behavior and design specifications that guide the browser application.
 - Root configuration files own build tooling, dependency versions, and environment wiring.
 
 # Local Contracts
