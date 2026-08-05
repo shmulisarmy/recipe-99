@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+  <title id="title">Vegetable curry</title><desc id="desc">Golden vegetable curry with herbs in a porcelain bowl.</desc>
+  <rect width="600" height="400" fill="#e3e8d7"/><circle cx="489" cy="74" r="54" fill="#f5f0dc"/><path d="m0 281 600-69v188H0z" fill="#c8d2b7"/>
+  <ellipse cx="298" cy="229" rx="185" ry="102" fill="#fff"/><ellipse cx="298" cy="209" rx="151" ry="73" fill="#d99b37"/>
+  <g><circle cx="237" cy="191" r="25" fill="#8cad4c"/><circle cx="291" cy="227" r="27" fill="#d75b3f"/><circle cx="350" cy="188" r="29" fill="#f0c262"/><circle cx="389" cy="228" r="23" fill="#739848"/><rect x="264" y="164" width="44" height="37" rx="10" fill="#f4df9c" transform="rotate(20 286 183)"/></g>
+  <g fill="#347249"><ellipse cx="315" cy="163" rx="19" ry="8" transform="rotate(-31 315 163)"/><ellipse cx="337" cy="172" rx="17" ry="7" transform="rotate(36 337 172)"/></g>
+</svg>

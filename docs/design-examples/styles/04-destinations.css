@@ -55,6 +55,28 @@
 .ingredient-preview li { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .ingredient-preview span:last-child { flex: none; color: var(--muted); font-family: var(--values); font-size: 11px; }
 .recipe-card .button { width: fit-content; margin-top: auto; }
+.recipes-page .page-heading { margin-bottom: 20px; }
+.recipe-filters { margin-bottom: 26px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+.recipe-filters .search-wrap { max-width: none; }
+.filter-meta { display: flex; min-height: 44px; align-items: center; gap: 12px; margin-top: 10px; }
+.filter-meta .toggle { flex: none; border-color: transparent; background: transparent; padding-inline: 0; }
+.filter-meta .result-count { margin: 0; }
+.filter-meta .clear-filter { min-height: 36px; margin-left: auto; padding: 6px 4px; border: 0; color: var(--enamel); background: transparent; font-weight: 600; cursor: pointer; }
+.recipes-page .recipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+.recipes-page .recipe-card { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); gap: 16px; padding: 22px 0 24px; border-top: 1px solid var(--rule); }
+.recipe-media { display: block; min-width: 0; overflow: hidden; aspect-ratio: 3 / 2; border-radius: 8px; background: var(--enamel-soft); }
+.recipe-image-art { display: block; width: 100%; height: 100%; object-fit: cover; animation: recipe-image-in 160ms ease-out both; }
+.recipe-content { display: flex; min-width: 0; flex-direction: column; gap: 9px; }
+.recipes-page .recipe-card-head { display: block; }
+.recipes-page .recipe-card h2 { display: inline; font-family: var(--major); font-size: clamp(22px, 1.8vw, 26px); font-weight: 650; line-height: 1.12; letter-spacing: -.02em; }
+.recipes-page .status-text { margin-left: 7px; vertical-align: 3px; }
+.recipes-page .recipe-description { min-height: 0; -webkit-line-clamp: 3; }
+.recipes-page .ingredient-preview { margin-top: 1px; }
+.recipes-page .ingredient-preview li { padding-top: 5px; border-top: 1px solid rgb(24 36 33 / .1); }
+.recipe-action { display: inline-flex; width: fit-content; align-items: center; gap: 7px; margin-top: auto; color: var(--enamel); font-weight: 650; text-decoration: none; }
+.recipe-action-arrow { transition: transform 160ms ease-out; }
+.recipe-action:hover .recipe-action-arrow, .recipe-action:focus-visible .recipe-action-arrow { transform: translateX(3px); }
+@keyframes recipe-image-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* Pantry */
 .ledger { width: 100%; border-collapse: collapse; background: var(--porcelain); }

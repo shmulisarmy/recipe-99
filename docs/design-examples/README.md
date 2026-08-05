@@ -1,6 +1,6 @@
 # Recipe 99 design examples
 
-These are disposable, static visual checkpoints for the design specification. They use sample data, contain no application code or persistence, and load no remote assets.
+These are disposable, static visual checkpoints for the design specification. They use sample data, contain no application code or persistence, and load no remote assets. Recipe artwork and interface icons are local SVG files so every checkpoint remains reviewable offline.
 
 Open [planner.html](planner.html) directly from disk to begin. The pages link to one another:
 

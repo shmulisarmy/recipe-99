@@ -10,19 +10,25 @@
 
 Search matches recipe title or required ingredient name case-insensitively. Query and toggle state update the URL after 250ms without adding history for every keystroke. Empty parameters are removed.
 
-## Library rows and cards
+## Library stream
 
-Use a flat responsive list/grid, not elevated dashboard cards. Each recipe is separated by a light rule or quiet grouped background and contains:
+Use an image-led editorial stream, not elevated dashboard cards. On wide screens, use two columns of flat horizontal bands; each band allocates approximately 42–45% of its width to imagery and the remainder to content. Separate bands with whitespace and a light rule: do not add a card border, card background, or shadow. Below tablet width, use one stacked stream with the image first.
 
-1. title;
-2. inline Ready, Missing, or Checking status;
-3. description clamped to three lines only in the library;
-4. compact ingredient summary;
-5. `View recipe`.
+Each recipe contains:
 
-Each recipe begins with a consistently cropped image in a fixed aspect ratio. Resolve images from the curated title map; recipes without a title match and failed images use a stable chalk-and-enamel recipe placeholder rather than repeating one generic food photograph. Keep readiness beside the title instead of over the crop. Lazy-loaded images reserve their final geometry and never expose broken media.
+1. a consistently cropped `3:2` image;
+2. title with adjacent Ready, Missing, or Checking status;
+3. description clamped to three lines on wide screens and two lines on mobile;
+4. three compact ingredient rows on wide screens and two on mobile;
+5. a quiet `View recipe` link with an action arrow.
 
-Ready does not fill the whole item green. Missing lists at most two missing ingredient names and then `+n more`. While pantry data loads, show `Checking pantry…` without implying failure.
+Resolve images from the curated title map; recipes without a title match and failed images use a stable chalk-and-enamel recipe placeholder rather than repeating one generic food photograph. Keep readiness beside the title instead of over the crop. Lazy-loaded images reserve their final geometry and never expose broken media. Use Chivo for recipe names at approximately 24–26px, Atkinson for descriptions and controls, and IBM Plex Mono only for quantities and the result count.
+
+Ready does not fill the whole item green. Do not repeat ingredient-level `ready` labels when the whole recipe is Ready. Missing lists at most two missing ingredient names and then `+n more`. While pantry data loads, show `Checking pantry…` without implying failure.
+
+Keep search full width. Place the Ready toggle, result count, updating state when present, and Clear action on one restrained metadata row without an enclosing workbench panel. On 320–430px screens, keep the row compact enough that the first recipe image arrives quickly; permit the count to truncate before wrapping the controls.
+
+Do not animate the result grid, zoom images, or shimmer loading media. Permit only a 140–180ms image fade-in and a 3px arrow translation on the explicit `View recipe` action. Under reduced motion, both changes are immediate.
 
 ## Recipe-library detail
 

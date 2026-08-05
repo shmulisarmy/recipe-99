@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+  <title id="title">Sesame noodles</title><desc id="desc">Sesame noodles with scallions in a dark enamel bowl.</desc>
+  <rect width="600" height="400" fill="#e8ddc8"/><circle cx="89" cy="80" r="48" fill="#f4ead8"/><path d="M0 300 600 215v185H0z" fill="#d5c4a7"/>
+  <ellipse cx="315" cy="229" rx="187" ry="103" fill="#1f5b62"/><ellipse cx="315" cy="209" rx="154" ry="75" fill="#f0c77d"/>
+  <g fill="none" stroke="#bb7b39" stroke-width="9" stroke-linecap="round"><path d="M195 205q120-72 238 13M196 229q128-71 226 5M224 253q83-50 166-5M234 182q78 82 156 44"/></g>
+  <g fill="#347249"><rect x="279" y="171" width="12" height="47" rx="6" transform="rotate(36 285 195)"/><rect x="343" y="177" width="12" height="52" rx="6" transform="rotate(-40 349 203)"/><rect x="313" y="195" width="11" height="43" rx="5" transform="rotate(72 318 217)"/></g>
+  <g fill="#fff6dd"><circle cx="252" cy="205" r="4"/><circle cx="330" cy="179" r="4"/><circle cx="371" cy="225" r="4"/><circle cx="298" cy="239" r="4"/></g>
+</svg>

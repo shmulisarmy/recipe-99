@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+  <title id="title">Grilled cheese</title><desc id="desc">Two crisp grilled cheese triangles on a green enamel plate.</desc>
+  <rect width="600" height="400" fill="#ebdfca"/><path d="M0 104h600v296H0z" fill="#d8c7aa"/><path d="M0 189h600M146 104v296M443 104v296" stroke="#eee2cf" stroke-width="5"/>
+  <ellipse cx="303" cy="229" rx="190" ry="102" fill="#347249"/><ellipse cx="303" cy="212" rx="155" ry="77" fill="#edf2e7"/>
+  <path d="m190 233 118-100 29 129z" fill="#b96f38"/><path d="m202 225 103-78 22 102z" fill="#f0bb54"/><path d="m284 261 89-127 58 125z" fill="#a85f32"/><path d="m299 251 75-101 43 97z" fill="#f2bd55"/>
+  <path d="m314 205 66 4" stroke="#fff2bd" stroke-width="8" stroke-linecap="round"/>
+</svg>

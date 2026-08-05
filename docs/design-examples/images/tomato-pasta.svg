@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+  <title id="title">Tomato pasta</title><desc id="desc">A bowl of tomato pasta with basil on a pale tiled counter.</desc>
+  <rect width="600" height="400" fill="#dce8df"/><path d="M0 292 600 235v165H0z" fill="#c7d5ce"/><path d="M0 86h600M118 0v282M410 0v255" stroke="#fff" stroke-opacity=".72" stroke-width="5"/>
+  <ellipse cx="316" cy="237" rx="184" ry="98" fill="#fffdf8"/><ellipse cx="316" cy="222" rx="153" ry="70" fill="#b84632"/>
+  <g fill="none" stroke="#f1c17f" stroke-width="13" stroke-linecap="round"><path d="M202 202q89-58 210 16M212 232q93-58 200 11M235 256q65-47 145-4M252 183q65 21 137 66"/></g>
+  <g fill="#347249"><ellipse cx="353" cy="187" rx="18" ry="9" transform="rotate(-28 353 187)"/><ellipse cx="379" cy="202" rx="17" ry="8" transform="rotate(34 379 202)"/><ellipse cx="333" cy="211" rx="15" ry="7" transform="rotate(18 333 211)"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+  <title id="title">Spinach omelet</title><desc id="desc">A folded spinach omelet on a porcelain plate.</desc>
+  <rect width="600" height="400" fill="#d9e5df"/><path d="m0 105 600-48v343H0z" fill="#eef1e9"/><path d="M0 171h600M0 318h600M183 91v309M432 72v328" stroke="#cbd7d1" stroke-width="4"/>
+  <circle cx="304" cy="221" r="151" fill="#fff"/><circle cx="304" cy="221" r="127" fill="#f8f4e8"/>
+  <path d="M183 243q42-126 180-103 69 12 74 83-83 95-254 20z" fill="#edbd55"/><path d="M218 215q81-52 169-9-58 66-169 9z" fill="#347249"/>
+  <g fill="#f7dc8e"><circle cx="260" cy="184" r="9"/><circle cx="338" cy="171" r="8"/><circle cx="383" cy="213" r="7"/></g>
+</svg>
