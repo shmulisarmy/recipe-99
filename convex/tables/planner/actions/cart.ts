@@ -18,8 +18,9 @@ const ingredient = v.object({
 export const BulkUpdateCartToGet = mutation({
     args: {
         date: v.string(),
-        ingredients: v.array(ingredient),
+        ingredients: v.record(v.string(), measurementT),
     },
+    returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
         const day = await ctx.db
@@ -31,20 +32,22 @@ export const BulkUpdateCartToGet = mutation({
 
         if (!day) throw new Error(`No planned day for ${args.date}`);
 
+        const toGet = { ...day.shoppingCart.toGet };
+        for (const [name, measurement] of Object.entries(args.ingredients)) {
+            const existingMeasurement = toGet[name];
+            toGet[name] = existingMeasurement
+                ? Measurement_Plus(existingMeasurement, measurement)
+                : measurement;
+        }
+
         await ctx.db.patch(day._id, {
             shoppingCart: {
                 ...day.shoppingCart,
-                toGet: {
-                    ...args.ingredients.reduce((acc, ingredient) => {
-                        acc[ingredient.name] = Measurement_Plus(
-                            acc[ingredient.name] ?? ZeroedMeasurement(),
-                            ingredient.measurement,
-                        );
-                        return acc;
-                    }, day.shoppingCart.toGet),
-                },
+                toGet,
             },
         });
+
+        return null;
     },
 });
 
@@ -204,4 +207,3 @@ export const PushOverIngredientShoppingItemsForTheNextDay = mutation({
         return null;
     },
 });
-

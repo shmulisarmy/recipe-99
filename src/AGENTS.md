@@ -17,6 +17,7 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 - Keep `App.tsx` as the composition root. Feature-specific behavior belongs in its feature, not in the app shell.
 - Preserve the provider order in `index.tsx`: Convex availability must wrap the authenticated application.
 - Shared code may depend on a feature only through that feature's documented integration surface.
+- `recipeMakingProjection` reports unfulfilled required and substitute measurements already scaled by the requested recipe multiplier.
 
 # Work Guidance
 

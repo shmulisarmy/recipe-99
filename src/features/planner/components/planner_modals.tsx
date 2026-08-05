@@ -1,5 +1,5 @@
 import { createSignal, For, JSX, Show, onCleanup } from "solid-js";
-import { makeCacheKey, RequiredIngredient } from "../../../data";
+import { IngredientSet, makeCacheKey, RequiredIngredient } from "../../../data";
 import type { RecipeProjection } from "./types";
 import {
     Measurement,
@@ -7,7 +7,7 @@ import {
     Measurement_Divide,
     Measurement_GTE,
     Measurement_Minus,
-    Measurement_Times,
+    Measurement_Plus,
     type Unit,
     ZeroedMeasurement,
 } from "../../../primitives/measurement";
@@ -89,6 +89,7 @@ function Modal(props: {
 
 export function RecipeModal(props: {
     item: RecipeProjection;
+    dateStr: string;
     onClose: () => void;
 }): JSX.Element {
     const recipeName = () => props.item.plannedRecipeReference.recipeId;
@@ -101,8 +102,14 @@ export function RecipeModal(props: {
     const [usingDayDefault, setUsingDayDefault] = createSignal(initialOverride === undefined);
     const [isSavingMultiplier, setIsSavingMultiplier] = createSignal(false);
     const [multiplierError, setMultiplierError] = createSignal("");
+    const [isAddingMissingIngredients, setIsAddingMissingIngredients] = createSignal(false);
+    const [missingIngredientsAdded, setMissingIngredientsAdded] = createSignal(false);
+    const [addMissingIngredientsError, setAddMissingIngredientsError] = createSignal("");
     const updateRecipeMultiplier = useMutation(
         api.planner_exports.updateRecipeOverrideMultiplier,
+    );
+    const addIngredientsToCart = useMutation(
+        api.planner_exports.BulkUpdateCartToGet,
     );
 
     const saveMultiplier = async (event: SubmitEvent) => {
@@ -127,6 +134,30 @@ export function RecipeModal(props: {
             setMultiplierError("Couldn't update the amount. Try again.");
         } finally {
             setIsSavingMultiplier(false);
+        }
+    };
+    const addMissingIngredientsToCart = async () => {
+        const ingredients: IngredientSet = {};
+        for (const { RequiredIngredient: requiredIngredient, have } of props.item.unfulfilledIngredients) {
+            const missingAmount = Measurement_Minus(requiredIngredient.Measurement, have);
+            const existingAmount = ingredients[requiredIngredient.name];
+            ingredients[requiredIngredient.name] = existingAmount
+                ? Measurement_Plus(existingAmount, missingAmount)
+                : missingAmount;
+        }
+
+        setIsAddingMissingIngredients(true);
+        setAddMissingIngredientsError("");
+        try {
+            await addIngredientsToCart.mutate({
+                date: props.dateStr,
+                ingredients,
+            });
+            setMissingIngredientsAdded(true);
+        } catch {
+            setAddMissingIngredientsError("Couldn't add the missing ingredients. Try again.");
+        } finally {
+            setIsAddingMissingIngredients(false);
         }
     };
 
@@ -256,13 +287,27 @@ export function RecipeModal(props: {
                 </div>
             }
         >
-            <div class="mt-1 flex items-center gap-2">
+            <div class="mt-1 flex flex-wrap items-center gap-2">
                 <Show
                     when={props.item.couldMake}
                     fallback={
-                        <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                            Can't make
-                        </span>
+                        <>
+                            <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                                Can't make
+                            </span>
+                            <button
+                                type="button"
+                                disabled={isAddingMissingIngredients() || missingIngredientsAdded()}
+                                class="rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                                onClick={addMissingIngredientsToCart}
+                            >
+                                {isAddingMissingIngredients()
+                                    ? "Adding…"
+                                    : missingIngredientsAdded()
+                                      ? "Added to cart"
+                                      : "Add missing ingredients to cart"}
+                            </button>
+                        </>
                     }
                 >
                     <span class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
@@ -270,6 +315,11 @@ export function RecipeModal(props: {
                     </span>
                 </Show>
             </div>
+            <Show when={addMissingIngredientsError()}>
+                {(message) => (
+                    <p class="mt-2 text-xs text-red-600" role="alert">{message()}</p>
+                )}
+            </Show>
             <Show when={recipeInMenu()}>
                 {(recipe) => <p class="mt-2 text-sm text-stone-500">{recipe().description}</p>}
             </Show>
@@ -296,7 +346,7 @@ export function RecipeModal(props: {
                     <ul class="mt-2 flex flex-col gap-3">
                         <For each={props.item.unfulfilledIngredients}>
                             {(ingredient) => {
-                                const need = () => Measurement_Times(ingredient.RequiredIngredient.Measurement, props.item.multiplier);
+                                const need = () => ingredient.RequiredIngredient.Measurement;
                                 const haveInNeedUnit = () => Measurement_Convert(ingredient.have, need().unit);
                                 const pct = () => need().amount === 0 ? 100
                                     : Math.min(100, Math.max(0, (haveInNeedUnit().amount / need().amount) * 100));

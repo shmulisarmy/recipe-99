@@ -22,7 +22,20 @@ export function recipeMakingProjection(recipe: Recipe, pantrySet: IngredientSet,
       }
   }
   //getting here means we tried the required ingredient and the substitute ingredient and didn't find enough
-  unfulfilledIngredients.push({RequiredIngredient: requiredIngredient, have: pantrySet[requiredIngredient.name]?? ZeroedMeasurement()});
+  const scaledRequiredIngredient: RequiredIngredient = {
+    ...requiredIngredient,
+    Measurement: Measurement_Times(requiredIngredient.Measurement, multiplier),
+    substitute: requiredIngredient.substitute
+      ? {
+          ...requiredIngredient.substitute,
+          Measurement: Measurement_Times(requiredIngredient.substitute.Measurement, multiplier),
+        }
+      : undefined,
+  };
+  unfulfilledIngredients.push({
+    RequiredIngredient: scaledRequiredIngredient,
+    have: pantrySet[requiredIngredient.name] ?? ZeroedMeasurement(),
+  });
 }
   return {
     unfulfilledIngredients,
@@ -30,5 +43,4 @@ export function recipeMakingProjection(recipe: Recipe, pantrySet: IngredientSet,
     substitutedIngredientUses
   }
 }
-
 

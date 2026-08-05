@@ -15,7 +15,7 @@ Own authenticated mutations for planner days, planned recipe occurrences, and sh
 - `updateRecipeOverrideMultiplier` accepts a positive UI multiplier or `null`; `null` removes `overrideDayMultiplier` so the recipe inherits the day default.
 - Moving a recipe must remove exactly one occurrence from its source and insert that same occurrence at the requested destination position.
 - `BulkSetCartToGet` exactly replaces only the supplied `toGet` entries and is the atomic save path for cart-modal drafts.
-- `BulkUpdateCartToGet` is additive and must remain semantically distinct from the exact-set mutation.
+- `BulkUpdateCartToGet` accepts an ingredient-name-to-measurement record, adds each amount to the existing `toGet` entry, and remains semantically distinct from the exact-set mutation.
 - Pushing cart items forward moves only the still-needed amount after `alreadyGot` and preserves measurement conversion semantics.
 
 # Work Guidance

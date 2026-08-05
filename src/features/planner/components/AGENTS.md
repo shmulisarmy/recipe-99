@@ -18,6 +18,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - The recipe three-dot menu labels the user-facing control `Amount to make`; it accepts a positive multiplier and offers `Use day default` to remove the recipe override.
 - Cart `toGet` measurements look unchanged at rest. Hover or keyboard focus reveals edit affordance; activation changes that row to original measurement, arrow, and editable amount/unit controls.
 - Cart measurement edits remain local drafts until `Save changes`; one save submits all drafts through `BulkSetCartToGet` and the modal widens while drafts exist.
+- A recipe that cannot be made offers `Add missing ingredients to cart`; the action adds its projected deficits to that recipe's planner day and exposes pending, success, and failure states at the button.
 - Escape closes a modal normally, but a cart modal with unsaved measurement drafts must ask for confirmation first.
 - Interactive controls inside a day cell or modal must not accidentally trigger the parent selection or backdrop-close handler.
 

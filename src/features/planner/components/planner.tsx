@@ -11,6 +11,11 @@ import { useQuery } from "convex-solidjs";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+type OpenRecipe = {
+  item: RecipeProjection;
+  dateStr: string;
+};
+
 /** All days of the current month's full weeks (leading/trailing out-of-month included). */
 function monthGridDays(): Date[] {
   const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -52,7 +57,7 @@ export function Planner() {
   const days = monthGridDays();
   const todayStr = today.toDateString();
 
-  const [openRecipe, setOpenRecipe] = createSignal<RecipeProjection | null>(null);
+  const [openRecipe, setOpenRecipe] = createSignal<OpenRecipe | null>(null);
   const [openCartDay, setOpenCartDay] = createSignal<string | null>(null);
   const [selectedDay, setSelectedDay] = createSignal<string>(todayStr);
 
@@ -111,7 +116,7 @@ export function Planner() {
                     cartCount={plannerData()[dateStr]? Object.keys(plannerData()[dateStr].shoppingCart.toGet).length: undefined} 
                     peopleCount={plannerData()[dateStr]?.multiplier}
                     onSelectDay={() => setSelectedDay(dateStr)}
-                    onOpenRecipe={(item) => setOpenRecipe(item)}
+                    onOpenRecipe={(item) => setOpenRecipe({ item, dateStr })}
                     onOpenCart={() => setOpenCartDay(dateStr)}
                   />
                 );
@@ -125,14 +130,20 @@ export function Planner() {
           dateStr={selectedDay()}
           recipes={projection[selectedDay()] ?? []}
           cartCount={plannerData()[selectedDay()] ? Object.keys(plannerData()[selectedDay()].shoppingCart.toGet).length : undefined}
-          onOpenRecipe={(item) => setOpenRecipe(item)}
+          onOpenRecipe={(item) => setOpenRecipe({ item, dateStr: selectedDay() })}
           onOpenCart={() => setOpenCartDay(selectedDay())}
         />
       </div>
 
       {/* Modals */}
       <Show when={openRecipe()}>
-        {(item) => <RecipeModal item={item()} onClose={() => setOpenRecipe(null)} />}
+        {(recipe) => (
+          <RecipeModal
+            item={recipe().item}
+            dateStr={recipe().dateStr}
+            onClose={() => setOpenRecipe(null)}
+          />
+        )}
       </Show>
       <Show when={openCartDay()}>
         {(dateStr) => (
