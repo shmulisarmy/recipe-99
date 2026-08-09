@@ -172,7 +172,9 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .ingredient-preview { display: grid; gap: 7px; margin: 1px 0 0; padding: 0; list-style: none; font-size: 13px; }
 .ingredient-preview li { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-top: 5px; border-top: 1px solid rgb(24 36 33 / .1); }
 .ingredient-preview span:last-child { flex: none; color: var(--muted); font-family: var(--values); font-size: 11px; }
-.recipe-view-action { display: inline-flex; width: fit-content; min-height: 40px; align-items: center; gap: 7px; margin-top: auto; padding: 6px 0; border: 0; color: var(--enamel); background: transparent; font-weight: 650; cursor: pointer; }
+.recipe-card-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-top: auto; }
+.recipe-add-action, .recipe-view-action { display: inline-flex; width: fit-content; min-height: 40px; align-items: center; gap: 7px; padding: 6px 0; border: 0; color: var(--enamel); background: transparent; font-weight: 650; cursor: pointer; }
+.recipe-add-action .icon { width: 17px; height: 17px; }
 .recipe-view-action .icon { width: 17px; height: 17px; transition: transform 140ms ease; }
 .recipe-view-action:hover .icon, .recipe-view-action:focus-visible .icon { transform: translateX(3px); }
 .missing-summary { margin: 0; color: var(--paprika); font-size: 13px; }
@@ -181,6 +183,8 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .recipe-detail-intro { margin: -4px 0 22px; padding: 0 2px; }
 .recipe-detail-description { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
 .detail-status { margin: 0; }
+.add-to-plan-form, .add-to-plan-success { display: grid; gap: 12px; }
+.add-to-plan-form .helper-text, .add-to-plan-success p { margin: 0; }
 
 /* Pantry */
 .ledger { width: 100%; border-collapse: collapse; background: transparent; }
@@ -246,10 +250,12 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
 .day-cell.today .day-number { box-shadow: inset 0 0 0 2px var(--enamel); }
 .day-cell.selected .day-number { color: var(--porcelain); background: var(--enamel); box-shadow: none; }
 .desktop-meals { display: grid; min-width: 0; gap: 4px; }
-.meal-summary { display: flex; min-width: 0; align-items: center; gap: 5px; font-size: 12px; line-height: 1.25; }
+.meal-summary { display: flex; min-width: 0; align-items: center; gap: 5px; padding: 2px 3px; border-radius: 4px; font-size: 12px; line-height: 1.25; cursor: grab; }
+.meal-summary:hover { background: var(--quiet); }
+body.is-dragging-meal .meal-summary { cursor: grabbing; }
 .meal-summary .icon { width: 14px; height: 14px; }
 .meal-summary span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.more-meals { color: var(--muted); font-size: 11px; font-weight: 600; }
+.more-meals { width: fit-content; color: var(--enamel); font-size: 11px; font-weight: 650; }
 .cell-meta { display: flex; justify-content: space-between; gap: 5px; margin-top: auto; color: var(--muted); font-family: var(--values); font-size: 10px; }
 .cell-meta span { display: inline-flex; align-items: center; gap: 3px; }
 .cell-meta .icon { width: 12px; height: 12px; }
@@ -268,6 +274,9 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
 .ticket-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .ticket-summary h2 { margin: 0; }
 .ticket-meals { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.meal-end-drop { display: grid; min-height: 26px; place-items: center; color: transparent; border: 1px dashed transparent; border-radius: 6px; font-family: var(--values); font-size: 10px; }
+body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--rule); }
+.ticket-meals.is-touch-end-target .meal-end-drop { color: var(--enamel); border-color: var(--enamel); background: var(--enamel-soft); }
 .ticket-meal { position: relative; display: grid; min-width: 0; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 58px; border-bottom: 1px solid var(--rule); }
 .ticket-meal.is-drag-over::before { position: absolute; top: -1px; right: 0; left: 0; height: 2px; transform-origin: left; background: var(--enamel); content: ""; animation: insertion-line 120ms ease-out both; }
 .ticket-meal.is-lifted { background: var(--enamel-soft); }
@@ -280,6 +289,7 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
 .meal-row-actions { display: flex; align-items: center; gap: 3px; }
 .meal-row-actions .icon-button { width: 36px; height: 36px; border-color: transparent; }
 .drag-control { opacity: 0; }
+.drag-control { touch-action: none; }
 .ticket-meal:hover .drag-control, .ticket-meal:focus-within .drag-control, .drag-control:focus-visible, .drag-control[aria-pressed="true"] { opacity: 1; }
 .action-menu { position: absolute; z-index: 12; top: calc(100% + 2px); right: 0; display: grid; min-width: 190px; padding: 5px; border: 1px solid var(--rule); border-radius: 8px; background: var(--porcelain); box-shadow: var(--drawer-shadow); }
 .action-menu button { min-height: 40px; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; text-align: left; cursor: pointer; }
@@ -290,6 +300,8 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
 .ticket-cart-line span { color: var(--muted); font-family: var(--values); font-size: 11px; }
 .ticket-cart .button { width: 100%; margin-top: 5px; }
 .empty-ticket p { margin-bottom: 0; color: var(--muted); }
+.touch-drag-preview { position: fixed; z-index: 95; display: flex; max-width: min(260px, calc(100vw - 32px)); align-items: center; gap: 7px; padding: 9px 12px; border: 1px solid var(--enamel); border-radius: 8px; color: var(--ink); background: var(--porcelain); box-shadow: var(--drawer-shadow); font-size: 13px; font-weight: 650; pointer-events: none; transform: translate(-50%, -115%); }
+.touch-drag-preview .icon { width: 17px; height: 17px; color: var(--enamel); }
 
 /* Overlays */
 .overlay { position: fixed; z-index: 100; inset: 0; display: grid; animation: overlay-enter 160ms ease both; }
@@ -391,7 +403,7 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
   .recipe-card { display: flex; flex-direction: column; gap: 13px; padding: 18px 0 20px; }
   .recipe-card:first-child { border-top: 0; }
   .ingredient-preview li:nth-child(n + 3) { display: none; }
-  .recipe-view-action { min-height: 44px; margin-top: 1px; }
+  .recipe-add-action, .recipe-view-action { min-height: 44px; }
   .recipe-image { aspect-ratio: 3 / 2; }
 
   .ledger, .ledger tbody, .ledger tr, .ledger td, .ledger tbody th { display: block; width: 100%; }
@@ -428,7 +440,7 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
   .reconcile-row .radio-list { grid-template-columns: minmax(0, 1fr); }
 
   .planner-layout { gap: 0; }
-  .planner-page { padding-top: 18px; }
+  .planner-page { padding-top: 18px; padding-bottom: calc(52dvh + 88px + env(safe-area-inset-bottom)); }
   .planner-page .page-heading { margin-bottom: 12px; }
   .planner-page h1 { font-size: 28px; }
   .planner-page .page-heading .supporting-copy { margin-top: 2px; }
@@ -449,14 +461,16 @@ body.is-dragging-meal .day-cell.drop-valid { border-style: dashed; border-color:
   .mobile-status .ready-count, .mobile-status .missing-count { display: inline-flex; align-items: center; gap: 1px; }
   .mobile-status .ready-count { color: var(--parsley); }
   .mobile-status .missing-count { color: var(--paprika); }
-  .ticket-shell { position: relative; top: auto; margin-top: 11px; }
+  .ticket-shell { position: fixed; z-index: 45; top: auto; right: 12px; bottom: calc(64px + env(safe-area-inset-bottom)); left: 12px; max-height: 48dvh; margin: 0; filter: drop-shadow(var(--day-shadow)); }
   .ticket-shell::before { position: absolute; z-index: 1; top: 0; left: 50%; width: 52px; height: 2px; border-radius: 999px; background: var(--enamel); content: ""; transform: translateX(-50%); }
+  .day-ticket { display: flex; max-height: 48dvh; flex-direction: column; box-shadow: var(--drawer-shadow); }
+  .ticket-body { overflow-y: auto; overscroll-behavior: contain; }
   .ticket-date { font-size: 15px; }
   .ticket-context { margin-top: 1px; font-size: 11px; }
   .ticket-head { padding: 17px 15px 13px; }
   .ticket-body { padding: 14px 15px 16px; }
   .ticket-meal { grid-template-columns: 20px minmax(0, 1fr) auto; min-height: 62px; }
-  .drag-control { display: none; }
+  .drag-control { display: inline-grid; opacity: 1; }
   .meal-row-actions .icon-button { width: 44px; height: 44px; }
 
   .overlay-inspection, .overlay-transaction, .overlay-compact, .overlay-sheet { align-items: end; grid-template-columns: minmax(0, 1fr); padding: 0; }

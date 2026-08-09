@@ -5,9 +5,9 @@ Own persisted planner days and the server-side behavior that reads and changes t
 # Ownership
 
 - `types.ts` defines validators and inferred types for recipe references, ingredient sets, carts, and planned days.
-- `table.ts` defines `plannerTable` and its lookup indexes.
-- `queries.ts` shapes planner documents into the date-keyed map consumed by the frontend.
-- `actions/` owns authenticated planner mutations.
+- Planner persistence owns ordered, user-scoped day documents and their date indexes.
+- Planner reads shape those documents into the date-keyed map consumed by the frontend.
+- `actions/` separates day, planned-recipe, and shopping-cart mutation behavior.
 
 # Local Contracts
 
@@ -21,12 +21,10 @@ Own persisted planner days and the server-side behavior that reads and changes t
 # Work Guidance
 
 - Preserve recipe order when moving items within or across days.
+- Treat a missing destination date as an empty planner day; recipe add and move mutations create it with the planner defaults.
 - Treat updates to a planner document as transactional and patch only the owned day or days involved.
 
 # Verification
-
-- Run `npx tsc -p convex/tsconfig.json --noEmit`.
-- Run `npm run build` when a query result or public mutation signature changes.
 
 # Child DOX Index
 

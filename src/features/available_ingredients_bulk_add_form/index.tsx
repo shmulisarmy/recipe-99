@@ -29,8 +29,8 @@ export function AvailableIngredientsBulkAddForm(props: AvailableIngredientsBulkA
   const [newNameError, setNewNameError] = createSignal("");
   const [newAmountError, setNewAmountError] = createSignal("");
   const [submitError, setSubmitError] = createSignal("");
-  const addPantryBatch = useMutation(api.data.AvailableIngredientsBulkAdd);
-  const planner = useQuery(api.data.usersPlanner, {});
+  const addPantryBatch = useMutation(api.pantry_exports.AvailableIngredientsBulkAdd);
+  const planner = useQuery(api.planner_exports.usersPlanner, {});
   let newNameInput!: HTMLInputElement;
   let newAmountInput!: HTMLInputElement;
 

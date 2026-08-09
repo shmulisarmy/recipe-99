@@ -20,9 +20,9 @@ function NotFound() {
 }
 
 const App: Component = () => {
-  const pantry = useQuery(api.data.getAvailableIngredients, {});
-  const menu = useQuery(api.data.getAllRecipes, {});
-  const planner = useQuery(api.data.usersPlanner, {});
+  const pantry = useQuery(api.pantry_exports.getAvailableIngredients, {});
+  const menu = useQuery(api.recipe_exports.getAllRecipes, {});
+  const planner = useQuery(api.planner_exports.usersPlanner, {});
   const [intakeHandoff, setIntakeHandoff] = createSignal<IntakeHandoff>();
 
   createEffect(() => {
@@ -30,7 +30,7 @@ const App: Component = () => {
     const menuData = menu.data();
     const plannerData = planner.data();
     if (!pantryData || !menuData || !plannerData) return;
-    for (const key of Object.keys(projection)) delete projection[key];
+    // for (const key of Object.keys(projection)) delete projection[key];
     Object.assign(projection, createPlannerProjection(plannerData, pantryData, menuData));
   });
 

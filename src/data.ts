@@ -42,7 +42,7 @@ export function fromCacheKey(cacheKey: `${string}@${number}`): RecipeId {
   export async function getOrSetRecipeByTitle(recipeId: RecipeId): Promise<Recipe> {
     const cacheKey = makeCacheKey(recipeId);
     if (!recipeCache.has(cacheKey)) {
-      const recipeInMenu = await convexClient.query(api.data.getRecipeByTitle, { recipeTitle: recipeId.title, version: recipeId.version });
+      const recipeInMenu = await convexClient.query(api.recipe_exports.getRecipeByTitle, { recipeTitle: recipeId.title, version: recipeId.version });
       if (!recipeInMenu) throw new Error(`Recipe "${cacheKey}" not found in menu.`);
       recipeCache.set(cacheKey, recipeInMenu);
     }
@@ -51,7 +51,7 @@ export function fromCacheKey(cacheKey: `${string}@${number}`): RecipeId {
 
 
   export async function loadRecipeCache() {
-    const recipes = await convexClient.query(api.data.getAllRecipes, {});
+    const recipes = await convexClient.query(api.recipe_exports.getAllRecipes, {});
     for (const recipe of recipes) {
       recipeCache.set(makeCacheKey({title: recipe.title, version: recipe.version}), recipe);
     }

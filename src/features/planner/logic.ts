@@ -14,6 +14,7 @@ import { sortDateStrings } from "../../utils/date";
 
 
 export function createPlannerProjection(planner: PlannerType, AvailableIngredients: Doc<"pantryItems">[], initialMenu: Doc<"recipes">[]) {
+    console.log("running createPlannerProjection");
     type RecipeProjection = {
         plannedRecipeReference: PlannedRecipe;
         multiplier: number;
@@ -79,19 +80,9 @@ export function createPlannerProjection(planner: PlannerType, AvailableIngredien
         }
         projection[date] = daysProjection;
     }
+
     return projection;
 }
 
 
 export const projection: PlannerProjection = createMutable({});
-
-
-
-export function reSimulatePlannerProjection() {
-    // createPlannerProjection().then(projection_ => 
-    //     Object.assign(projection, projection_)
-    // );
-}
-
-
-    

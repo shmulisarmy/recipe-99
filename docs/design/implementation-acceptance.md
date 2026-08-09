@@ -36,11 +36,12 @@ app shell and routes
 - Current month, leading/trailing dates, today, selection, max two meal summaries, `+n`, cart count, and people count remain visible at the appropriate breakpoint.
 - The calendar has one date-button focus model and the Day Ticket owns all selected-day actions.
 - On mobile, status marks use distinct local SVG shapes and 10-11px complete Ready/Missing totals with no additive `+n`; visible and accessible summaries cover the same meals.
-- At 320px, each calendar date target is at least 44 by 44px, the calendar causes no horizontal page scroll, and the normally padded Day Ticket follows after a subtle selected-day handoff.
+- At 320px, each calendar date target is at least 44 by 44px, the calendar causes no horizontal page scroll, and the normally padded Day Ticket remains available as a non-modal bottom sheet above navigation.
 - Day and recipe serving amounts validate, persist, show pending/failure, and support day-default restoration.
 - Planner readiness explains chronology, consumption, substitutions, and missing quantities at the active amount.
 - Missing recipe quantities can be added to the correct day cart with local feedback.
-- Pointer dragging supports beginning-of-day and before-meal placement with clear targets.
+- Pointer dragging supports beginning-of-day, before-meal, and end-of-day placement with clear targets; calendar hover never resizes the grid.
+- Touch dragging starts from the mobile Day Ticket and supports the same day and meal targets without exposing recipe names in calendar cells.
 - Keyboard lift/drop and explicit Move meal surfaces can perform every pointer move.
 - Failed moves restore confirmed order and expose retry.
 - Recipe search, ingredient matching, ready-only filter, URL state, result counts, loading, and empty states work.

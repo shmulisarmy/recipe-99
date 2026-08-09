@@ -21,6 +21,8 @@ Desktop cells show:
 - `+n more` when additional meals exist;
 - cart item count and people count when the day exists.
 
+The two visible meal summaries are pointer drag sources. Selecting `+n more` selects the date and exposes every meal in the authoritative Day Ticket; it does not resize the calendar row.
+
 Cells are compact, about 102-112px high. Full meal names truncate visually but remain in the date button's accessible summary. Leading/trailing days use lower contrast. Today uses an enamel outline around the date. Selection uses a quiet enamel background and solid enamel date treatment; today and selection remain distinguishable.
 
 Mobile cells are at least 52px high, and their single date target is at least 44 by 44px even at a 320px viewport. The calendar may extend through the mobile page gutters to preserve seven equal columns without horizontal page scrolling; the Day Ticket retains the normal page gutters. Cells contain the day number plus complete Ready and Missing shape/count totals, for example a check with `4` and a warning with `1`. Do not add `+n` to mobile totals because Ready and Missing already account for every meal. Use 10-11px text. The date button accessible name includes the full date, today/selected state, the same complete meal-status totals, people, and shopping count; visual marks are decorative and hidden from assistive technology.
@@ -41,7 +43,7 @@ Desktop pointer movement may expose a drag handle on row hover/focus, but do not
 
 The bottom of the Ticket shows either `Nothing to buy for this day.` or shopping item count, obtained percentage, progress bar, and `Open shopping cart`.
 
-No planned day: `No meals planned for Wednesday, August 5.` Do not invent people or cart values. On mobile, the Ticket follows the calendar after a subtle 10-12px handoff gap and restrained enamel top accent; it keeps ordinary page padding and does not become a new card metaphor. Its authoritative short date is about 15px, with `Today` subordinate. Scroll its heading into view only when it is below the viewport.
+No planned day: `No meals planned for Wednesday, August 5.` Do not invent people or cart values. On mobile, the Ticket is a non-modal bottom sheet above the primary navigation so it remains available while the calendar stays visible as a drop target. It uses ordinary page gutters, a restrained enamel top accent, and an internally scrolling body. Its authoritative short date is about 15px, with `Today` subordinate.
 
 ## Serving amounts
 
@@ -93,7 +95,7 @@ While projected availability loads, show `Checking the projected pantry…` and 
 
 The persisted meal identity remains stable through every move.
 
-1. Drag starts from the handle revealed on row hover or focus.
+1. Drag starts from either of the two visible desktop meal summaries or the handle revealed on a Day Ticket row's hover or focus.
 2. Preview shows recipe title and current date; origin keeps a quiet placeholder.
 3. Valid days receive a dashed outline; the active target receives a 2px enamel outline and quiet enamel fill.
 4. Dropping on day space moves the meal to the beginning of that date.
@@ -103,6 +105,8 @@ The persisted meal identity remains stable through every move.
 8. Within 48px of the scroll edge, scroll at no more than 12px per frame.
 9. Escape or dropping outside a valid target cancels.
 10. Show a local pending marker after drop. Failure restores confirmed order and offers `Retry move`.
+
+Hovering a calendar day only highlights it; it never expands or resizes during the drag. Dropping on its day space moves the meal to position one. The user can select that date afterward for exact reordering.
 
 Success announcement: `Moved Tomato pasta to Tuesday, August 5, position 1 of 2.`
 
@@ -119,4 +123,4 @@ Outside lifted mode, arrows retain calendar or page behavior.
 
 ## Touch and explicit movement
 
-Do not use long-press drag. `Move meal` opens a bottom sheet with recipe title, seven-day strip, native date choice, and positions `First` or `Before {meal}`. Desktop and keyboard users can open the same move surface as a compact centered modal. It uses the same move result, feedback, and announcements as drag-and-drop.
+Do not use long-press drag. The mobile Day Ticket exposes the drag handle directly: dragging over a meal moves before it, dragging to the end marker places it last, and dragging onto a calendar date moves it first on that date. `Move meal` remains a precise fallback with recipe title, seven-day strip, native date choice, and positions `First`, `Before {meal}`, or `Last`. Desktop and keyboard users can open the same move surface as a compact centered modal. It uses the same move result, feedback, and announcements as drag-and-drop.

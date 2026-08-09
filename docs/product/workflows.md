@@ -27,6 +27,7 @@
 - Each recipe is classified from the current pantry as ready, missing ingredients, or temporarily unavailable for analysis while pantry data is loading.
 - A recipe shows its description, required ingredients already present, missing ingredients and quantities, and available substitutes.
 - Result counts and a useful no-results state help the user understand a search or filter.
+- A user can add a recipe from either its result or detail drawer to a chosen planner date. Existing days receive it last; missing dates are created with one person and an empty shopping cart.
 
 ## Meal planner
 
@@ -36,12 +37,15 @@
 - The current day and selected day are identifiable.
 - Each day shows its planned recipes, shopping-cart item count, and number of people eating when that day exists in the plan.
 - Recipe status is visible at a glance: the user can distinguish meals that can be made from meals that are missing ingredients.
-- On small screens, selecting a date opens a focused day summary beneath the calendar.
+- On small screens, selecting a date updates a non-modal bottom Day Ticket that remains available above primary navigation.
 
 ### Arrange meals with drag and drop
 
 - A planned recipe can be dragged onto another calendar day, moving it to the beginning of that day.
 - A planned recipe can be dragged onto another recipe to place it directly before that recipe.
+- A planned recipe can be dragged to the end of its expanded day list.
+- Desktop calendar cells expose the first two planned recipes as direct drag sources; selecting `+n more` opens that date's full ordered Day Ticket.
+- On mobile, recipe names and movement controls stay in the bottom Day Ticket while calendar cells continue to show complete Ready and Missing totals only.
 - Drop targets expose a visible active state.
 - Every move preserves the planned recipe's stable identity and persists immediately.
 

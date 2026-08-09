@@ -22,7 +22,7 @@ function convertFromGrams(
   gramAmount: number,
   convertTo: Unit,
 ): Measurement {
-  zUnit.parse(convertTo);
+  zBuiltinUnit.parse(convertTo);
   switch (convertTo) {
     case 'grams':
       return {
@@ -144,22 +144,23 @@ function convertFromGrams(
   
   export type Unit = 'grams' | 'kilograms' | 'ounces' | 'pounds';
 
-const zUnit = z.enum(['grams', 'kilograms', 'ounces', 'pounds']);
+const zBuiltinUnit = z.enum(['grams', 'kilograms', 'ounces', 'pounds']);
+const zCustomUnit = z.object({
+  name: z.string(),
+  gramsPerUnit: z.number(),
+});
 
   const zMeasurement = z.object({
     amount: z.number(),
-    unit: zUnit,
+    unit: zBuiltinUnit,
   });
 
-  // export type Measurement = {
-  //   amount: number;
-  //   unit: Unit;
-  // };
+
   export type Measurement = z.infer<typeof zMeasurement>;
 
   export function Measurement_Convert(m: Measurement, to: Unit): Measurement {
     zMeasurement.parse(m);
-    zUnit.parse(to);
+    zBuiltinUnit.parse(to);
     return convertFromGrams(convertToGrams(m), to);
   }
 

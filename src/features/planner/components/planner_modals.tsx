@@ -64,7 +64,7 @@ export function RecipeModal(props: { item: RecipeProjection; dateStr: string; on
   const [isAdding, setIsAdding] = createSignal(false);
   const [added, setAdded] = createSignal(false);
   const [addError, setAddError] = createSignal("");
-  const recipe = useQuery(api.data.getRecipeByTitle, () => ({ recipeTitle: recipeId().title, version: recipeId().version }));
+  const recipe = useQuery(api.recipe_exports.getRecipeByTitle, () => ({ recipeTitle: recipeId().title, version: recipeId().version }));
   const addIngredientsToCart = useMutation(api.planner_exports.BulkUpdateCartToGet);
   const coveredEntries = () => Object.entries(props.item.scratchPadOfIngredientsNeededToUse);
 
@@ -112,6 +112,7 @@ export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; 
   const [saving, setSaving] = createSignal(false);
   const [error, setError] = createSignal("");
   const insertBeginning = useMutation(api.planner_exports.InsertRecipeAtBeginningOfDate);
+  const insertEnd = useMutation(api.planner_exports.InsertRecipeAtEndOfDate);
   const moveBefore = useMutation(api.planner_exports.MoveRecipeOnTopOfOtherRecipe);
   const selectedDay = () => props.plannerData[targetDate()];
   const targetMeals = () => selectedDay()?.recipes.filter((recipe) => recipe.id !== props.item.plannedRecipeReference.id) ?? [];
@@ -119,12 +120,12 @@ export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; 
 
   const move = async (event: SubmitEvent) => {
     event.preventDefault();
-    if (!selectedDay()) { setError("Choose a day that is available in this plan."); return; }
     setSaving(true); setError("");
     try {
       if (position() === "first") await insertBeginning.mutate({ recipeId: props.item.plannedRecipeReference.id, toDate: targetDate() });
+      else if (position() === "last") await insertEnd.mutate({ recipeId: props.item.plannedRecipeReference.id, toDate: targetDate() });
       else await moveBefore.mutate({ recipeId: props.item.plannedRecipeReference.id, otherRecipeId: position() });
-      const targetPosition = position() === "first" ? 1 : targetMeals().findIndex((meal) => meal.id === position()) + 1;
+      const targetPosition = position() === "first" ? 1 : position() === "last" ? targetMeals().length + 1 : targetMeals().findIndex((meal) => meal.id === position()) + 1;
       props.onMoved(targetDate(), targetPosition, targetMeals().length + 1);
       props.onClose();
     } catch { setError("Couldn’t move the meal. Try again."); }
@@ -134,9 +135,9 @@ export function MoveMealModal(props: { item: RecipeProjection; dateStr: string; 
   return (
     <Overlay kind="compact" title="Move meal" eyebrow={props.item.plannedRecipeReference.recipeId.title} onClose={props.onClose}>
       <form class="move-form" onSubmit={move}>
-        <fieldset class="date-strip"><legend>Choose a day</legend><For each={routeDates()}>{(date) => { const key = date.toDateString(); return <button class="date-choice" classList={{ selected: targetDate() === key }} type="button" disabled={!props.plannerData[key]} onClick={() => { setTargetDate(key); setPosition("first"); }}><span>{date.toLocaleDateString(undefined, { weekday: "short" })}</span><strong>{date.getDate()}</strong></button>; }}</For></fieldset>
+        <fieldset class="date-strip"><legend>Choose a day</legend><For each={routeDates()}>{(date) => { const key = date.toDateString(); return <button class="date-choice" classList={{ selected: targetDate() === key }} type="button" onClick={() => { setTargetDate(key); setPosition("first"); }}><span>{date.toLocaleDateString(undefined, { weekday: "short" })}</span><strong>{date.getDate()}</strong></button>; }}</For></fieldset>
         <label class="field"><span>Date</span><input class="input" type="date" value={toRouteDate(new Date(targetDate()))} onChange={(event) => { const value = event.currentTarget.valueAsDate; if (value) { setTargetDate(new Date(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()).toDateString()); setPosition("first"); } }}/></label>
-        <fieldset class="radio-list"><legend class="field-label">Position</legend><label><input type="radio" name="move-position" value="first" checked={position() === "first"} onChange={() => setPosition("first")}/>First</label><For each={targetMeals()}>{(meal) => <label><input type="radio" name="move-position" value={meal.id} checked={position() === meal.id} onChange={() => setPosition(meal.id)}/>Before {meal.recipeId.title}</label>}</For></fieldset>
+        <fieldset class="radio-list"><legend class="field-label">Position</legend><label><input type="radio" name="move-position" value="first" checked={position() === "first"} onChange={() => setPosition("first")}/>First</label><For each={targetMeals()}>{(meal) => <label><input type="radio" name="move-position" value={meal.id} checked={position() === meal.id} onChange={() => setPosition(meal.id)}/>Before {meal.recipeId.title}</label>}</For><Show when={targetMeals().length > 0}><label><input type="radio" name="move-position" value="last" checked={position() === "last"} onChange={() => setPosition("last")}/>Last</label></Show></fieldset>
         <Show when={error()}><p class="field-error" role="alert">{error()}</p></Show>
         <div class="form-actions"><button class="button button-secondary" type="button" onClick={props.onClose}>Cancel</button><button class="button button-primary" type="submit" disabled={saving()}>{saving() ? "Moving…" : "Move meal"}</button></div>
       </form>

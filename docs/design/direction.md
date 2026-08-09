@@ -42,7 +42,7 @@ It combines:
 
 The surface has softly clipped 8px top corners, one quiet divider below its date, and the design system's only persistent lift shadow. Remove faux perforation, ticket numbering, and other decorative metaphor.
 
-Placement is inline with the calendar only when the current shell leaves enough content width, approximately a 1280px viewport in the current 208px-navigation shell. Below that it follows the calendar. On mobile it appears immediately below the compact month grid.
+Placement is inline with the calendar only when the current shell leaves enough content width, approximately a 1280px viewport in the current 208px-navigation shell. At intermediate widths it follows the calendar. On mobile it remains fixed above primary navigation as a non-modal bottom sheet while the calendar stays visible.
 
 ## Uniqueness check
 

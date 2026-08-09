@@ -10,7 +10,7 @@ import { today } from "../planner/outside_feature_exports";
 type ReconcileAction = "keep" | "move" | "remove";
 
 export function FormTemplateWithDataStructure(props: { handoff: IntakeHandoff; onComplete: () => void; onBack: () => void }) {
-  const planner = useQuery(api.data.usersPlanner, {});
+  const planner = useQuery(api.planner_exports.usersPlanner, {});
   const updateAlreadyGot = useMutation(api.planner_exports.UpdateCartAlreadyGot);
   const pushToTomorrow = useMutation(api.planner_exports.PushOverIngredientShoppingItemsForTheNextDay);
   const setCartTargets = useMutation(api.planner_exports.BulkSetCartToGet);

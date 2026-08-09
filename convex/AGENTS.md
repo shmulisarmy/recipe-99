@@ -5,11 +5,13 @@ Own Recipe-99's persisted data model and authenticated server functions.
 # Ownership
 
 - `schema.ts` composes all persisted tables.
-- `data.ts` owns pantry, recipe, identity, and top-level planner query exports.
-- `planner_exports.ts` is the stable client-facing alias module for planner mutations.
-- `types.ts` owns shared Convex validators.
+- `auth.ts` owns the current-user identity query exposed as `api.auth.*`.
+- `pantry_exports.ts` is the stable client-facing alias module for pantry reads and writes.
+- `planner_exports.ts` is the stable client-facing alias module for planner reads plus add, move, day, and cart mutations.
+- `recipe_exports.ts` is the stable client-facing alias module for recipe reads and creation.
+- `types.ts` owns the shared measurement validator.
 - `utils/auth.ts` owns canonical authenticated user identification.
-- `tables/` owns domain-specific table validators, indexes, queries, and mutations.
+- `tables/` owns domain-specific persistence modules under its local contract.
 - `_generated/` is Convex-generated output and is never hand-edited.
 
 # Local Contracts
@@ -18,7 +20,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 - Define all tables in `schema.ts`, validate every public function argument, and add return validators when changing or adding functions.
 - Derive ownership from `ctx.auth.getUserIdentity()` through `authenticatedUserId`; never trust a client-provided user identifier for authorization.
 - Use indexes for user-owned document lookup and name indexes after all indexed fields in order.
-- Frontend callers use generated `api.*` references. Keep `planner_exports.ts` aligned with the intentional planner mutation surface.
+- Frontend callers use generated `api.*` references. Keep `pantry_exports.ts`, `planner_exports.ts`, and `recipe_exports.ts` aligned with their intentional client surfaces rather than calling nested table modules directly.
 - Never edit `_generated` files manually; regenerate them through Convex tooling.
 
 # Work Guidance
@@ -34,4 +36,4 @@ Own Recipe-99's persisted data model and authenticated server functions.
 
 # Child DOX Index
 
-- `tables/planner/AGENTS.md` — planner-day data model, queries, and mutation semantics.
+- `tables/AGENTS.md` — shared table-module structure plus pantry, planner, and recipe domain boundaries.

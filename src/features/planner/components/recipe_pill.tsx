@@ -14,6 +14,8 @@ export function RecipePill(props: {
   isLifted: boolean;
   moveLabel?: string;
   registerRow?: (element: HTMLLIElement) => void;
+  touchDropActive: boolean;
+  onTouchMoveStart: (event: PointerEvent) => void;
   onMoveFailure: (message: string, retry: () => Promise<void>) => void;
 }) {
   const [isDragOver, setIsDragOver] = createSignal(false);
@@ -62,7 +64,8 @@ export function RecipePill(props: {
     <li
       ref={props.registerRow}
       class="ticket-meal"
-      classList={{ "is-drag-over": isDragOver(), "is-moving": isMoving(), "is-lifted": props.isLifted }}
+      data-meal-drop-id={id()}
+      classList={{ "is-drag-over": isDragOver() || props.touchDropActive, "is-moving": isMoving(), "is-lifted": props.isLifted }}
       onDragOver={(event) => { event.preventDefault(); event.stopPropagation(); if (event.dataTransfer) event.dataTransfer.dropEffect = "move"; setIsDragOver(true); }}
       onDragLeave={() => setIsDragOver(false)}
       onDrop={(event) => void handleDrop(event)}
@@ -80,6 +83,7 @@ export function RecipePill(props: {
           onDragStart={handleDragStart}
           onDrag={handleDrag}
           onDragEnd={() => document.body.classList.remove("is-dragging-meal")}
+          onPointerDown={props.onTouchMoveStart}
           onKeyDown={props.onMoveKeyDown}
         ><Icon name="grip"/></button>
         <div class="anchored-control">

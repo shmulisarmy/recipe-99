@@ -56,7 +56,7 @@ Mobile status summaries are 10-11px. Avoid pervasive uppercase and letter spacin
 - Do not use blur or translucent glass.
 - Inspection drawers use `0 12px 36px rgb(24 36 33 / 0.14)`.
 - Transaction modals use `0 18px 52px rgb(24 36 33 / 0.20)`.
-- The inline Day Ticket may use `0 4px 18px rgb(24 36 33 / 0.10)` as the one persistent lifted surface.
+- The Day Ticket may use `0 4px 18px rgb(24 36 33 / 0.10)` as the one persistent lifted surface.
 
 ## Icons
 

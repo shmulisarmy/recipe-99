@@ -1,45 +1,11 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
-import { measurementT } from "./types";
+import { defineSchema } from "convex/server";
+import { pantryItems } from "./tables/pantryItems/table";
 import { plannerTable } from "./tables/planner/table";
-
-
-
-
-
-
-export const recipeValidator = v.object({
-    title: v.string(),
-    version: v.number(),
-    description: v.string(),
-    requiredIngredients: v.array(v.object({
-        name: v.string(),
-        Measurement: measurementT,
-        substitute: v.optional(v.object({
-            name: v.string(),
-            Measurement: measurementT,
-        })),
-    })),
-});
-
-const recipes = defineTable(recipeValidator).index("versionedRecipe", ["title", "version"]);
-
-
-
-const pantryItems = defineTable({
-    name_: v.string(),
-    Measurement: measurementT,
-    userId: v.string(),
-})
-    .index("by_userId", ["userId"])
-    .index("by_userId_and_name_", ["userId", "name_"]);
+import { recipes, recipesVersions } from "./tables/recipes/table";
 
 export default defineSchema({
     recipes,
     pantryItems,
-    recipesVersions: defineTable({
-        recipeTitle: v.string(),
-        mostRecentVersion: v.number(),
-    }).index("recipeTitle", ["recipeTitle"]),
+    recipesVersions,
     plannerTable,
 });

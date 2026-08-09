@@ -4,7 +4,7 @@ import type { IngredientSet, RequiredIngredient } from "../data";
 import { fromCacheKey, makeCacheKey } from "../data";
 import { recipeMakingProjection } from "../logic";
 import type { Measurement } from "../primitives/measurement";
-import { useQuery } from "convex-solidjs";
+import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { Amount, Icon, Overlay, StatusText } from "./ui";
@@ -47,14 +47,127 @@ function projectRecipe(recipe: Doc<"recipes">, pantry: Doc<"pantryItems">[]): Re
     : { kind: "missing", recipe, unfulfilled: result.unfulfilledIngredients };
 }
 
-function RecipeDetail(props: { status: RecipeStatus; pantry: Doc<"pantryItems">[]; onClose: () => void }) {
+function dateInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function dateFromInput(value: string): Date | undefined {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  if (dateInputValue(date) !== value) return;
+  return date;
+}
+
+function AddToPlanOverlay(props: {
+  recipe: Doc<"recipes">;
+  onClose: () => void;
+  onViewDay: (date: Date) => void;
+}) {
+  const addRecipe = useMutation(api.planner_exports.AddRecipeToDate);
+  const [dateValue, setDateValue] = createSignal(dateInputValue(new Date()));
+  const [addedDate, setAddedDate] = createSignal<Date>();
+  const [error, setError] = createSignal("");
+
+  const add = async (event: SubmitEvent) => {
+    event.preventDefault();
+    const date = dateFromInput(dateValue());
+    if (!date) {
+      setError("Choose a valid day.");
+      return;
+    }
+
+    setError("");
+    try {
+      await addRecipe.mutate({
+        recipeId: {
+          title: props.recipe.title,
+          version: props.recipe.version,
+        },
+        toDate: date.toDateString(),
+      });
+      setAddedDate(date);
+      const live = document.getElementById("app-live-region");
+      if (live)
+        live.textContent = `Added ${props.recipe.title} to ${date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}.`;
+    } catch {
+      setError("Couldn’t add the recipe to that day. Try again.");
+    }
+  };
+
+  return (
+    <Overlay
+      kind="compact"
+      title="Add to plan"
+      eyebrow={props.recipe.title}
+      onClose={props.onClose}
+    >
+      <Show
+        when={addedDate()}
+        fallback={
+          <form class="add-to-plan-form" onSubmit={add}>
+            <label class="field">
+              <span>Day</span>
+              <input
+                class="input"
+                type="date"
+                value={dateValue()}
+                onInput={(event) => setDateValue(event.currentTarget.value)}
+              />
+            </label>
+            <p class="helper-text">
+              The recipe will be added after the meals already planned for that day.
+            </p>
+            <Show when={error()}>
+              <p class="field-error" role="alert">{error()}</p>
+            </Show>
+            <div class="form-actions">
+              <button class="button button-secondary" type="button" onClick={props.onClose}>
+                Cancel
+              </button>
+              <button class="button button-primary" type="submit" disabled={addRecipe.isLoading()}>
+                {addRecipe.isLoading() ? "Adding…" : "Add to day"}
+              </button>
+            </div>
+          </form>
+        }
+      >
+        {(date) => (
+          <div class="add-to-plan-success" role="status">
+            <StatusText kind="saved">Added to plan</StatusText>
+            <p>
+              {props.recipe.title} is planned for {date().toLocaleDateString(undefined, {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })}.
+            </p>
+            <div class="form-actions">
+              <button class="button button-secondary" type="button" onClick={props.onClose}>
+                Stay in recipes
+              </button>
+              <button class="button button-primary" type="button" onClick={() => props.onViewDay(date())}>
+                View day
+              </button>
+            </div>
+          </div>
+        )}
+      </Show>
+    </Overlay>
+  );
+}
+
+function RecipeDetail(props: { status: RecipeStatus; pantry: Doc<"pantryItems">[]; onAdd: () => void; onClose: () => void }) {
   const pantryMeasurement = (name: string) => props.pantry.find((item) => item.name_ === name)?.Measurement;
   const missingNames = () => new Set(props.status.kind === "missing" ? props.status.unfulfilled.map((item) => item.RequiredIngredient.name) : []);
   const owned = () => props.status.recipe.requiredIngredients.filter((item) => !missingNames().has(item.name));
   const missing = () => props.status.kind === "missing" ? props.status.unfulfilled : [];
   const substitutes = () => props.status.recipe.requiredIngredients.filter((item) => item.substitute);
   return (
-    <Overlay kind="inspection" title={props.status.recipe.title} eyebrow="Recipe library" onClose={props.onClose} footer={<button class="button button-secondary" type="button" onClick={props.onClose}>Close</button>}>
+    <Overlay kind="inspection" title={props.status.recipe.title} eyebrow="Recipe library" onClose={props.onClose} footer={<><button class="button button-secondary" type="button" onClick={props.onClose}>Close</button><button class="button button-primary" type="button" onClick={props.onAdd}><Icon name="plus"/>Add to plan</button></>}>
       <div class="recipe-detail-intro"><div class="detail-status"><Show when={props.status.kind === "ready"}><StatusText kind="ready"/></Show><Show when={props.status.kind === "missing"}><StatusText kind="missing"/></Show><Show when={props.status.kind === "checking"}><StatusText kind="checking"/></Show></div><p class="recipe-detail-description">{props.status.recipe.description}</p></div>
       <div class="recipe-detail-media"><RecipeImage title={props.status.recipe.title}/></div>
       <Show when={props.status.kind !== "checking"} fallback={<section class="ingredient-group" aria-labelledby="recipe-pantry-heading"><h3 id="recipe-pantry-heading">Pantry status unavailable</h3><p class="helper-text">Ingredient availability is still being checked. No ingredients are marked as on hand yet.</p></section>}>
@@ -66,7 +179,7 @@ function RecipeDetail(props: { status: RecipeStatus; pantry: Doc<"pantryItems">[
   );
 }
 
-function RecipeCard(props: { status: RecipeStatus; onOpen: () => void }) {
+function RecipeCard(props: { status: RecipeStatus; onOpen: () => void; onAdd: () => void }) {
   const missingNames = () => props.status.kind === "missing" ? props.status.unfulfilled.map((item) => item.RequiredIngredient.name) : [];
   return (
     <article class="recipe-card" classList={{ "is-ready": props.status.kind === "ready", "is-missing": props.status.kind === "missing" }}>
@@ -78,21 +191,22 @@ function RecipeCard(props: { status: RecipeStatus; onOpen: () => void }) {
           <For each={props.status.recipe.requiredIngredients.slice(0, 3)}>{(ingredient) => <li><span>{ingredient.name}</span><Amount measurement={ingredient.Measurement}/></li>}</For>
         </ul>
         <Show when={props.status.kind === "missing"}><p class="missing-summary">Missing {missingNames().slice(0, 2).join(", ")}{missingNames().length > 2 ? ` +${missingNames().length - 2} more` : ""}</p></Show>
-        <button class="recipe-view-action" type="button" onClick={props.onOpen}>View recipe<Icon name="arrow-right"/></button>
+        <div class="recipe-card-actions"><button class="recipe-add-action" type="button" onClick={props.onAdd}><Icon name="plus"/>Add to plan</button><button class="recipe-view-action" type="button" onClick={props.onOpen}>View recipe<Icon name="arrow-right"/></button></div>
       </div>
     </article>
   );
 }
 
 export function Menu() {
-  const recipes = useQuery(api.data.getAllRecipes, {});
-  const pantry = useQuery(api.data.getAvailableIngredients, {});
+  const recipes = useQuery(api.recipe_exports.getAllRecipes, {});
+  const pantry = useQuery(api.pantry_exports.getAvailableIngredients, {});
   const params = useParams<{ recipeKey?: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams<{ q?: string; ready?: string }>();
   const [query, setQuery] = createSignal(searchParams.q ?? "");
   const [readyOnly, setReadyOnly] = createSignal(searchParams.ready === "1");
+  const [addStatus, setAddStatus] = createSignal<RecipeStatus>();
   let observedSearch = location.search;
 
   createEffect(() => {
@@ -151,12 +265,13 @@ export function Menu() {
           <Show when={filtered().length > 0} fallback={
             <div class="empty-state"><Icon name="search"/><h2>{query().trim() && readyOnly() ? `No ready recipes match “${query().trim()}”.` : query().trim() ? `No recipes match “${query().trim()}”.` : "Nothing is ready with your current pantry."}</h2><button class="button button-secondary" type="button" onClick={() => { if (query().trim() && readyOnly()) { setQuery(""); setReadyOnly(false); } else if (query().trim()) setQuery(""); else setReadyOnly(false); }}>{query().trim() && readyOnly() ? "Clear filters" : query().trim() ? "Clear search" : "Show all recipes"}</button></div>
           }>
-            <section class="recipe-grid" aria-label="Recipe results"><For each={filtered()}>{(status) => <RecipeCard status={status} onOpen={() => openRecipe(status)}/>}</For></section>
+            <section class="recipe-grid" aria-label="Recipe results"><For each={filtered()}>{(status) => <RecipeCard status={status} onOpen={() => openRecipe(status)} onAdd={() => setAddStatus(status)}/>}</For></section>
           </Show>
         </Show>
       </Show>
       <Show when={params.recipeKey && !openStatus() && !recipes.isLoading()}><div class="inline-notice notice-error"><p>That recipe is not available.</p><A href={`/recipes${location.search}`}>Back to recipes</A></div></Show>
-      <Show when={openStatus()}>{(status) => <RecipeDetail status={status()} pantry={pantry.data() ?? []} onClose={closeRecipe}/>}</Show>
+      <Show when={openStatus()}>{(status) => <RecipeDetail status={status()} pantry={pantry.data() ?? []} onAdd={() => setAddStatus(status())} onClose={closeRecipe}/>}</Show>
+      <Show when={addStatus()}>{(status) => <AddToPlanOverlay recipe={status().recipe} onClose={() => setAddStatus(undefined)} onViewDay={(date) => navigate(`/planner/day/${dateInputValue(date)}`)}/>}</Show>
     </main>
   );
 }

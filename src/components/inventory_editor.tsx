@@ -7,7 +7,7 @@ import type { Doc } from "../../convex/_generated/dataModel";
 import { ALL_UNITS, Amount, Icon, Overlay, StatusText } from "./ui";
 
 function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
-  const updateIngredient = useMutation(api.data.updateAvailableIngredient);
+  const updateIngredient = useMutation(api.pantry_exports.updateAvailableIngredient);
   const [editing, setEditing] = createSignal(false);
   const [amountDraft, setAmountDraft] = createSignal(String(props.ingredient.Measurement.amount));
   const [unitDraft, setUnitDraft] = createSignal<Unit>(props.ingredient.Measurement.unit);
@@ -159,7 +159,7 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
 }
 
 export function InventoryEditor() {
-  const pantry = useQuery(api.data.getAvailableIngredients, {});
+  const pantry = useQuery(api.pantry_exports.getAvailableIngredients, {});
   return (
     <main class="main" id="main">
       <header class="page-heading"><div><h1>Pantry</h1><p class="supporting-copy">Keep these amounts accurate so recipe readiness stays useful.</p></div><A class="button button-primary" href="/intake"><Icon name="intake"/>Add a batch</A></header>

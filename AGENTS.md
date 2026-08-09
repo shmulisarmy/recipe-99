@@ -7,6 +7,8 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 - `src/` owns the browser application, UI composition, client-side projections, and shared frontend domain utilities.
 - `convex/` owns persisted data, authentication-aware queries and mutations, schema validators, and the generated client API boundary.
 - `docs/` owns durable product behavior and design specifications that guide the browser application.
+- `public/` owns static browser assets, including the installable-app icons referenced by the PWA manifest.
+- `.agents/skills/` and `.claude/skills/` contain tool-generated, repo-local Convex guidance for supported coding agents.
 - Root configuration files own build tooling, dependency versions, and environment wiring.
 
 # Local Contracts
@@ -15,6 +17,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 - Treat `src` and `convex` as one typed system: schema or function changes must be reflected through generated Convex APIs rather than handwritten parallel interfaces.
 - Preserve user-owned work already present in a dirty worktree and keep unrelated edits out of the current task.
 - Never edit files under `convex/_generated/` by hand.
+- Do not hand-edit the generated Convex skill bundles under `.agents/skills/` or `.claude/skills/`; refresh both through `npx convex ai-files install`.
 
 # Work Guidance
 
@@ -25,6 +28,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 # Verification
 
 - Run `npm run build` after application code changes.
+- When changing PWA configuration or icons, confirm the production build emits the manifest and that every referenced `public/` asset exists at its configured path.
 - Add the verification required by the nearest child `AGENTS.md` for the paths changed.
 
 # Child DOX Index

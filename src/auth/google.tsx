@@ -142,7 +142,7 @@ export function useAuth(): AuthContextValue {
 }
 
 function AuthenticatedApp(props: { children: JSX.Element; onSignOut(): void }) {
-    const identity = useQuery(api.data.getCurrentUserOAuthId, {});
+    const identity = useQuery(api.auth.getCurrentUserOAuthId, {});
     return (
         <AuthContext.Provider value={{ identity: identity.data, signOut: props.onSignOut }}>
             <Show

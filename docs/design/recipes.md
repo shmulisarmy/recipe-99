@@ -20,7 +20,7 @@ Each recipe contains:
 2. title with adjacent Ready, Missing, or Checking status;
 3. description clamped to three lines on wide screens and two lines on mobile;
 4. three compact ingredient rows on wide screens and two on mobile;
-5. a quiet `View recipe` link with an action arrow.
+5. quiet `Add to plan` and `View recipe` actions.
 
 Resolve images from the curated title map; recipes without a title match and failed images use a stable chalk-and-enamel recipe placeholder rather than repeating one generic food photograph. Keep readiness beside the title instead of over the crop. Lazy-loaded images reserve their final geometry and never expose broken media. Use Chivo for recipe names at approximately 24–26px, Atkinson for descriptions and controls, and IBM Plex Mono only for quantities and the result count.
 
@@ -38,7 +38,9 @@ Use a right drawer on desktop and full-height mobile drawer. Show full descripti
 - `Still needed`, with required, available, and missing amounts;
 - `Substitutes`, with substitute requirement and availability.
 
-This context has no planner-day actions such as serving override or add-to-cart.
+This context has no planned-occurrence actions such as serving override or add-to-cart. It does offer `Add to plan`, which opens a compact day chooser and appends the recipe to that date.
+
+Adding succeeds in place with `Added to plan`, `Stay in recipes`, and `View day`. A missing planner date is created with the planner defaults.
 
 ## States
 
