@@ -789,7 +789,7 @@ export function CartModal(props: {
                             const getCustomUnits = useQuery(api.customUnit_exports.getCustomUnits, {associatedIngredient: name})
                           return <Select
                           options={(BuiltinUnitOptions as Unit[]).concat(getCustomUnits.data()?.map(unit => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit})) || [])}
-                          toString={(unit) => `yo bro ${unit.type === 'builtin' ? unit.unit : unit.name}`}  
+                          toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}  
                           whenSelected={(unit) => {
                                     updateDraft(name, {unit: unit});
                                 }}
