@@ -9,7 +9,7 @@ Own domain values shared across the browser application and Convex functions.
 # Local Contracts
 
 - Preserve the serializable shape `{ amount: number, unit: Unit }`.
-- Keep supported units aligned with `convex/types.ts`: grams, kilograms, ounces, and pounds.
+- Keep supported units aligned with `convex/types.ts`: tagged builtin units for grams, kilograms, ounces, and pounds, plus tagged custom units with a name and grams-per-unit conversion.
 - Route measurement math through the named helpers so conversion and result-unit behavior remain consistent.
 - Changes here are cross-runtime changes because Convex planner mutations import these operations directly.
 

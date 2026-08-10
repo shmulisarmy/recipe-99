@@ -1,8 +1,14 @@
 import { For, Match, Show, Switch, createUniqueId, onCleanup, onMount, type JSX } from "solid-js";
 import { Portal } from "solid-js/web";
-import type { Measurement, Unit } from "../primitives/measurement";
+import type { Measurement, Unit, BuiltinUnit } from "../primitives/measurement";
+import { BuiltinUnitObjectKeysAndValues } from "../primitives/utils";
 
-export const ALL_UNITS: Unit[] = ["grams", "kilograms", "ounces", "pounds"];
+export const BuiltinUnitOptions: BuiltinUnit[] = [
+  { type: "builtin", unit: "grams" },
+  { type: "builtin", unit: "kilograms" },
+  { type: "builtin", unit: "ounces" },
+  { type: "builtin", unit: "pounds" },
+];
 
 export type IconName =
   | "calendar"
@@ -92,31 +98,14 @@ export function StatusText(props: { kind: "ready" | "missing" | "checking" | "sa
 }
 
 export function Amount(props: { measurement: Measurement | undefined }) {
-  return <span class="amount-value">{props.measurement ? `${formatAmount(props.measurement.amount)} ${props.measurement.unit}` : "0 grams"}</span>;
+  return <span class="amount-value">{props.measurement ? `${formatAmount(props.measurement.amount)} ${props.measurement.unit.type === 'builtin' ? props.measurement.unit.unit : props.measurement.unit.name}` : "0 grams"}</span>;
 }
 
 export function formatAmount(amount: number): string {
   return Number.isInteger(amount) ? String(amount) : Number(amount.toFixed(2)).toString();
 }
 
-export function MeasurementEditor(props: {
-  id: string;
-  amount: string | number;
-  unit: Unit;
-  onAmount: (value: string) => void;
-  onUnit: (unit: Unit) => void;
-  error?: string;
-  compact?: boolean;
-}) {
-  const errorId = `${props.id}-error`;
-  return (
-    <div class={`measurement-editor ${props.compact ? "compact" : ""}`}>
-      <label class="field"><span>Amount</span><input id={`${props.id}-amount`} class="input" inputmode="decimal" value={props.amount} aria-invalid={!!props.error} aria-describedby={props.error ? errorId : undefined} onInput={(event) => props.onAmount(event.currentTarget.value)}/></label>
-      <label class="field"><span>Unit</span><select id={`${props.id}-unit`} class="select" value={props.unit} onChange={(event) => props.onUnit(event.currentTarget.value as Unit)}><For each={ALL_UNITS}>{(unit) => <option value={unit}>{unit}</option>}</For></select></label>
-      <Show when={props.error}><p class="field-error" id={errorId}>{props.error}</p></Show>
-    </div>
-  );
-}
+
 
 type OverlayKind = "inspection" | "transaction" | "compact" | "sheet";
 

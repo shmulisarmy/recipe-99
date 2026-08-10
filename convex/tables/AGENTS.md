@@ -30,6 +30,7 @@ Own the domain modules that define Recipe-99's persisted tables and the server b
 
 # Child DOX Index
 
+- `customUnits/AGENTS.md` — ingredient-associated custom-unit definitions, lookup, and creation.
 - `pantryItems/AGENTS.md` — pantry-item schema, authenticated reads, and additive or replacement writes.
 - `planner/AGENTS.md` — planner-day data model, queries, and mutation semantics.
 - `recipes/AGENTS.md` — recipe and latest-version tables, recipe reads, and recipe creation.

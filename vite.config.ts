@@ -5,6 +5,9 @@ import devtools from 'solid-devtools/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  resolve: {
+    dedupe: ['solid-js'],
+  },
   plugins: [
     devtools(),
     solidPlugin(),

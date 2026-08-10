@@ -3,7 +3,10 @@ import {z} from "zod";
 
 function convertToGrams(measurement: Measurement): number {
   zMeasurement.parse(measurement);
-  switch (measurement.unit) {
+  if (measurement.unit.type === 'custom') {
+    return measurement.amount * measurement.unit.gramsPerUnit;
+  }
+  switch (measurement.unit.unit) {
     case 'grams':
       return measurement.amount;
 
@@ -16,36 +19,58 @@ function convertToGrams(measurement: Measurement): number {
     case 'pounds':
       return measurement.amount * 453.59237;
   }
+  
 }
 
 function convertFromGrams(
   gramAmount: number,
   convertTo: Unit,
 ): Measurement {
-  zBuiltinUnit.parse(convertTo);
-  switch (convertTo) {
+  zUnit.parse(convertTo);
+
+  if (convertTo.type === 'custom') {
+    return {
+      amount: gramAmount / convertTo.gramsPerUnit,
+      unit: convertTo,
+    };
+  }
+
+
+  switch (convertTo.unit) {
     case 'grams':
       return {
         amount: gramAmount,
-        unit: 'grams',
+        unit : {
+          type: 'builtin',
+          unit: 'grams',
+        },
       };
 
     case 'kilograms':
       return {
         amount: gramAmount / 1000,
-        unit: 'kilograms',
+        unit: {
+          type: 'builtin',
+          unit: 'kilograms',
+        },
       };
 
     case 'ounces':
       return {
         amount: gramAmount / 28.3495,
-        unit: 'ounces',
+        unit: {
+          type: 'builtin',
+          unit: 'ounces',
+        },
       };
 
     case 'pounds':
       return {
         amount: gramAmount / 453.59237,
-        unit: 'pounds',
+        unit: {
+          type: 'builtin',
+          unit: 'pounds',
+        },
       };
   }
 }
@@ -138,29 +163,42 @@ function convertFromGrams(
   export  function ZeroedMeasurement(): Measurement {
     return {
       amount: 0,
-      unit: "grams",
+      unit: {
+        type: 'builtin',
+        unit: 'grams',
+      },
     };
   }
   
-  export type Unit = 'grams' | 'kilograms' | 'ounces' | 'pounds';
+  export type Unit = z.infer<typeof zUnit>;
+  export type BuiltinUnit = z.infer<typeof zBuiltinUnit>;
 
-const zBuiltinUnit = z.enum(['grams', 'kilograms', 'ounces', 'pounds']);
+const zBuiltinUnit = z.object({
+  type: z.literal('builtin'),
+  unit: z.enum(['grams', 'kilograms', 'ounces', 'pounds']),
+});
 const zCustomUnit = z.object({
+  type: z.literal('custom'),
   name: z.string(),
   gramsPerUnit: z.number(),
 });
 
+
+
+const zUnit = z.union([zBuiltinUnit, zCustomUnit]);
+
   const zMeasurement = z.object({
     amount: z.number(),
-    unit: zBuiltinUnit,
+    unit: zUnit,
   });
 
 
   export type Measurement = z.infer<typeof zMeasurement>;
 
   export function Measurement_Convert(m: Measurement, to: Unit): Measurement {
+    console.log("converting", m, to);
     zMeasurement.parse(m);
-    zBuiltinUnit.parse(to);
+    zUnit.parse(to);
     return convertFromGrams(convertToGrams(m), to);
   }
 
@@ -180,9 +218,17 @@ const zCustomUnit = z.object({
     return b;
   }
 
+  export function Unit_ToString(unit: Unit): string {
+    zUnit.parse(unit);
+    if (unit.type === 'builtin') {
+      return `${unit.unit}`;
+    } 
+    return `${unit.name}`;
+
+  }
   export function Measurement_ToString(measurement: Measurement): string {
     zMeasurement.parse(measurement);
-    return `${measurement.amount} ${measurement.unit}`
+    return `${measurement.amount} ${Unit_ToString(measurement.unit)}`;
   }
 
 

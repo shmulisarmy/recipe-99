@@ -6,6 +6,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 
 - `schema.ts` composes all persisted tables.
 - `auth.ts` owns the current-user identity query exposed as `api.auth.*`.
+- `customUnit_exports.ts` is the stable client-facing alias module for custom-unit reads and creation.
 - `pantry_exports.ts` is the stable client-facing alias module for pantry reads and writes.
 - `planner_exports.ts` is the stable client-facing alias module for planner reads plus add, move, day, and cart mutations.
 - `recipe_exports.ts` is the stable client-facing alias module for recipe reads and creation.
@@ -20,7 +21,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 - Define all tables in `schema.ts`, validate every public function argument, and add return validators when changing or adding functions.
 - Derive ownership from `ctx.auth.getUserIdentity()` through `authenticatedUserId`; never trust a client-provided user identifier for authorization.
 - Use indexes for user-owned document lookup and name indexes after all indexed fields in order.
-- Frontend callers use generated `api.*` references. Keep `pantry_exports.ts`, `planner_exports.ts`, and `recipe_exports.ts` aligned with their intentional client surfaces rather than calling nested table modules directly.
+- Frontend callers use generated `api.*` references. Keep `customUnit_exports.ts`, `pantry_exports.ts`, `planner_exports.ts`, and `recipe_exports.ts` aligned with their intentional client surfaces rather than calling nested table modules directly.
 - Never edit `_generated` files manually; regenerate them through Convex tooling.
 
 # Work Guidance

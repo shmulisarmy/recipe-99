@@ -9,9 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as customUnit_exports from "../customUnit_exports.js";
 import type * as pantry_exports from "../pantry_exports.js";
 import type * as planner_exports from "../planner_exports.js";
 import type * as recipe_exports from "../recipe_exports.js";
+import type * as tables_customUnits_actions from "../tables/customUnits/actions.js";
+import type * as tables_customUnits_queries from "../tables/customUnits/queries.js";
+import type * as tables_customUnits_table from "../tables/customUnits/table.js";
 import type * as tables_pantryItems_actions from "../tables/pantryItems/actions.js";
 import type * as tables_pantryItems_queries from "../tables/pantryItems/queries.js";
 import type * as tables_pantryItems_table from "../tables/pantryItems/table.js";
@@ -35,9 +39,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  customUnit_exports: typeof customUnit_exports;
   pantry_exports: typeof pantry_exports;
   planner_exports: typeof planner_exports;
   recipe_exports: typeof recipe_exports;
+  "tables/customUnits/actions": typeof tables_customUnits_actions;
+  "tables/customUnits/queries": typeof tables_customUnits_queries;
+  "tables/customUnits/table": typeof tables_customUnits_table;
   "tables/pantryItems/actions": typeof tables_pantryItems_actions;
   "tables/pantryItems/queries": typeof tables_pantryItems_queries;
   "tables/pantryItems/table": typeof tables_pantryItems_table;

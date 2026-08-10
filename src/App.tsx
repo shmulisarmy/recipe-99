@@ -45,8 +45,10 @@ const App: Component = () => {
     return <FormTemplateWithDataStructure handoff={handoff} onBack={() => navigate("/intake")} onComplete={() => { setIntakeHandoff(undefined); navigate("/pantry"); }}/>;
   };
 
+
   return (
     <Router root={AppShell} scrollRestoration>
+      
       <Route path="/" component={() => <Navigate href="/planner"/>}/>
       <Route path="/sign-in" component={() => <Navigate href="/planner"/>}/>
       <Route path="/planner" component={Planner}/>
@@ -62,5 +64,8 @@ const App: Component = () => {
     </Router>
   );
 };
+
+
+
 
 export default App;

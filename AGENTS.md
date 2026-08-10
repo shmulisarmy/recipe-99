@@ -15,6 +15,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 
 - Read this file and every nearer `AGENTS.md` before changing a governed path; the nearest file adds local rules without weakening its parents.
 - Treat `src` and `convex` as one typed system: schema or function changes must be reflected through generated Convex APIs rather than handwritten parallel interfaces.
+- Keep `solid-js` in Vite's `resolve.dedupe` list so the application and Solid-aware dependencies share one reactive runtime.
 - Preserve user-owned work already present in a dirty worktree and keep unrelated edits out of the current task.
 - Never edit files under `convex/_generated/` by hand.
 - Do not hand-edit the generated Convex skill bundles under `.agents/skills/` or `.claude/skills/`; refresh both through `npx convex ai-files install`.
