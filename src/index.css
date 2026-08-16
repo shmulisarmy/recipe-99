@@ -407,7 +407,7 @@ body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--
   .button, .icon-button, .input, .select, .toggle { min-height: 44px; }
   .section-head { align-items: stretch; flex-direction: column; }
   .inline-notice { align-items: flex-start; flex-direction: column; }
-  .auth-page { display: block; padding: 24px 16px; }
+  .auth-page { display: block; align-content: start; padding: 24px 16px; }
   .auth-thesis { padding: 8px 0 28px; }
   .auth-wordmark { margin-bottom: 36px; }
   .auth-thesis h1 { font-size: 32px; line-height: 1.16; }

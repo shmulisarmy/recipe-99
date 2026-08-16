@@ -74,6 +74,19 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Mobile public sign-in alignment — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command for `/planner`, read the installed Chrome-control skill, connected through the supported Chrome bridge, emitted the Chrome documentation, and claimed the current `localhost:3000/planner` tab.
+- Authenticated Planner and Intake were unavailable in the controllable Chrome tab; it rendered the public sign-in surface. No authenticated UI was changed.
+- Chose a safe public authentication-flow improvement after rendered inspection showed a real mobile layout defect: `.auth-page` inherited tablet `align-content: center`, and modern block alignment pushed the mobile sign-in flow down inside the 100vh page.
+- Before evidence: `.impeccable/review/iteration-06-current-signin-mobile.png`, `.impeccable/review/iteration-06-current-signin-desktop.png`, `.impeccable/review/iteration-06-current-signin-summary.json`, and `.impeccable/review/iteration-06-mobile-signin-rects.json`; the mobile wordmark started at `272px`, the heading at `342px`, and the Google slot at `723px`.
+- Fixed only the mobile public sign-in layout: under `<768px`, `.auth-page` now resets `align-content: start`, preserving the desktop two-column sign-in composition and all Google sign-in behavior.
+- After evidence: `.impeccable/review/iteration-06-after-signin-mobile.png`, `.impeccable/review/iteration-06-after-signin-desktop.png`, `.impeccable/review/iteration-06-after-signin-summary.json`, `.impeccable/review/iteration-06-after-signin-320.png`, and `.impeccable/review/iteration-06-after-signin-320-summary.json`. At exact 320 CSS pixels, there is no horizontal scroll, the wordmark starts at `32px`, the heading at `102px`, and the Google slot at `594px`.
+- Verification: `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` passed; Impeccable detector returned no layout findings for `src/index.css`.
+- Fresh Impeccable finish reviewer returned `disposition: ship` with no material findings after the 320px gap was separately verified.
+- Browser console evidence: the known Solid cleanup warning remains. The standalone 320px Playwright check also logged the existing Google Identity origin warning that the sign-in smoke test explicitly filters; Chrome verification did not show a new source error from this CSS-only change.
+- Hostile review: this improves the public authentication path and removes a mobile first-impression failure, but it is not a substitute for the higher-value authenticated Intake and wide Planner work. Those remain blocked until a controllable Chrome tab can render authenticated routes before and after changes.
+
 ### Wide Planner verification blocked after auth drop — 2026-08-16
 
 - Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command for `/intake`, read the installed Chrome-control skill, connected through the supported Chrome bridge, and claimed the existing authenticated `localhost:3000/planner` tab.
