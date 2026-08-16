@@ -250,7 +250,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
                 <section class="sign-in-panel" aria-labelledby="sign-in-panel-title">
                     <h2 id="sign-in-panel-title">Sign in to your kitchen plan</h2>
                     <p>Your pantry, recipes, and shopping amounts stay with your account.</p>
-                    <div class="google-button-slot" classList={{ "is-loading": googleState() === "loading" }} ref={googleButton}/>
+                    <div class="google-button-slot" classList={{ "is-loading": googleState() === "loading", "is-failed": googleState() === "failed" }} ref={googleButton}/>
                     <Show when={googleState() === "loading"}><p class="auth-status">Loading Google sign-in…</p></Show>
                     <Show when={isSigningIn()}><p class="auth-status" aria-live="polite">Signing in…</p></Show>
                     <Show when={authError()}>{(message) => <div ref={errorNotice} class="inline-notice notice-error" role="alert" tabindex="-1"><p>{message()}</p><Show when={googleState() === "failed" && !!GOOGLE_CLIENT_ID}><button class="button button-secondary" type="button" onClick={() => { setGoogleState("loading"); setAuthError(undefined); void setupGoogle(); }}>Try again</button></Show></div>}</Show>

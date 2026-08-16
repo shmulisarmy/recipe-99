@@ -71,6 +71,12 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Sign-in failure state composition — 2026-08-16
+
+- Rendered the previously unreviewed "Google sign-in could not load" state by blocking the GSI script in headless Playwright at desktop and 390px viewports. The state itself follows the design contract (names what happened, offers "Try again", focuses the alert), but the reserved `.google-button-slot` kept its 44px + 24px space while empty, leaving a dead hole between the panel copy and the error notice.
+- Fix: the slot collapses (`display: none` via an `is-failed` class) only when Google Identity Services failed to load; the loading and ready states keep the reserved space so the button does not shift on arrival.
+- Evidence: `.impeccable/review/iteration-10-gsi-failed-desktop.png` and `.impeccable/review/iteration-10-gsi-failed-mobile.png` (re-captured after the fix). Impeccable detector on `src/index.css` returned `[]`; `npm run build` passed; `npm run test:ui` passed (2 passed, includes the no-browser-errors assertion covering the normal sign-in path).
+
 ### Per-route document titles — 2026-08-16
 
 - Every screen previously carried the static `<title>Recipe 99</title>`, failing WCAG 2.4.2 (Page Titled) and making history/tabs indistinguishable. Added reactive titles: `AppShell` sets `<Destination> — Recipe 99` from `location.pathname` (the same reactive source as the visible route label), the auth gate sets `Sign in — Recipe 99` whenever unauthenticated, and `NotFound` sets `Page not found — Recipe 99` on mount. Redirect passthroughs (`/`, `/sign-in`) fall back to plain `Recipe 99` so no "not found" title flashes mid-redirect.
