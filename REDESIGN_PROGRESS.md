@@ -36,12 +36,11 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ### Highest priority
 
-1. **Mobile Planner loses the Day Ticket.** In the 390×844 baseline, the fixed Day Ticket and bottom navigation compete for the lower viewport; only the ticket's top edge/header is readily visible. This hides the authoritative selected-day actions.
-2. **Intake's generated-draft wait copy leaks implementation state.** “The agent is still working on your ingredients” does not use the product voice or tell the user what will happen next.
+1. **Intake's generated-draft wait copy leaks implementation state.** “The agent is still working on your ingredients” does not use the product voice or tell the user what will happen next.
+2. **Desktop Planner leaves a large unused region at wide viewports.** The dense calendar and Day Ticket remain visually small even when the viewport has room to support a stronger planning workspace.
 
 ### Significant follow-ups
 
-- Desktop Planner leaves a large unused region at wide viewports while the dense calendar and ticket remain visually small.
 - Planner cell metadata is compact enough that icon meaning and counts require learning; selected-day context must carry more of the explanatory burden.
 - Pantry mobile action rows split a strong outlined Edit action and a much quieter Convert action without a clear shared action rhythm.
 - The app repeatedly logs Solid's “cleanups created outside a `createRoot` or `render` will never be run” warning during route changes. Treat this as a functional-quality issue to diagnose separately from visual styling.
@@ -68,13 +67,24 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Next highest-value opportunities
 
-1. Fix mobile Planner so the Day Ticket and bottom navigation never overlap and the ticket exposes useful selected-day content in the first viewport.
-2. Give Intake camera permission/loading failure an actionable product-voice state, then refine the generated-draft wait copy.
-3. Improve wide Planner composition so calendar and Day Ticket use available space without reducing scanability.
-4. Audit Pantry mobile action hierarchy and conversion presentation.
-5. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
+1. Give Intake camera permission/loading failure an actionable product-voice state, then refine the generated-draft wait copy.
+2. Improve wide Planner composition so calendar and Day Ticket use available space without reducing scanability.
+3. Audit Pantry mobile action hierarchy and conversion presentation.
+4. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
 
 ## Iteration log
+
+### Mobile Planner Day Ticket anchoring — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command, read the installed Chrome-control skill, connected through the supported Chrome bridge, and claimed the authenticated `localhost:3000/intake` tab before navigating to `/planner`.
+- Verified the previous highest-priority problem in authenticated Chrome: before the fix, mobile Planner placed the Day Ticket at document bottom (`top: 959`, `bottom: 1118`) in a `1055px` viewport because `.main` retained the `page-settle` transform and became the fixed-position containing block.
+- Fixed the mobile Planner only: `.planner-page` no longer runs the route-level page animation on mobile, so the fixed Day Ticket is anchored to the viewport, and `.ticket-shell` sits `72px` above the viewport bottom to clear the fixed bottom navigation.
+- Verification evidence: authenticated Chrome captures live under `.impeccable/review/iteration-04-before-mobile-planner.png`, `.impeccable/review/iteration-04-after-mobile-planner.png`, `.impeccable/review/iteration-04-after-desktop-planner.png`, `.impeccable/review/iteration-04-after-320-planner.png`, and `.impeccable/review/iteration-04-after-reload-320-planner.png`.
+- Geometry evidence: after the fix, mobile Planner reports a `7px` gap between the Day Ticket and bottom navigation; the 320 CSS-pixel reload reports authenticated shell present, no horizontal scroll, minimum date targets of `45×58`, ticket `top: 589`, ticket `bottom: 772`, and bottom nav `top: 779`.
+- Verification: `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` passed; Impeccable detector still reports only the four pre-existing `src/index.css` warnings already listed in Current problems.
+- Fresh Impeccable finish reviewer returned `disposition: ship` with no material fixes, specifically confirming mobile Day Ticket visibility, 320px layout, mobile motion behavior, and unchanged desktop Planner composition.
+- Browser console evidence: no new source errors from this CSS change; the known Solid cleanup warning remains, along with existing development/auth initialization noise from prior route loads.
+- Hostile review: the mobile Day Ticket is now available and no longer competes with bottom navigation, but the empty-day state still consumes a large lower sheet for little content, and wide Planner composition remains underpowered. The next highest-value opportunity shifts back to Intake's product-voice states.
 
 ### Public sign-in IA vocabulary — 2026-08-16
 
