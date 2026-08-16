@@ -318,7 +318,7 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
                             const getCustomUnits = useQuery(api.customUnit_exports.getCustomUnits, {associatedIngredient: props.ingredient.name_})
                           return <Select
                           options={(BuiltinUnitOptions as Unit[]).concat(getCustomUnits.data()?.map(unit => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit})) || [])}
-                          toString={(unit) => `fucker ${unit.type === 'builtin' ? unit.unit : unit.name}`}  
+                          toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}
                           whenSelected={(unit) => setConvertUnit(unit)}
                           />
                         }()}

@@ -41,12 +41,14 @@ function convertIngredientsDataStructure(
       <Show
         when={draft.data()}
         keyed
-        fallback={<p class="supporting-copy">Preparing your ingredient form…</p>}
+        fallback={<p class="supporting-copy">Preparing your ingredient draft…</p>}
       >
         {(draftData) => (
             <>
             <Show when={!draftData.isDoneInitialGeneration}>
-              <span>the agent is still working on your ingredients</span>
+              <p class="supporting-copy" aria-live="polite">
+                More ingredients may appear as the receipt is read. Review and adjust what's here.
+              </p>
             </Show>
           <AvailableIngredientsBulkAddForm
             ingredientsToAdd={convertIngredientsDataStructure(draftData.ingredients)}

@@ -67,11 +67,18 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Next highest-value opportunities
 
-1. Give Intake camera permission/loading failure an actionable product-voice state, then refine the generated-draft wait copy.
-2. Audit Pantry mobile action hierarchy and conversion presentation.
-3. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
+1. Audit Pantry mobile action hierarchy and conversion presentation.
+2. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
+3. Investigate and fix the Solid `cleanups created outside a createRoot` warning to remove known console noise.
 
 ## Iteration log
+
+### Intake copy, camera errors, and Pantry toString bug — 2026-08-16
+
+- Found and removed a `fucker` debug string embedded in the mobile Pantry conversion sheet's `toString` prop in `src/components/inventory_editor.tsx:321`. The desktop conversion popover and edit-mode Select used the correct format; only the mobile Overlay's Select carried the artifact.
+- Added a full camera permission/availability failure state to `CameraView` in `src/features/take_image.tsx`. Previously a denied or missing camera silently left the video element blank with no user feedback. Now three cases are handled: permission denied (instructs user to allow in browser settings), device not found, and unknown error; each presents product-voice copy and a "Reload page" button.
+- Replaced implementation-leaking Intake agent wait copy. "the agent is still working on your ingredients" (a bare `<span>`) is now a polite `<p aria-live="polite">` with "More ingredients may appear as the receipt is read. Review and adjust what's here." The fallback draft-preparing copy was similarly tightened from "Preparing your ingredient form…" to "Preparing your ingredient draft…"
+- Verification: `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` clean.
 
 ### Wide Planner workspace — 2026-08-16
 
