@@ -76,6 +76,16 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Authenticated Planner verification blocked — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command, and inspected the current git state before selecting work.
+- The highest-value unresolved issue remains mobile Planner: the selected-day Day Ticket must stay usable above the fixed bottom navigation.
+- No Planner UI code was changed because the authenticated Planner surface could not be rendered in this session.
+- Evidence: a copied Chrome profile with localhost and Convex cookies still rendered the sign-in page at both `127.0.0.1:3000/planner` and `localhost:3000/planner`; Playwright collected Google origin/auth errors and the existing Solid cleanup warning, not authenticated Planner DOM.
+- Evidence: live browser screenshots under `.impeccable/review/` also showed the sign-in or Intake state rather than authenticated Planner after the automation attempt.
+- Decision: do not commit an authenticated Planner presentation change from source intent, stale baseline screenshots, or unauthenticated Playwright output. Resume with mobile Planner only after an authenticated browser session can render `/planner`; otherwise choose a public/unauthenticated surface if a meaningful issue is found there.
+- Loop correction: the fresh Codex context had not loaded the installed Chrome browser skill and incorrectly fell back to profile copying and AppleScript. The persistent Ralph prompt now requires the supported Chrome bridge bootstrap and explicitly prohibits profile, cookie, storage, and browser-database inspection. Retry authenticated Planner verification through that bridge.
+
 ### Infrastructure and baseline — 2026-08-16
 
 - Inspected repository, routes, current design contracts, Convex boundary, and authenticated application state.

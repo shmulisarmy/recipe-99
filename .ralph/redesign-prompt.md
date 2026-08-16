@@ -17,7 +17,9 @@ Load and follow the repo-local Impeccable skill for design work. Run its session
 
 ## Inspect the actual application
 
-Run the app and inspect the rendered current state before choosing work. Prefer the connected authenticated browser session. Use the in-app browser or the installed Playwright setup as appropriate. Test at desktop and mobile viewports, inspect console errors, and capture screenshots under `.impeccable/review/`.
+Run the app and inspect the rendered current state before choosing work. Prefer the connected authenticated Chrome session. Before any browser action, locate and read the complete installed Chrome skill at `/Users/shmuli/.codex/plugins/cache/openai-bundled/chrome/*/skills/control-chrome/SKILL.md`. Follow its Browser setup exactly: initialize its absolute `scripts/browser-client.mjs` through the Node REPL, select `agent.browsers.get("chrome")`, emit and read Chrome's complete documentation, then claim a current `localhost:3000` tab. This bridge—not a remote-debugging port—is how fresh Codex CLI contexts reach the authenticated browser.
+
+Do not inspect or copy Chrome profiles, cookies, local storage, passwords, session files, or browser databases. Do not use AppleScript, screen-coordinate clicking, or standalone Playwright as a substitute for an available connected Chrome bridge. If Chrome setup fails, follow the skill's documented troubleshooting once before falling back. Use the clean in-app browser or installed Playwright setup for public/unauthenticated surfaces and mechanical checks. Test at desktop and mobile viewports, inspect console errors, and capture screenshots under `.impeccable/review/`.
 
 Do not treat source inspection, a build, an unauthenticated sign-in screen, or a stale screenshot as proof of an authenticated feature's visual state. If authenticated browser access is unavailable, do not commit an authenticated UI change that you cannot render and inspect.
 
@@ -69,7 +71,7 @@ For a successful iteration:
 - Commit the iteration with a clear focused message. Do not include unrelated changes.
 - Exit after the commit so the next iteration starts in a fresh context.
 
-If no safe meaningful improvement can be completed and visually verified, document the exact blocker in `REDESIGN_PROGRESS.md` and exit without pretending the iteration succeeded.
+If no safe meaningful improvement can be completed and visually verified, document a new exact blocker in `REDESIGN_PROGRESS.md` and exit without pretending the iteration succeeded. Do not repeatedly append the same known blocker on consecutive iterations.
 
 ## Completion
 
