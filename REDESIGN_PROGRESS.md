@@ -36,9 +36,8 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ### Highest priority
 
-1. **Intake is not a coherent route.** The rendered page has no `main` landmark, `h1`, explanation, step framing, camera guidance, fallback, or visible status hierarchy. The desktop camera occupies a narrow unexplained strip; mobile is almost entirely an unlabeled camera surface.
-2. **Mobile Planner loses the Day Ticket.** In the 390×844 baseline, the fixed Day Ticket and bottom navigation compete for the lower viewport; only the ticket's top edge/header is readily visible. This hides the authoritative selected-day actions.
-3. **Intake leaks implementation state.** Current copy such as “the agent is still working on your ingredients” and raw action text does not use the product voice or explain what the user should do.
+1. **Mobile Planner loses the Day Ticket.** In the 390×844 baseline, the fixed Day Ticket and bottom navigation compete for the lower viewport; only the ticket's top edge/header is readily visible. This hides the authoritative selected-day actions.
+2. **Intake's generated-draft wait copy leaks implementation state.** “The agent is still working on your ingredients” does not use the product voice or tell the user what will happen next.
 
 ### Significant follow-ups
 
@@ -46,7 +45,7 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 - Planner cell metadata is compact enough that icon meaning and counts require learning; selected-day context must carry more of the explanatory burden.
 - Pantry mobile action rows split a strong outlined Edit action and a much quieter Convert action without a clear shared action rhythm.
 - The app repeatedly logs Solid's “cleanups created outside a `createRoot` or `render` will never be run” warning during route changes. Treat this as a functional-quality issue to diagnose separately from visual styling.
-- Intake currently requests its upload URL during render and starts from camera capture only; preserve semantics while making camera state, permission failure, processing, review, and reconciliation understandable.
+- Intake still needs an explicit camera-permission failure state. Preserve capture, OCR, upload, Agent, and handoff semantics when addressing it.
 - Impeccable's baseline detector reports four warnings in `src/index.css`: two side-accent borders (`.inline-notice` and `.cart-match`) and two width transitions (`.progress > span` and the widened cart modal). Evaluate them in context rather than mechanically changing all four.
 
 ## Decisions already made
@@ -69,8 +68,8 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Next highest-value opportunities
 
-1. Reframe `/intake` as an accessible capture → processing → review workflow while preserving the current camera, OCR, upload, Agent, and reconciliation semantics.
-2. Fix mobile Planner so the Day Ticket and bottom navigation never overlap and the ticket exposes useful selected-day content in the first viewport.
+1. Fix mobile Planner so the Day Ticket and bottom navigation never overlap and the ticket exposes useful selected-day content in the first viewport.
+2. Give Intake camera permission/loading failure an actionable product-voice state, then refine the generated-draft wait copy.
 3. Improve wide Planner composition so calendar and Day Ticket use available space without reducing scanability.
 4. Audit Pantry mobile action hierarchy and conversion presentation.
 5. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
@@ -85,3 +84,14 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 - Recorded product truth, functional invariants, design direction, and prioritized redesign opportunities.
 - Verified the new Playwright desktop/mobile sign-in smoke checks (`2 passed`) and a production build.
 - No product functionality or application presentation changed in this baseline iteration.
+
+### Intake capture workspace — 2026-08-16
+
+- Reframed `/intake` as a full-page step-one workspace with a main landmark, `Add a batch` hierarchy, the established two-step indicator, task-oriented capture guidance, and a clear processing state.
+- Kept the 1:2, 960×1920 camera target and every OCR, upload, Agent draft, review, and reconciliation behavior unchanged.
+- Desktop now pairs concise receipt guidance with the narrow camera instead of presenting an unexplained strip.
+- The first mobile render put guidance before the shutter; hostile self-review rejected it. The final mobile order puts the camera first and scales it so the shutter is available before the fixed bottom navigation, with guidance immediately below.
+- Removed raw Agent action output from presentation; the editable generated draft remains the next visible workflow state.
+- Independent Impeccable finish review caught and corrected two issues before commit: processing now announces itself as a polite live status, and the camera remains flat instead of borrowing the Day Ticket's reserved elevation.
+- Rendered evidence: `.impeccable/baseline/iteration-01-desktop-intake.png` and `.impeccable/baseline/iteration-01-mobile-intake.png` (local, ignored).
+- Verification: production build passed; Playwright desktop/mobile sign-in checks passed (`2 passed`); authenticated Chrome desktop and 390×844 mobile DOM/render checks passed; no new browser errors; Impeccable detector remained at the four recorded pre-existing warnings.

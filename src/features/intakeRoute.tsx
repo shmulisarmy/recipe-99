@@ -94,38 +94,85 @@ function convertIngredientsDataStructure(
     return (
       <>
       <LoadingReceiptOcr/>
-        <Show when={searchParams.notice === "handoff"}>
-          <div class="route-notice inline-notice notice-neutral">
-            Start or finish a pantry batch before reconciling today’s cart.
-          </div>
-        </Show>
-        <Show when={!image()}>
-        <CameraView
-            ImageSetter={setImage}
-            styles={{
-              width: "22rem",
-              "max-width": "100%",
-              "aspect-ratio": "1 / 2",
-              "object-fit": "cover",
-              "border-radius": "1rem",
-            }}
-            />
-
-          </Show>
-
-        <Show when={image() && !action.data()}>
-          <LoadingAnimation/>
+        <Show when={!action.data()}>
+          <main class="main workspace-narrow intake-capture-page" id="main">
+            <div class="stepper" aria-label="Intake progress">
+              <div class="step active" aria-current="step">
+                1 Review ingredients
+              </div>
+              <div class="step">2 Reconcile today’s cart</div>
+            </div>
+            <header class="page-heading">
+              <div>
+                <h1>Add a batch</h1>
+                <p class="supporting-copy">
+                  Capture a receipt, then review every ingredient before updating the pantry.
+                </p>
+              </div>
+            </header>
+            <Show when={searchParams.notice === "handoff"}>
+              <div class="route-notice inline-notice notice-neutral">
+                Start or finish a pantry batch before reconciling today’s cart.
+              </div>
+            </Show>
+            <Show
+              when={!image()}
+              fallback={
+                <section
+                  class="intake-processing"
+                  aria-labelledby="intake-processing-heading"
+                  aria-live="polite"
+                  role="status"
+                >
+                  <div>
+                    <h2 id="intake-processing-heading">Reading your receipt</h2>
+                    <p class="supporting-copy">
+                      Finding ingredients and amounts. You’ll review the draft before anything is added.
+                    </p>
+                  </div>
+                  <LoadingAnimation/>
+                </section>
+              }
+            >
+              <section class="capture-workspace" aria-labelledby="capture-heading">
+                <div class="capture-guidance">
+                  <h2 id="capture-heading">Photograph the full receipt</h2>
+                  <p>
+                    Hold it straight inside the frame with the item names and amounts in focus.
+                  </p>
+                  <ul class="capture-checklist">
+                    <li>Use even light and avoid glare.</li>
+                    <li>Include the top and bottom edges.</li>
+                    <li>Press the round shutter when the text is clear.</li>
+                  </ul>
+                  <p class="helper-text">
+                    The receipt is used to prepare an editable ingredient draft.
+                  </p>
+                </div>
+                <div class="capture-camera">
+                  <CameraView
+                    ImageSetter={setImage}
+                    styles={{
+                      width: "22rem",
+                      "max-width": "100%",
+                      "aspect-ratio": "1 / 2",
+                      "object-fit": "cover",
+                      "border-radius": "1rem",
+                    }}
+                  />
+                  <p class="capture-caption">Fit the entire receipt inside the frame.</p>
+                </div>
+              </section>
+            </Show>
+          </main>
         </Show>
 
         <Show when={action.data()}>
           {(data) => (
-            <>
-              <span>{data().text}</span>
-              <LiveGeneratedIntakeForm
-                draftId={data().draftId}
-                onComplete={props.onComplete}
-              />
-            </>
+            <LiveGeneratedIntakeForm
+              draftId={data().draftId}
+              onComplete={props.onComplete}
+            />
           )}
         </Show>
       </>
