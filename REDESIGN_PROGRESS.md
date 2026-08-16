@@ -43,7 +43,6 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 - Planner cell metadata is compact enough that icon meaning and counts require learning; selected-day context must carry more of the explanatory burden.
 - Pantry mobile action rows split a strong outlined Edit action and a much quieter Convert action without a clear shared action rhythm.
-- The app repeatedly logs Solid's “cleanups created outside a `createRoot` or `render` will never be run” warning during route changes. Treat this as a functional-quality issue to diagnose separately from visual styling.
 - Intake still needs an explicit camera-permission failure state. Preserve capture, OCR, upload, Agent, and handoff semantics when addressing it.
 - Impeccable's baseline detector reports four warnings in `src/index.css`: two side-accent borders (`.inline-notice` and `.cart-match`) and two width transitions (`.progress > span` and the widened cart modal). Evaluate them in context rather than mechanically changing all four.
 
@@ -67,11 +66,19 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Next highest-value opportunities
 
-1. Audit Pantry mobile action hierarchy and conversion presentation.
+1. Audit Pantry mobile action hierarchy and conversion presentation (requires an authenticated browser session).
 2. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
-3. Investigate and fix the Solid `cleanups created outside a createRoot` warning to remove known console noise.
 
 ## Iteration log
+
+### Solid cleanup-warning root cause fixed — 2026-08-16
+
+- Chose the known Solid `cleanups created outside a createRoot or render will never be run` console warning because no authenticated Chrome bridge was reachable this session (ports 9222–9224 closed), which blocks the Pantry mobile action-hierarchy work, and the warning reproduces on the public surface.
+- Reproduced first: a headless Playwright script (`.impeccable/solid-warning-check.mjs`) showed the warning fires exactly once per page load, including on the unauthenticated sign-in page — so the source is bootstrap code, not route components. An independent exploration agent's route-component candidates (module-level signals in intake/planner) were checked and ruled out: bare `createSignal`/`createMutable` at module scope do not emit this warning; only ownerless `onCleanup` does.
+- Root cause: `convex-solidjs`'s `setupConvex` internally registers `onCleanup(() => client.close())` (`node_modules/convex-solidjs/dist/index.js:22`), and `src/convex_client.ts` called it at module scope with no reactive owner.
+- Fix: wrap the `setupConvex` call in `createRoot` in `src/convex_client.ts`, giving the cleanup an app-lifetime owner. The client remains the same module-level singleton consumed by `src/index.tsx`, `src/data.ts`, and `src/auth/google.tsx`; no behavior changes because the cleanup was never going to run in either arrangement.
+- Verification: the headless console check now shows zero Solid warnings across five page loads (only the pre-existing headless-origin Google Identity 403 noise that the smoke test filters); `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` clean.
+- No visual or interaction change; no design-critic pass was warranted for this four-line infrastructure fix.
 
 ### Intake copy, camera errors, and Pantry toString bug — 2026-08-16
 
