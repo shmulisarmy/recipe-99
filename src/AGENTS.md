@@ -16,6 +16,7 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 - Call Convex through `convex-solidjs` and `convex/_generated/api`; do not create handwritten function-reference shims.
 - Use `api.customUnit_exports.*` for custom-unit reads and creation, `api.pantry_exports.*` for pantry reads and writes, `api.planner_exports.*` for planner reads and writes, and `api.recipe_exports.*` for recipe reads and creation; do not couple frontend code to nested Convex table modules.
 - Keep `App.tsx` as the composition root. Feature-specific behavior belongs in its feature, not in the app shell.
+- `features/intakeRoute.tsx` uploads captured intake images to Convex storage, starts multimodal ingredient-draft generation with the returned storage ID, and subscribes to the draft ID so scheduled Agent tool writes reach the intake form reactively.
 - Preserve the provider order in `index.tsx`: Convex availability must wrap the authenticated application.
 - Shared code may depend on a feature only through that feature's documented integration surface.
 - `recipeMakingProjection` reports unfulfilled required and substitute measurements already scaled by the requested recipe multiplier.

@@ -7,14 +7,19 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "receipt-ocr-prototype": "tsx receipt-ocr-prototype/run.ts",
+    "test:receipt-ocr-prototype": "tsx --test receipt-ocr-prototype/*.test.ts",
+    "typecheck:receipt-ocr-prototype": "tsc -p receipt-ocr-prototype/tsconfig.json"
   },
   "license": "MIT",
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "@types/lodash": "^4.17.25",
+    "@types/node": "^26.2.0",
     "solid-devtools": "^0.34.3",
     "tailwindcss": "^4.1.13",
+    "tsx": "^4.23.12",
     "typescript": "^5.9.2",
     "vite": "^7.1.4",
     "vite-plugin-pwa": "^1.3.0",
@@ -31,6 +36,7 @@
     "convex-solidjs": "^0.0.3",
     "lodash": "^4.18.1",
     "solid-js": "^1.9.9",
+    "tesseract.js": "^7.0.0",
     "zod": "^4.4.3"
   }
 }
