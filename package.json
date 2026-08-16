@@ -8,12 +8,15 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed",
     "receipt-ocr-prototype": "tsx receipt-ocr-prototype/run.ts",
     "test:receipt-ocr-prototype": "tsx --test receipt-ocr-prototype/*.test.ts",
     "typecheck:receipt-ocr-prototype": "tsc -p receipt-ocr-prototype/tsconfig.json"
   },
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.1.13",
     "@types/lodash": "^4.17.25",
     "@types/node": "^26.2.0",

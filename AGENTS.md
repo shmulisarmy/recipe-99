@@ -10,8 +10,11 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 - `learnings/` owns non-runtime tutorials, references, and learning records derived from work on the application.
 - `public/` owns static browser assets, including the installable-app icons referenced by the PWA manifest.
 - `resources/` owns source artifacts used for local investigation or prototyping; application code must not depend on them at runtime.
+- `tests/ui/` owns Playwright smoke coverage for public responsive presentation; authenticated workflows still require the connected browser session.
 - `.agents/skills/` and `.claude/skills/` contain tool-generated, repo-local Convex guidance for supported coding agents.
 - Root configuration files own build tooling, dependency versions, and environment wiring; root Markdown files own repository-level project notes.
+- `PRODUCT.md`, `FUNCTIONAL_INVARIANTS.md`, `DESIGN.md`, and `REDESIGN_PROGRESS.md` are the persistent context contract for autonomous redesign iterations.
+- `.ralph/` owns the fresh-context redesign-loop configuration and prompt; `.impeccable/` owns local visual-review artifacts and shared Impeccable configuration.
 
 # Local Contracts
 
@@ -25,12 +28,15 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 # Work Guidance
 
 - After every meaningful application change, perform a DOX pass: update the closest owning `AGENTS.md`, refresh affected parent indexes, and remove stale contracts.
+- At the start of an autonomous redesign iteration, read the four root redesign context files and recent git history, then inspect the rendered application before choosing one coherent improvement.
+- Keep successful redesign iterations small enough to verify visually and functionally, update `REDESIGN_PROGRESS.md`, and commit as a checkpoint.
 - Create a child `AGENTS.md` only for a durable ownership boundary with rules that are more specific than its parent.
 - Keep durable behavior and architecture here; keep implementation details in the closest child contract.
 
 # Verification
 
 - Run `npm run build` after application code changes.
+- Run the Playwright smoke checks after changing public authentication presentation or shared responsive layout; authenticated feature verification still requires the connected browser session.
 - When changing PWA configuration or icons, confirm the production build emits the manifest and that every referenced `public/` asset exists at its configured path.
 - Add the verification required by the nearest child `AGENTS.md` for the paths changed.
 
