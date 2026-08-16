@@ -76,6 +76,17 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Public sign-in IA vocabulary — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command for `/planner`, read the installed Chrome-control skill, and connected to Chrome through the supported browser bridge.
+- Authenticated Planner verification is still blocked in this fresh context: the existing `localhost:3000/intake` Chrome tab is already owned by an older browser automation session, and a fresh controlled Chrome tab renders the unauthenticated sign-in page. No authenticated Planner UI was changed.
+- Chose a safe public-surface improvement instead: the sign-in thesis chain now uses the durable primary destinations in order, `Planner`, `Recipes`, `Pantry`, `Intake`, instead of implying a separate Shopping destination.
+- Verification evidence: Chrome-rendered desktop and mobile sign-in captures live under `.impeccable/review/iteration-03-desktop-signin-after.png` and `.impeccable/review/iteration-03-mobile-signin-after.png`; DOM checks confirmed the updated chain at both sizes.
+- Verification: `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` passed; Impeccable detector still reports only the four pre-existing `src/index.css` warnings already listed in Current problems.
+- Impeccable finish reviewer returned `disposition: ship` with no material fixes for the scoped public sign-in refinement.
+- Browser console evidence: no new source errors from this copy change; the known Solid cleanup warning still appears, and Chrome logged one Google Identity warning after repeated sign-in page initialization during verification.
+- Hostile review: this is intentionally a small information-architecture correction, not the main Planner fix. The next highest-value opportunity remains authenticated mobile Planner Day Ticket verification and layout repair once a controllable authenticated tab is available.
+
 ### Authenticated Planner verification blocked — 2026-08-16
 
 - Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command, and inspected the current git state before selecting work.

@@ -241,7 +241,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
                     <a class="wordmark auth-wordmark" href="/sign-in"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>
                     <h1 id="sign-in-title">Plan meals from what’s already in your kitchen.</h1>
                     <p>Recipe 99 connects your pantry, recipes, calendar, and shopping needs.</p>
-                    <div class="auth-chain" aria-hidden="true"><span>Pantry</span><span>Recipes</span><span>Plan</span><span>Shopping</span></div>
+                    <div class="auth-chain" aria-hidden="true"><span>Planner</span><span>Recipes</span><span>Pantry</span><span>Intake</span></div>
                 </section>
                 <section class="sign-in-panel" aria-labelledby="sign-in-panel-title">
                     <h2 id="sign-in-panel-title">Sign in to your kitchen plan</h2>
