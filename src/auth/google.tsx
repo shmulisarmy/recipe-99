@@ -223,6 +223,10 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     });
 
     createEffect(() => {
+        if (!isAuthenticated()) document.title = "Sign in — Recipe 99";
+    });
+
+    createEffect(() => {
         if (authError()) queueMicrotask(() => errorNotice?.focus());
     });
 

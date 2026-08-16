@@ -1,5 +1,5 @@
 import { A, useLocation, type RouteSectionProps } from "@solidjs/router";
-import { For, Show, createMemo, createSignal, onCleanup } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { useAuth } from "../auth/google";
 import { Icon, type IconName } from "./ui";
 
@@ -18,6 +18,11 @@ function routeLabel(pathname: string): string {
   return destinations.find((destination) => activeDestination(pathname, destination.href))?.label ?? "Recipe 99";
 }
 
+function documentTitle(pathname: string): string {
+  const destination = destinations.find((d) => activeDestination(pathname, d.href));
+  return destination ? `${destination.label} — Recipe 99` : "Recipe 99";
+}
+
 export function AppShell(props: RouteSectionProps) {
   const location = useLocation();
   const auth = useAuth();
@@ -27,6 +32,10 @@ export function AppShell(props: RouteSectionProps) {
     const value = email();
     const parts = value.split(/[@.\s_-]+/).filter(Boolean);
     return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "99";
+  });
+
+  createEffect(() => {
+    document.title = documentTitle(location.pathname);
   });
 
   const closeOnEscape = (event: KeyboardEvent) => {

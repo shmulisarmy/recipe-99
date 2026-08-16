@@ -71,6 +71,24 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Per-route document titles — 2026-08-16
+
+- Every screen previously carried the static `<title>Recipe 99</title>`, failing WCAG 2.4.2 (Page Titled) and making history/tabs indistinguishable. Added reactive titles: `AppShell` sets `<Destination> — Recipe 99` from `location.pathname` (the same reactive source as the visible route label), the auth gate sets `Sign in — Recipe 99` whenever unauthenticated, and `NotFound` sets `Page not found — Recipe 99` on mount. Redirect passthroughs (`/`, `/sign-in`) fall back to plain `Recipe 99` so no "not found" title flashes mid-redirect.
+- Verified in the real authenticated Chrome session by navigating the signed-in tab through all destinations and reading tab titles via AppleScript: Planner, Recipes, Pantry, Intake, the reconcile-handoff redirect (correctly lands on `/intake?notice=handoff` titled Intake), and a 404 path. Sign-in title verified headlessly. `npm run build` and `npm run test:ui` (2 passed, includes a no-browser-errors assertion) passed.
+- Client-side (non-reload) navigation title updates were not directly exercised (no JS execution available in the authenticated browser); the effect tracks the same reactive `location.pathname` that drives the working top-bar route label, so risk is minimal.
+
+### Verification-access findings — 2026-08-16
+
+This session runs under Claude Code, not the Codex CLI loop. Current authenticated-verification access, in decreasing usefulness:
+
+- AppleScript against the user's signed-in Chrome works for: navigation (`set URL of active tab`), reading tab title/URL, and window resize. It does NOT allow JS execution ("Allow JavaScript from Apple Events" is off, and Chrome ignores synthetic menu clicks to enable it — a real user gesture is required).
+- `screencapture` returns only the wallpaper: the terminal lacks macOS Screen Recording permission, so no authenticated screenshots are possible right now.
+- The Codex chrome bridge (`browser-client.mjs`) refuses outside the Codex CLI: "Browser use requires privileged node_repl capabilities". Chrome remote-debugging ports are closed, and Chrome 136+ blocks CDP on the default profile anyway.
+- Claude Code has its own Chrome extension (native host installed at `~/.claude/chrome/chrome-native-host`), but browser tools must be enabled by launching `claude --chrome` or via the `/chrome` command — not reachable from inside a session.
+- The user's Chrome runs with `WebContentsForceDark` (auto dark mode), which is the root cause of the previously mysterious dark-treated captures. Never judge palette from that browser.
+
+To fully unblock authenticated visual work, ask the user to do any one of: run `/chrome` (or relaunch `claude --chrome`); enable Chrome menu View → Developer → Allow JavaScript from Apple Events; or grant the terminal Screen Recording permission in System Settings → Privacy & Security.
+
 ### Solid cleanup-warning root cause fixed — 2026-08-16
 
 - Chose the known Solid `cleanups created outside a createRoot or render will never be run` console warning because no authenticated Chrome bridge was reachable this session (ports 9222–9224 closed), which blocks the Pantry mobile action-hierarchy work, and the warning reproduces on the public surface.

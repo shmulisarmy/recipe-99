@@ -1,5 +1,5 @@
 import { Navigate, Route, Router, useNavigate } from "@solidjs/router";
-import { Show, createEffect, createSignal, type Component } from "solid-js";
+import { Show, createEffect, createSignal, onMount, type Component } from "solid-js";
 import { useQuery } from "convex-solidjs";
 import { api } from "../convex/_generated/api";
 import { createPlannerProjection, projection } from "./features/planner/logic";
@@ -13,6 +13,9 @@ import IntakeRoute from "./features/intakeRoute";
 
 
 function NotFound() {
+  onMount(() => {
+    document.title = "Page not found — Recipe 99";
+  });
   return <main class="main" id="main"><div class="empty-state not-found"><Icon name="warning"/><h1>That page is not in Recipe 99.</h1><a class="button button-primary" href="/planner">Go to planner</a></div></main>;
 }
 
