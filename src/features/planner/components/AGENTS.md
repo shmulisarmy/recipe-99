@@ -21,6 +21,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - A recipe that cannot be made offers `Add missing ingredients to cart`; the action adds its projected deficits to that recipe's planner day and exposes pending, success, and failure states at the button.
 - Escape closes a modal normally, but a cart modal with unsaved measurement drafts must ask for confirmation first.
 - Interactive controls inside a day cell or modal must not accidentally trigger the parent selection or backdrop-close handler.
+- Generic selects match object-valued selections through their rendered semantic option index, never JavaScript object identity.
 - Calendar cells have one focusable date target; the selected-day Day Ticket owns people, meal, cart, and movement actions.
 - Desktop calendar cells expose at most two draggable meal summaries; `+n more` selects that date so the full ordered Day Ticket becomes authoritative.
 - Cross-day hover highlights the calendar target without expanding it; dropping on a date moves the occurrence to the beginning of that day.

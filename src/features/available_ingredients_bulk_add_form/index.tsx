@@ -1,4 +1,4 @@
-import { For, Show, createSignal } from "solid-js";
+import { For, Show, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import {
   Measurement_GTE,
@@ -42,7 +42,7 @@ export function AvailableIngredientsBulkAddForm(
     unit: measurement.unit,
     nameError: "",
     amountError: "",
-    cartSelected: false,
+    cartSelected: true,
   }));
   const [rows, setRows] = createStore<IntakeRow[]>(
     initialRows.length
@@ -55,7 +55,7 @@ export function AvailableIngredientsBulkAddForm(
             unit: { type: "builtin", unit: "grams" },
             nameError: "",
             amountError: "",
-            cartSelected: false,
+            cartSelected: true,
           },
         ],
   );
@@ -184,7 +184,7 @@ export function AvailableIngredientsBulkAddForm(
       unit: newUnit(),
       nameError: "",
       amountError: "",
-      cartSelected: false,
+      cartSelected: true,
     });
     closeAddIngredient();
   };
@@ -295,6 +295,7 @@ export function AvailableIngredientsBulkAddForm(
                             const getCustomUnits = useQuery(api.customUnit_exports.getCustomUnits, {associatedIngredient: row.name})
                           return <Select
                           options={(BuiltinUnitOptions as Unit[]).concat(getCustomUnits.data()?.map(unit => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit})) || [])}
+                          selected={row.unit}
                           toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}  
                           whenSelected={(unit) => {
                             setRows(
@@ -426,6 +427,7 @@ export function AvailableIngredientsBulkAddForm(
                   options={(BuiltinUnitOptions as Unit[]).concat(customUnits.data()?.map(
                     (unit) => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit}) as Unit
                   ) || [])}
+                  selected={newUnit()}
                   toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}  
                   whenSelected={(unit) => setNewUnit(unit)}
                   />

@@ -1,7 +1,6 @@
 import { For, Match, Show, Switch, createUniqueId, onCleanup, onMount, type JSX } from "solid-js";
 import { Portal } from "solid-js/web";
 import type { Measurement, Unit, BuiltinUnit } from "../primitives/measurement";
-import { BuiltinUnitObjectKeysAndValues } from "../primitives/utils";
 
 export const BuiltinUnitOptions: BuiltinUnit[] = [
   { type: "builtin", unit: "grams" },

@@ -7,7 +7,9 @@ import { Morrow } from "./utils";
 
 
 
-export type UsersPlannerQueryResult = FunctionReturnType<typeof api.data.usersPlanner>;
+export type UsersPlannerQueryResult = FunctionReturnType<
+    typeof api.planner_exports.usersPlanner
+>;
 // export const planner: UsersPlannerQueryResult = {} as Record<string, PlannedDay>;
 export type PlannerType = Record<string, PlannedDay>;
 
