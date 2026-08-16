@@ -7,7 +7,7 @@ Own authenticated ingredient bulk-add drafts and the AI tools that operate on th
 - `table.ts` owns the persisted draft shape.
 - `actions.ts` owns authenticated draft creation and ingredient writes.
 - `tools.ts` owns model-facing Zod schemas and thin adapters to Convex mutations.
-- `queries.ts` owns draft reads when they are added.
+- `queries.ts` owns authenticated draft reads.
 
 # Local Contracts
 

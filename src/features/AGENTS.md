@@ -28,3 +28,4 @@ Keep product workflows cohesive while making their cross-feature dependencies ex
 
 - `available_ingredients_bulk_add_form/AGENTS.md` — batch pantry intake and shopping-cart handoff.
 - `planner/AGENTS.md` — planner queries, projections, calendar behavior, and planner UI ownership.
+- `receipt_ocr/AGENTS.md` — browser-resident receipt OCR worker lifecycle and text extraction.

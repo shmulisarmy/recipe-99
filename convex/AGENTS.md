@@ -26,6 +26,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 - Schedule background Agent generation through a registered internal action; await scheduling in the public action and await model generation inside the worker.
 - Use indexes for user-owned document lookup and name indexes after all indexed fields in order.
 - Frontend callers use generated `api.*` references. Keep `customUnit_exports.ts`, `pantry_exports.ts`, `planner_exports.ts`, and `recipe_exports.ts` aligned with their intentional client surfaces rather than calling nested table modules directly.
+- Agent orchestration and image-upload functions intentionally use their generated `api.agents.*` paths; keep their module paths stable or update all generated callers together.
 - Never edit `_generated` files manually; regenerate them through Convex tooling.
 
 # Work Guidance

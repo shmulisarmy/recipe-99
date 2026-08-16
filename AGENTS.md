@@ -7,10 +7,11 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 - `src/` owns the browser application, UI composition, client-side projections, and shared frontend domain utilities.
 - `convex/` owns persisted data, authentication-aware queries and mutations, schema validators, and the generated client API boundary.
 - `docs/` owns durable product behavior and design specifications that guide the browser application.
+- `learnings/` owns non-runtime tutorials, references, and learning records derived from work on the application.
 - `public/` owns static browser assets, including the installable-app icons referenced by the PWA manifest.
-- `receipt-ocr-prototype/` owns the standalone local OCR and trie feasibility experiment; keep it isolated from application and Convex modules.
+- `resources/` owns source artifacts used for local investigation or prototyping; application code must not depend on them at runtime.
 - `.agents/skills/` and `.claude/skills/` contain tool-generated, repo-local Convex guidance for supported coding agents.
-- Root configuration files own build tooling, dependency versions, and environment wiring.
+- Root configuration files own build tooling, dependency versions, and environment wiring; root Markdown files own repository-level project notes.
 
 # Local Contracts
 
@@ -30,15 +31,15 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 # Verification
 
 - Run `npm run build` after application code changes.
-- Run `npm run typecheck:receipt-ocr-prototype` and `npm run test:receipt-ocr-prototype` after changing the OCR prototype.
 - When changing PWA configuration or icons, confirm the production build emits the manifest and that every referenced `public/` asset exists at its configured path.
 - Add the verification required by the nearest child `AGENTS.md` for the paths changed.
 
 # Child DOX Index
 
-- `docs/AGENTS.md` — product behavior, redesign specifications, and static design examples.
-- `src/AGENTS.md` — browser application, shared frontend modules, and feature boundaries.
 - `convex/AGENTS.md` — Convex schema, functions, authentication, and generated API conventions.
+- `docs/AGENTS.md` — product behavior, redesign specifications, and static design examples.
+- `learnings/AGENTS.md` — non-runtime tutorials, references, and learning records.
+- `src/AGENTS.md` — browser application, shared frontend modules, and feature boundaries.
 
 <!-- convex-ai-start -->
 

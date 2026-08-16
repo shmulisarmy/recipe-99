@@ -5,9 +5,9 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 # Ownership
 
 - `index.tsx`, `App.tsx`, and `convex_client.ts` compose providers, authentication, planner projection, Solid Router destinations, and top-level screens.
-- `auth/` owns the Google authentication gate.
-- `components/` owns the responsive application shell, local SVG/UI primitives, inventory editor, and recipe library UI that is not feature-private.
-- `data.ts`, `logic.ts`, `math.ts`, and `utils/` own shared client data helpers and calculations.
+- `auth/` owns the Google authentication gate under its local contract.
+- `components/` owns the responsive application shell and shared route-level UI under its local contract.
+- `data.ts`, `logic.ts`, and `utils/` own shared client data helpers and calculations.
 - `features/` owns self-contained product workflows; `primitives/` owns cross-cutting domain values.
 
 # Local Contracts
@@ -15,6 +15,7 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 - Use SolidJS signals, stores, and control-flow components for reactive state; do not introduce a second UI state system.
 - Call Convex through `convex-solidjs` and `convex/_generated/api`; do not create handwritten function-reference shims.
 - Use `api.customUnit_exports.*` for custom-unit reads and creation, `api.pantry_exports.*` for pantry reads and writes, `api.planner_exports.*` for planner reads and writes, and `api.recipe_exports.*` for recipe reads and creation; do not couple frontend code to nested Convex table modules.
+- Intake may use the generated `api.agents.*` surface for Agent orchestration and image-upload functions owned by `convex/agents/`.
 - Keep `App.tsx` as the composition root. Feature-specific behavior belongs in its feature, not in the app shell.
 - `features/intakeRoute.tsx` uploads captured intake images to Convex storage, starts multimodal ingredient-draft generation with the returned storage ID, and subscribes to the draft ID so scheduled Agent tool writes reach the intake form reactively.
 - Preserve the provider order in `index.tsx`: Convex availability must wrap the authenticated application.
@@ -37,5 +38,7 @@ Own the SolidJS browser application and the frontend side of the Convex boundary
 
 # Child DOX Index
 
+- `auth/AGENTS.md` — Google Identity Services, Convex token delivery, and authenticated UI gating.
+- `components/AGENTS.md` — application shell, shared UI primitives, pantry editor, and recipe library.
 - `features/AGENTS.md` — feature ownership and integration surfaces.
 - `primitives/AGENTS.md` — measurement values, units, conversion, and arithmetic.

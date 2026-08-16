@@ -23,7 +23,7 @@ Own the meal-planning feature: Convex planner data, day-by-day projections, cale
 # Work Guidance
 
 - Keep projection calculation independent of component-local editing state.
-- Keep the feature helper surface narrow; `App.tsx` remains the current composition root for mounting the planner and refreshing its projection.
+- Keep the feature helper surface narrow; `src/App.tsx` remains the current composition root for mounting the planner and refreshing its projection.
 
 # Verification
 

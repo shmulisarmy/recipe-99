@@ -13,7 +13,7 @@ Own the domain modules that define Recipe-99's persisted tables and the server b
 # Local Contracts
 
 - Keep table definitions close to their domain and export them to `convex/schema.ts` for schema composition.
-- Keep registered reads and writes out of `convex/data.ts`; expose intentional client APIs through the top-level `*_exports.ts` modules.
+- Keep registered reads and writes inside their owning domain modules; expose intentional client APIs through the top-level `*_exports.ts` modules.
 - Derive TypeScript types from validators or generated `Doc<...>` types rather than maintaining parallel interfaces.
 - Keep cross-domain imports limited to shared validators, value operations, generated document types, and deliberate server behavior.
 
@@ -31,7 +31,7 @@ Own the domain modules that define Recipe-99's persisted tables and the server b
 # Child DOX Index
 
 - `customUnits/AGENTS.md` — ingredient-associated custom-unit definitions, lookup, and creation.
-- `ingredientBulkAddFormDraft/AGENTS.md` — authenticated bulk-add drafts and their agent-tool adapters.
+- `initialIngredientBulkAddFormDraft/AGENTS.md` — authenticated initial bulk-add drafts and their Agent-tool adapters.
 - `pantryItems/AGENTS.md` — pantry-item schema, authenticated reads, and additive or replacement writes.
 - `planner/AGENTS.md` — planner-day data model, queries, and mutation semantics.
 - `recipes/AGENTS.md` — recipe and latest-version tables, recipe reads, and recipe creation.
