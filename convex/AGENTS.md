@@ -5,6 +5,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 # Ownership
 
 - `schema.ts` composes all persisted tables.
+- `agents/` owns named AI Agents and their Agent-adjacent image-storage utilities.
 - `auth.ts` owns the current-user identity query exposed as `api.auth.*`.
 - `customUnit_exports.ts` is the stable client-facing alias module for custom-unit reads and creation.
 - `pantry_exports.ts` is the stable client-facing alias module for pantry reads and writes.
@@ -20,6 +21,9 @@ Own Recipe-99's persisted data model and authenticated server functions.
 - Read `_generated/ai/guidelines.md` before editing Convex code; its version-specific rules are binding.
 - Define all tables in `schema.ts`, validate every public function argument, and add return validators when changing or adding functions.
 - Derive ownership from `ctx.auth.getUserIdentity()` through `authenticatedUserId`; never trust a client-provided user identifier for authorization.
+- Keep LLM credentials in typed Convex environment variables and authenticate public agent functions before accessing the Agent component.
+- Pass captured images to Agent generation through `Id<"_storage">`, validate their media type in the background action, and delete the temporary upload after the Agent ingests it.
+- Schedule background Agent generation through a registered internal action; await scheduling in the public action and await model generation inside the worker.
 - Use indexes for user-owned document lookup and name indexes after all indexed fields in order.
 - Frontend callers use generated `api.*` references. Keep `customUnit_exports.ts`, `pantry_exports.ts`, `planner_exports.ts`, and `recipe_exports.ts` aligned with their intentional client surfaces rather than calling nested table modules directly.
 - Never edit `_generated` files manually; regenerate them through Convex tooling.
@@ -37,4 +41,5 @@ Own Recipe-99's persisted data model and authenticated server functions.
 
 # Child DOX Index
 
+- `agents/AGENTS.md` — named Agent orchestration and Agent-adjacent storage boundaries.
 - `tables/AGENTS.md` — shared table-module structure plus pantry, planner, and recipe domain boundaries.

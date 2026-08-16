@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as agents_imageUtils from "../agents/imageUtils.js";
+import type * as agents_initialIngredientBulkAddFormDraftAgent from "../agents/initialIngredientBulkAddFormDraftAgent.js";
 import type * as auth from "../auth.js";
 import type * as customUnit_exports from "../customUnit_exports.js";
 import type * as pantry_exports from "../pantry_exports.js";
@@ -16,6 +18,10 @@ import type * as recipe_exports from "../recipe_exports.js";
 import type * as tables_customUnits_actions from "../tables/customUnits/actions.js";
 import type * as tables_customUnits_queries from "../tables/customUnits/queries.js";
 import type * as tables_customUnits_table from "../tables/customUnits/table.js";
+import type * as tables_initialIngredientBulkAddFormDraft_actions from "../tables/initialIngredientBulkAddFormDraft/actions.js";
+import type * as tables_initialIngredientBulkAddFormDraft_queries from "../tables/initialIngredientBulkAddFormDraft/queries.js";
+import type * as tables_initialIngredientBulkAddFormDraft_table from "../tables/initialIngredientBulkAddFormDraft/table.js";
+import type * as tables_initialIngredientBulkAddFormDraft_tools from "../tables/initialIngredientBulkAddFormDraft/tools.js";
 import type * as tables_pantryItems_actions from "../tables/pantryItems/actions.js";
 import type * as tables_pantryItems_queries from "../tables/pantryItems/queries.js";
 import type * as tables_pantryItems_table from "../tables/pantryItems/table.js";
@@ -38,6 +44,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "agents/imageUtils": typeof agents_imageUtils;
+  "agents/initialIngredientBulkAddFormDraftAgent": typeof agents_initialIngredientBulkAddFormDraftAgent;
   auth: typeof auth;
   customUnit_exports: typeof customUnit_exports;
   pantry_exports: typeof pantry_exports;
@@ -46,6 +54,10 @@ declare const fullApi: ApiFromModules<{
   "tables/customUnits/actions": typeof tables_customUnits_actions;
   "tables/customUnits/queries": typeof tables_customUnits_queries;
   "tables/customUnits/table": typeof tables_customUnits_table;
+  "tables/initialIngredientBulkAddFormDraft/actions": typeof tables_initialIngredientBulkAddFormDraft_actions;
+  "tables/initialIngredientBulkAddFormDraft/queries": typeof tables_initialIngredientBulkAddFormDraft_queries;
+  "tables/initialIngredientBulkAddFormDraft/table": typeof tables_initialIngredientBulkAddFormDraft_table;
+  "tables/initialIngredientBulkAddFormDraft/tools": typeof tables_initialIngredientBulkAddFormDraft_tools;
   "tables/pantryItems/actions": typeof tables_pantryItems_actions;
   "tables/pantryItems/queries": typeof tables_pantryItems_queries;
   "tables/pantryItems/table": typeof tables_pantryItems_table;
@@ -88,4 +100,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
+};
