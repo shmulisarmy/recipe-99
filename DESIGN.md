@@ -50,7 +50,7 @@ Ordinary sections are flat. Separate them with whitespace, rules, or a quiet sur
 
 Use a `4, 8, 12, 16, 24, 32, 48px` spacing rhythm. Default controls are 40px on desktop and 44px on touch. Ordinary radius is 8px; modal radius is 12px; mobile full-height overlays have no radius.
 
-Desktop uses a 208px left navigation, a 64px identity bar, and content up to 1440px with 24px gutters. Tablet uses top identity plus horizontal primary navigation and a single content column. Mobile uses a 56px top bar, 16px content gutters, and a fixed 64px bottom navigation with safe-area spacing.
+Desktop uses a 208px left navigation, a 64px identity bar, and most content up to 1440px with 24px gutters. The Planner may expand to 1600px on wide desktop screens so the calendar and Day Ticket use the available planning workspace. Tablet uses top identity plus horizontal primary navigation and a single content column. Mobile uses a 56px top bar, 16px content gutters, and a fixed 64px bottom navigation with safe-area spacing.
 
 Responsive changes are structural. The planner calendar and 320px Day Ticket sit side by side only when space genuinely supports both. On mobile the calendar stays visible and the non-modal Day Ticket sits above—never under—the bottom navigation, with its own scrolling body.
 

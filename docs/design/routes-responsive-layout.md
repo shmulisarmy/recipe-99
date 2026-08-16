@@ -34,13 +34,15 @@ Shopping is reached through a planner day because each cart belongs to a date.
 
 | Viewport | Shell | Content |
 | --- | --- | --- |
-| `>= 1100px` | 208px left navigation and 64px identity bar | Maximum 1440px content width with 24px gutters. |
+| `>= 1100px` | 208px left navigation and 64px identity bar | Maximum 1440px content width with 24px gutters; Planner may expand to 1600px on wide desktop screens. |
 | `768-1099px` | 64px top identity bar and horizontal route navigation | 20px gutters; single main column. |
 | `< 768px` | 56px top bar and fixed 64px bottom navigation | 16px gutters plus safe-area and bottom-navigation padding. |
 
 The planner's calendar and 320px Day Ticket sit side by side only when the viewport is approximately 1280px or wider. Between 768px and that threshold, the Day Ticket follows the full-width calendar. At 200% zoom, allow the layout to enter a smaller mode rather than forcing horizontal page scrolling.
 
 ## Wide planner
+
+On desktop viewports around 1600px and wider, Planner uses the available shell width up to 1600px instead of the ordinary 1440px route cap. The extra width belongs to the month calendar while the Day Ticket stays at 320px, preserving the selected-day authority without stranding the planning workspace in the center of the screen.
 
 ```text
 ┌──────────────┬──────────────────────────────────────────────────────┐

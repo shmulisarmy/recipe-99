@@ -7,6 +7,7 @@
 - Browser verification works through the connected in-app browser and an authenticated Chrome session.
 - Playwright and Chromium are installed for standalone fresh-context checks.
 - SantanderAI Ralph is installed as `ralph-loop.sh`; repository-specific configuration and prompt live under `.ralph/`.
+- Ralph is currently paused because Codex CLI reported its usage allowance exhausted until 2026-08-19 23:38 local time. The installed wrapper now stops after one explicit exhaustion failure when no alternate CLI is available, rather than burning subsequent iterations; resume the loop after capacity returns.
 - Persistent context files: `PRODUCT.md`, `FUNCTIONAL_INVARIANTS.md`, `DESIGN.md`, and this file.
 
 ## Baseline evidence
@@ -37,7 +38,6 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 ### Highest priority
 
 1. **Intake's generated-draft wait copy leaks implementation state.** “The agent is still working on your ingredients” does not use the product voice or tell the user what will happen next.
-2. **Desktop Planner leaves a large unused region at wide viewports.** The dense calendar and Day Ticket remain visually small even when the viewport has room to support a stronger planning workspace.
 
 ### Significant follow-ups
 
@@ -68,11 +68,24 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 ## Next highest-value opportunities
 
 1. Give Intake camera permission/loading failure an actionable product-voice state, then refine the generated-draft wait copy.
-2. Improve wide Planner composition so calendar and Day Ticket use available space without reducing scanability.
-3. Audit Pantry mobile action hierarchy and conversion presentation.
-4. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
+2. Audit Pantry mobile action hierarchy and conversion presentation.
+3. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
 
 ## Iteration log
+
+### Wide Planner workspace — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command for `src`, read the installed Chrome-control skill, connected through the supported Chrome bridge, and claimed a live authenticated `localhost:3000` tab.
+- Re-checked authenticated Planner and Intake before choosing work. Intake's generated-draft wait state remained the top product-voice problem, but it could not be safely rendered without running a receipt capture/upload flow, while wide Planner was available and previously blocked only by authentication loss.
+- Before evidence: `.impeccable/review/iteration-07-current-planner-desktop.png`, `.impeccable/review/iteration-07-current-planner-mobile.png`, `.impeccable/review/iteration-07-current-intake-desktop.png`, `.impeccable/review/iteration-07-current-intake-mobile.png`, and matching `iteration-07-current-*-summary.json` files. At the wide desktop viewport, Planner was authenticated but the `main` surface stayed capped at `1440px`, centered from `left: 284` to `right: 1724` inside an `1800px` viewport.
+- Fixed only the wide Planner composition: `.planner-page` now expands up to `1600px` at `min-width: 1600px`, and the calendar/Day Ticket grid uses the documented `24px` spacing rhythm. Other routes keep the normal `1440px` cap; tablet and mobile Planner retain their existing structure.
+- Updated `DESIGN.md` and `docs/design/routes-responsive-layout.md` to document the Planner-specific wide desktop exception.
+- After evidence: `.impeccable/review/iteration-07-after-planner-wide.png`, `.impeccable/review/iteration-07-after-planner-mobile.png`, `.impeccable/review/iteration-07-after-planner-320.png`, and matching summary/DOM files. The wide authenticated Planner reports `main.width: 1592`, `layout.width: 1544`, `calendar.width: 1200`, `ticket.width: 320`, `layoutGap: 24px`, and no horizontal overflow.
+- Mobile regression evidence was recaptured after the independent reviewer rejected Chrome's initially scaled viewport labels. At exact `390x844`, there is no horizontal overflow, date targets are at least `55x58`, and the Day Ticket clears the bottom navigation by `7.37px`; at exact `320x844`, there is no horizontal overflow, date targets are at least `45x58`, and the same `7.37px` clearance remains. Evidence lives in `.impeccable/review/iteration-07-after-planner-390.{png,summary.json}` and `.impeccable/review/iteration-07-after-planner-320.{png,summary.json}`.
+- Verification: Impeccable detector `node .agents/skills/impeccable/scripts/detect.mjs --json --scope layout src/index.css` returned `[]`; the design hook also reported no deterministic issues; `npm run build` passed; `npm run test:ui` passed (`2 passed`); `git diff --check` passed.
+- Browser console evidence: no new source errors from this CSS-only change. The known Solid cleanup warning remains, along with existing Vite debug logs and existing route debug logging.
+- Independent Impeccable finish review first returned `disposition: recapture` because Chrome's 0.8 scale made the original “390” and “320” evidence render at 487 and 400 CSS pixels. After calibrated exact-width recaptures verified the metrics above, no implementation fix or rebuild remained.
+- Hostile review: the wide Planner now uses the shell width more credibly, but it is still visually restrained by the current dark-treated Chrome capture and sparse empty-day ticket. This iteration does not address Intake's Agent-state wording or camera-permission failure state, which remain the next highest-value work.
 
 ### Mobile public sign-in alignment — 2026-08-16
 
