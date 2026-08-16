@@ -13,6 +13,7 @@ Keep product workflows cohesive while making their cross-feature dependencies ex
 - Export only values and types that external consumers need; keep implementation helpers private.
 - Cross-feature calls must preserve the owning feature's data semantics instead of mutating its internal state opportunistically.
 - Backend persistence belongs in generated Convex queries and mutations, not in duplicated client action modules.
+- Receipt capture uses a narrow 1:2 frame at an ideal 960 by 1920 resolution, preferring the rear camera on touch-first mobile devices and the user-facing camera on computers while allowing device fallback; callers own its displayed dimensions through `styles`.
 
 # Work Guidance
 
