@@ -74,6 +74,16 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Wide Planner verification blocked after auth drop — 2026-08-16
+
+- Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command for `/intake`, read the installed Chrome-control skill, connected through the supported Chrome bridge, and claimed the existing authenticated `localhost:3000/planner` tab.
+- Re-checked current authenticated Planner and Intake before choosing work. Intake's generated-draft wait copy remains a source issue, but the draft wait state could not be rendered without capturing and uploading a receipt image, so wide Planner composition became the only verifiable high-priority candidate.
+- Authenticated wide Planner evidence before editing: `.impeccable/review/iteration-05-current-planner-desktop.png`, `.impeccable/review/iteration-05-before-wide-planner.png`, and metrics in `.impeccable/review/iteration-05-before-wide-metrics.json` showed the route capped at `1440px` while the 1920-style viewport left the active planning workspace stranded in the middle of a much wider canvas.
+- Impeccable layout assessment and deterministic detector both supported a narrow CSS-only candidate: widen only `.planner-page` while preserving the documented 320px Day Ticket, existing breakpoints, and all planner behavior. The detector returned no layout findings before the attempted change.
+- The candidate CSS change was made and then reverted because post-change authenticated verification failed: the controlled Chrome tab redirected to the public sign-in surface at `http://localhost:3000/planner`, and recovery still showed `Sign in to your kitchen plan` rather than authenticated Planner DOM.
+- Evidence for the auth drop lives under `.impeccable/review/iteration-05-after-wide-planner.png`, `.impeccable/review/iteration-05-recovery-summary.json`, `.impeccable/review/iteration-05-recovery-dom.txt`, and `.impeccable/review/iteration-05-recovery-open-tabs.json`.
+- Decision: do not commit the wide Planner CSS change from source intent, the pre-change authenticated screenshot, or the unauthenticated post-change sign-in screenshot. Resume this opportunity only when the connected Chrome tab can render authenticated `/planner` after a viewport override or use a different authenticated route state that can be rendered before and after the change.
+
 ### Mobile Planner Day Ticket anchoring — 2026-08-16
 
 - Reconstructed the redesign context, loaded Impeccable 4.1.1, ran its context command, read the installed Chrome-control skill, connected through the supported Chrome bridge, and claimed the authenticated `localhost:3000/intake` tab before navigating to `/planner`.
