@@ -234,6 +234,7 @@ export function Overlay(props: {
 export function ConfirmDialog(props: { title: string; body: string; confirmLabel: string; onConfirm: () => void; onCancel: () => void }) {
   const titleId = createUniqueId();
   let dialog!: HTMLElement;
+  let opener: Element | null = null;
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") { event.preventDefault(); props.onCancel(); return; }
     if (event.key !== "Tab") return;
@@ -242,8 +243,12 @@ export function ConfirmDialog(props: { title: string; body: string; confirmLabel
     if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls[controls.length - 1].focus(); }
     else if (!event.shiftKey && document.activeElement === controls[controls.length - 1]) { event.preventDefault(); controls[0].focus(); }
   };
-  onMount(() => { window.addEventListener("keydown", onKeyDown, true); queueMicrotask(() => dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus()); });
-  onCleanup(() => window.removeEventListener("keydown", onKeyDown, true));
+  onMount(() => { opener = document.activeElement; window.addEventListener("keydown", onKeyDown, true); queueMicrotask(() => dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus()); });
+  onCleanup(() => {
+    window.removeEventListener("keydown", onKeyDown, true);
+    const elementToRestore = opener;
+    if (elementToRestore instanceof HTMLElement && elementToRestore.isConnected) queueMicrotask(() => elementToRestore.focus());
+  });
   return (
     <Portal>
       <div class="overlay overlay-confirm">

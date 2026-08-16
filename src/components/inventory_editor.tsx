@@ -231,6 +231,12 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
                           closeConversion();
                         }
                       }}
+                      onFocusOut={(event) => {
+                        const next = event.relatedTarget;
+                        if (next instanceof Node && (event.currentTarget.contains(next) || convertButton?.contains(next))) return;
+                        // Focus moved on; dismiss without yanking it back.
+                        setConversionOpen(false);
+                      }}
                     >
                       <div class="popover-head">
                         <h3 id={conversionTitleId}>Convert unit</h3>
@@ -253,12 +259,13 @@ function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
                         {function(){
                             const getCustomUnits = useQuery(api.customUnit_exports.getCustomUnits, {associatedIngredient: props.ingredient.name_})
                           return <Select
+                          ref={(el) => (conversionSelect = el)}
                           options={(BuiltinUnitOptions as Unit[]).concat(getCustomUnits.data()?.map(unit => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit})) || [])}
-                          toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}  
+                          toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}
                           whenSelected={(unit) => setConvertUnit(unit)}
                           />
                         }()}
-                        
+
 
 
                       </label>

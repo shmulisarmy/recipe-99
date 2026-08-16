@@ -3,6 +3,7 @@ export function Select<T>(props: {
   selected?: T;
   toString: (item: T) => string;
   whenSelected?: (item: T) => void;
+  ref?: (el: HTMLSelectElement) => void;
   SelectClass?: string;
   SelectStyle?: string;
   OptionsClass?: string;
@@ -19,6 +20,7 @@ export function Select<T>(props: {
 
   return (
     <select
+      ref={props.ref}
       class={props.SelectClass}
       style={props.SelectStyle}
       value={selectedIndex()}

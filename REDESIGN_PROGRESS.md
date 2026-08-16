@@ -71,6 +71,15 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Overlay keyboard contract: conversion popover + ConfirmDialog — 2026-08-16
+
+- Ran the queued overlay accessibility audit (independent agent, code-level) and cross-checked its claims against source: the `Overlay` primitive is complete (trap, restore, inert, `aria-modal`), but the Pantry conversion popover and `ConfirmDialog` fell short of the invariant "shared overlays … restore focus to the exact opener".
+- Discovered during live keyboard verification (not by the audit): opening the conversion popover never moved focus into it because `conversionSelect` was a dangling ref — the `Select` component didn't forward refs at all. Fixed `Select` to accept an optional ref and attached it in the popover.
+- Added light dismiss to the desktop conversion popover: when focus leaves it (Tab past its controls or focus moves elsewhere), it closes without stealing focus back. Escape and the close button still restore focus to the Convert button. The mobile conversion sheet already used `Overlay` and is unchanged.
+- `ConfirmDialog` now captures the opener on mount and restores focus on close, mirroring `Overlay`'s verified logic. (Not rendered live — reaching it requires editing a cart draft; the change is code-symmetric with the verified primitive.)
+- Verification: full keyboard contract exercised in the REAL authenticated app via a new System Events AX harness (documented in `AGENT_FINDINGS.md`): AXPress on "Convert unit" → focus lands on the "Target unit" select (label association confirmed via accessible name); three Tabs → focus walks out and the popover dismisses; reopen + Escape → popover closes and focus returns to "Convert unit". `npm run build` and `npm run test:ui` (2 passed) passed.
+- Remaining audit findings are queued in `AGENT_FINDINGS.md`; the highest is the reconcile add-ingredient panel, unreachable without a real receipt handoff.
+
 ### Sign-in failure state composition — 2026-08-16
 
 - Rendered the previously unreviewed "Google sign-in could not load" state by blocking the GSI script in headless Playwright at desktop and 390px viewports. The state itself follows the design contract (names what happened, offers "Try again", focuses the alert), but the reserved `.google-button-slot` kept its 44px + 24px space while empty, leaving a dead hole between the panel copy and the error notice.
