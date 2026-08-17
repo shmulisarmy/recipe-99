@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { action, query } from "./_generated/server";
+import { UserValidator } from "./UserValidator";
 
 export const getCurrentUserOAuthId = query({
     args: {},

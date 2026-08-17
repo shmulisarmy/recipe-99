@@ -121,6 +121,7 @@ export function DayCell(props: {
         type="button"
         aria-label={fullLabel()}
         aria-pressed={props.selected}
+        aria-current={props.isToday ? "date" : undefined}
         onClick={props.onSelectDay}
         onKeyDown={props.onFocusKey}
       >

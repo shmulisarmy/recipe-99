@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as UserValidator from "../UserValidator.js";
 import type * as agents_imageUtils from "../agents/imageUtils.js";
 import type * as agents_initialIngredientBulkAddFormDraftAgent from "../agents/initialIngredientBulkAddFormDraftAgent.js";
 import type * as auth from "../auth.js";
@@ -44,6 +45,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  UserValidator: typeof UserValidator;
   "agents/imageUtils": typeof agents_imageUtils;
   "agents/initialIngredientBulkAddFormDraftAgent": typeof agents_initialIngredientBulkAddFormDraftAgent;
   auth: typeof auth;
