@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { BuiltinUnitOptions, Amount, Icon, Overlay, StatusText } from "./ui";
-import { Select } from "../features/planner/components/Select";
+import { Select } from "./Select";
 
 function IngredientRow(props: { ingredient: Doc<"pantryItems"> }) {
   const updateIngredient = useMutation(

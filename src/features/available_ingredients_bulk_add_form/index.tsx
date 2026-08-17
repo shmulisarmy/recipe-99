@@ -16,7 +16,7 @@ import type {
 } from "./types";
 import { BuiltinUnitOptions, Amount, Icon } from "../../components/ui";
 import { today } from "../planner/outside_feature_exports";
-import { Select } from "../planner/components/Select";
+import { Select } from "../../components/Select";
 import debounce from "lodash/debounce";
 type IntakeRow = {
   id: string;

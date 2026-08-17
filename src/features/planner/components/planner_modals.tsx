@@ -24,7 +24,7 @@ import {
   Overlay,
   StatusText,
 } from "../../../components/ui";
-import { Select } from "./Select";
+import { Select } from "../../../components/Select";
 
 function longDay(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(undefined, {
