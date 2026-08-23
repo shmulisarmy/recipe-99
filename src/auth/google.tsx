@@ -21,8 +21,10 @@ type GoogleIdentityServices = {
                 options: {
                     theme: "outline";
                     size: "large";
-                    shape: "rectangular";
+                    shape: "pill";
                     text: "signin_with";
+                    logo_alignment: "center";
+                    width: number;
                 },
             ): void;
             disableAutoSelect(): void;
@@ -191,11 +193,17 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
                 },
             });
             googleButton.replaceChildren();
+            // Google owns the button's face; shape, width and alignment are the
+            // design left to us. A pill at the width of its surface matches the
+            // app's own controls, and Google caps the width at 400.
+            const slotWidth = Math.round(googleButton.getBoundingClientRect().width);
             google.accounts.id.renderButton(googleButton, {
                 theme: "outline",
                 size: "large",
-                shape: "rectangular",
+                shape: "pill",
                 text: "signin_with",
+                logo_alignment: "center",
+                width: Math.min(400, Math.max(240, slotWidth || 280)),
             });
             setGoogleState("ready");
 

@@ -156,7 +156,8 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .sign-in-card h1, .sign-in-card h2 { margin: 0; font-family: var(--major); font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
 .sign-in-card > p { margin: 0; color: var(--muted); }
 .sign-in-card .button { margin-top: 16px; }
-.google-button-slot { min-height: 44px; margin-top: 20px; }
+.google-button-slot { display: flex; justify-content: center; min-height: 44px; margin-top: 20px; }
+.google-button-slot > div { max-width: 100%; }
 .google-button-slot.is-loading { border-radius: 8px; background: var(--quiet); }
 .google-button-slot.is-failed { display: none; }
 .auth-status { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
@@ -477,7 +478,10 @@ body.is-dragging-meal .meal-end-drop { border-color: var(--rule); color: var(--m
   .auth-page:not(.auth-page-solo) .auth-lede,
   .auth-page:not(.auth-page-solo) .sign-in-card > p:not(.auth-status) { display: none; }
   .auth-page:not(.auth-page-solo) .sign-in-card h2 { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap; }
-  .auth-page:not(.auth-page-solo) .google-button-slot { display: flex; justify-content: center; margin-top: 16px; }
+  /* Lift the pill off the dark ground; the shadow follows its shape. */
+  /* The card centres its children, so the empty slot has to stretch before the
+     button can be measured against it. */
+  .auth-page:not(.auth-page-solo) .google-button-slot { align-self: stretch; margin-top: 16px; filter: drop-shadow(0 10px 22px rgb(6 20 38 / .38)); }
   .auth-page:not(.auth-page-solo) .google-button-slot.is-loading { background: rgb(255 255 255 / .14); }
   .auth-page:not(.auth-page-solo) .auth-status { color: rgb(255 255 255 / .74); }
   .auth-page:not(.auth-page-solo) .inline-notice { border-radius: 12px; background: var(--porcelain); text-align: left; }
