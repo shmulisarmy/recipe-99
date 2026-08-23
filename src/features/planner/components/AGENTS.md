@@ -26,6 +26,7 @@ Own the interactive calendar, day sheet, and modal UI for planner days, recipes,
 - The calendar shows two weeks around the selected day; the month heading toggles the full month grid. Calendar cells have one focusable date target and the day sheet owns people, meal, and movement actions.
 - A calendar cell shows at most three draggable meal thumbnails plus a `+n` count; while the day sheet is open every cell shows readiness dots instead so the calendar stays scannable behind it.
 - The route owns the day sheet: `/planner/day/:date` is the open sheet for that day, and closing it returns to `/planner` and restores focus to that date's calendar cell.
+- The day sheet never covers the calendar it belongs to. It caps its height and scrolls its own meal list, and while a meal is in hand it collapses to a compact list of drop targets and stops intercepting the drag, so every calendar date stays reachable and reordering inside the day still works.
 - Cross-day hover highlights the calendar target without expanding it; dropping on a date moves the occurrence to the beginning of that day.
 - Touch dragging starts from the meal card handle, supports before-meal and end-of-day reordering, and moves to the beginning of a calendar date; `Move meal` remains the precise fallback.
 - The explicit move surface can target an existing or missing date and place a meal first, before another meal, or last.

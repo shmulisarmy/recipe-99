@@ -52,7 +52,7 @@ Use a `4, 8, 12, 16, 24, 32, 48px` spacing rhythm. Default controls are 40px on 
 
 Desktop uses a 208px left navigation, a 64px identity bar, and most content up to 1440px with 24px gutters. The Planner may expand to 1600px on wide desktop screens so the calendar and Day Ticket use the available planning workspace. Tablet uses top identity plus horizontal primary navigation and a single content column. Mobile uses a 56px top bar, 16px content gutters, and a fixed 64px bottom navigation with safe-area spacing.
 
-Responsive changes are structural. The planner is a single centred column of cards at every width. The day sheet rises from the bottom of the viewport over a scrim, sits above—never under—the bottom navigation, and keeps its own scrolling body.
+Responsive changes are structural. The planner is a single centred column of cards at every width. The day sheet rises from the bottom of the viewport over a scrim, sits above—never under—the bottom navigation, and keeps its own scrolling body. It never covers the calendar it belongs to, and it gets out of the way while a meal is being dragged.
 
 ## Component language
 

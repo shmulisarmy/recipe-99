@@ -322,8 +322,24 @@ body.is-dragging-meal .day-meal { cursor: grabbing; }
 
 .day-sheet-shell { position: fixed; z-index: 40; inset: 0; display: grid; align-items: end; }
 .day-sheet-scrim { position: absolute; inset: 0; padding: 0; border: 0; background: rgb(24 36 33 / .38); cursor: pointer; animation: scrim-enter 180ms ease both; }
-.day-sheet { position: relative; display: flex; max-height: 78dvh; flex-direction: column; padding: 8px 16px calc(76px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: var(--porcelain); box-shadow: var(--modal-shadow); animation: sheet-enter 180ms cubic-bezier(.22, 1, .36, 1) both; }
+.day-sheet { position: relative; display: flex; max-height: min(56dvh, 560px); flex-direction: column; padding: 8px 16px calc(76px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: var(--porcelain); box-shadow: var(--modal-shadow); animation: sheet-enter 180ms cubic-bezier(.22, 1, .36, 1) both; }
 .day-sheet.is-drag-over { outline: 2px dashed var(--enamel); outline-offset: -6px; }
+/* A meal in hand hands the calendar back. The scrim stops intercepting the
+   drag and fades, and the sheet shrinks to a compact list of drop targets, so
+   every date is reachable while reordering inside the day still works. */
+body.is-dragging-meal .day-sheet-shell { pointer-events: none; }
+body.is-dragging-meal .day-sheet { max-height: 40dvh; pointer-events: auto; }
+body.is-dragging-meal .day-sheet-scrim { opacity: .1; }
+body.is-dragging-meal .day-sheet-count,
+body.is-dragging-meal .people-control,
+body.is-dragging-meal .day-sheet .disclosure,
+body.is-dragging-meal .meal-card .recipe-thumb,
+body.is-dragging-meal .meal-card .meal-meta,
+body.is-dragging-meal .meal-card .meal-badge { display: none; }
+body.is-dragging-meal .day-sheet-head { padding-bottom: 6px; }
+body.is-dragging-meal .meal-card { padding: 3px 10px; }
+body.is-dragging-meal .day-sheet-meals { gap: 6px; }
+.day-sheet-scrim { transition: opacity 140ms ease; }
 .day-sheet-grab { width: 46px; height: 4px; margin: 0 auto 12px; border-radius: 999px; background: rgb(24 36 33 / .16); }
 .day-sheet-head { display: flex; flex: none; align-items: start; justify-content: space-between; gap: 12px; padding-bottom: 10px; }
 .day-sheet-head h2 { margin: 0; font-family: var(--major); font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
