@@ -70,6 +70,16 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Planner reference rebuild finish — 2026-08-23
+
+- Completed the five-state real-data visual review through the explicitly authorized temporary authentication bypass: closed Planner at 1440×900 and 390×844, a 320px narrow check, populated day modal, recipe modal, and cart modal. Evidence is saved under `.impeccable/review/` as `desktop.png`, `mobile.png`, `user-390.png`, `user-320.png`, `day.png`, `recipe.png`, and `cart.png`.
+- The single correction batch fixed the only measured layout defect: meal-heavy weeks no longer expand. Calendar rows now hold at 104px on desktop and 71px on mobile, with compact thumbnails and an overlaid additional-meal count. Planner metadata previously rendered at 10px now meets the 11px essential-text floor.
+- Updated the closest Planner component contract to describe the reference-led mobile thumbnail treatment and its accessible complete readiness summary.
+- Verified route-owned day and cart Escape behavior in the collaborative browser. The saved captures show persisted Convex quantities and recipes, not fixtures or fabricated values.
+- Fresh Impeccable finish review returned `disposition: ship` with no material fixes. It accepted the full-month calendar, contained 320px calendar scrolling, desktop composition, truthful recipe statistics, preserved four-destination shell, and denser day/cart sheets as contract-required adaptations.
+- Verification passed: frontend TypeScript, Convex TypeScript, production build, and `git diff --check`. The public sign-in Playwright smoke suite fails by design while the bypass is active because `/sign-in` now redirects to Planner instead of rendering the sign-in thesis.
+- Authentication evidence is explicitly a local dev bypass, not an authenticated Firefox or Chrome session. The isolated bypass commit is `27dad03`; revert it after visual work to restore the normal gate and strict server identity requirement.
+
 ### Planner reference rebuild documentation — 2026-08-23
 
 - Reconciled the durable planner design contract with the implemented reference-image rebuild across `a98d7c5`, `68898ea`, `9d0855b`, and `5fe2443`: the closed route is now a thumbnail calendar plus shopping preview, selecting a date opens a route-owned day modal, and recipe/cart routes use the coordinated modal family without stacking over the day surface.

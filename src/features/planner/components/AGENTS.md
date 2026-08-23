@@ -32,7 +32,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - Calendar cells have one focusable date target; the selected-day modal owns people, meal, cart, and movement actions.
 - Desktop calendar cells expose at most two draggable meal summaries; `+n more` selects that date so the full ordered day modal becomes authoritative.
 - Cross-day hover highlights the calendar target without expanding it; dropping on a date moves the occurrence to the beginning of that day.
-- Mobile calendar cells expose complete `Ready` and `Missing` meal totals without listing meal names or using an additional-count suffix; dates remain at least 44 by 44 pixels and the selected day opens as a modal bottom sheet.
+- Mobile calendar cells use compact recipe thumbnails from the approved references without expanding the 71px calendar row; the accessible date label carries the complete `Ready` and `Missing` totals, dates remain at least 44 by 44 pixels, and the selected day opens as a modal bottom sheet.
 - Touch dragging starts from the day modal handle, supports before-meal and end-of-day reordering, and moves to the beginning of a calendar date; `Move meal` remains the precise fallback.
 - The explicit move surface can target an existing or missing date and place a meal first, before another meal, or last.
 - Planned-recipe and cart overlays are route-owned; amount and explicit-move surfaces remain local overlays over the selected day.

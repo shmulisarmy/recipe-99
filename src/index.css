@@ -293,14 +293,14 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .planner-calendar-card .day-number { margin-inline: auto; color: var(--planner-ink); font-size: 14px; }
 .planner-calendar-card .day-cell.selected .day-number { color: var(--planner-ready); background: transparent; }
 .planner-calendar-card .day-cell.today .day-number { box-shadow: inset 0 0 0 2px var(--planner-action); }
-.planner-meal-thumbnails { display: flex; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 3px; }
-.planner-meal-thumbnail { display: block; width: 30px; height: 30px; overflow: hidden; border-radius: 5px; cursor: grab; }
+.planner-meal-thumbnails { position: relative; display: flex; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.planner-meal-thumbnail { display: block; width: 24px; height: 24px; overflow: hidden; border-radius: 5px; cursor: grab; }
 .planner-meal-thumbnail:active { cursor: grabbing; }
 .planner-meal-thumbnail .recipe-image { height: 100%; aspect-ratio: 1; }
 .planner-meal-thumbnail .recipe-image-fallback { gap: 0; padding: 3px; }
 .planner-meal-thumbnail .recipe-image-fallback .icon { width: 16px; height: 16px; }
 .planner-meal-thumbnail .recipe-image-fallback span { display: none; }
-.planner-thumbnail-more { align-self: center; color: var(--planner-muted); font-size: 10px; font-weight: 650; }
+.planner-thumbnail-more { position: absolute; right: -2px; bottom: -2px; padding-inline: 2px; border-radius: 4px; color: var(--planner-muted); background: var(--planner-surface); font-size: 11px; font-weight: 650; line-height: 1.4; }
 .planner-calendar-card .desktop-meals, .planner-calendar-card .mobile-status, .planner-calendar-card .cell-meta { display: none; }
 .planner-shopping-card { padding: 17px 15px 15px; border-color: var(--planner-action); background: var(--planner-action-soft); }
 .planner-shopping-heading, .planner-shopping-heading > div { display: flex; align-items: center; }
@@ -347,7 +347,7 @@ body.is-dragging-meal .meal-summary { cursor: grabbing; }
 .cell-meta span { display: inline-flex; align-items: center; gap: 3px; }
 .cell-meta .icon { width: 12px; height: 12px; }
 .mobile-status { display: none; }
-.drop-error { position: absolute; z-index: 3; right: 4px; bottom: 4px; padding: 3px 5px; border-radius: 4px; background: var(--porcelain); font-size: 10px; }
+.drop-error { position: absolute; z-index: 3; right: 4px; bottom: 4px; padding: 3px 5px; border-radius: 4px; background: var(--porcelain); font-size: 11px; }
 .ticket-shell { position: sticky; top: 84px; filter: drop-shadow(var(--day-shadow)); }
 .day-ticket { overflow: hidden; border: 1px solid var(--rule); background: var(--porcelain); clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%); animation: ticket-context 140ms ease both; }
 .day-ticket.is-drag-over { outline: 2px dashed var(--enamel); outline-offset: -5px; background: var(--enamel-soft); }
@@ -361,7 +361,7 @@ body.is-dragging-meal .meal-summary { cursor: grabbing; }
 .ticket-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .ticket-summary h2 { margin: 0; }
 .ticket-meals { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-.meal-end-drop { display: grid; min-height: 26px; place-items: center; color: transparent; border: 1px dashed transparent; border-radius: 6px; font-family: var(--values); font-size: 10px; }
+.meal-end-drop { display: grid; min-height: 26px; place-items: center; color: transparent; border: 1px dashed transparent; border-radius: 6px; font-family: var(--values); font-size: 11px; }
 body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--rule); }
 .ticket-meals.is-touch-end-target .meal-end-drop { color: var(--enamel); border-color: var(--enamel); background: var(--enamel-soft); }
 .ticket-meal { position: relative; display: grid; min-width: 0; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 58px; border-bottom: 1px solid var(--rule); }
@@ -372,7 +372,7 @@ body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--
 .meal-title { min-width: 0; padding: 0; overflow: hidden; border: 0; color: var(--ink); background: transparent; font-weight: 600; text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .meal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .meal-meta .status-text { font-size: 11px; }
-.serving-override, .move-proposal { color: var(--muted); font-family: var(--values); font-size: 10px; }
+.serving-override, .move-proposal { color: var(--muted); font-family: var(--values); font-size: 11px; }
 .meal-row-actions { display: flex; align-items: center; gap: 3px; }
 .meal-row-actions .icon-button { width: 36px; height: 36px; border-color: transparent; }
 .drag-control { opacity: 0; }
@@ -410,7 +410,7 @@ body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--
 .day-modal .meal-order .recipe-image-fallback .icon { width: 22px; height: 22px; }
 .day-modal .meal-order .recipe-image-fallback span { display: none; }
 .day-modal .meal-title { font-size: 15px; }
-.day-modal .meal-meta .status-text { width: fit-content; padding: 3px 7px; border-radius: 999px; background: var(--planner-ready-soft, var(--parsley-soft)); font-size: 10px; text-transform: uppercase; }
+.day-modal .meal-meta .status-text { width: fit-content; padding: 3px 7px; border-radius: 999px; background: var(--planner-ready-soft, var(--parsley-soft)); font-size: 11px; text-transform: uppercase; }
 .day-modal .meal-end-drop { min-height: 20px; }
 .day-modal .disclosure { margin-top: 12px; }
 .day-modal .ticket-cart { padding-bottom: 2px; }
@@ -639,7 +639,7 @@ button.planner-recipe-stat { cursor: pointer; }
   .day-cell.selected { border-color: var(--enamel); background: var(--enamel-soft); }
   .day-number { width: 44px; height: 44px; font-size: 11px; }
   .desktop-meals, .cell-meta { display: none; }
-  .mobile-status { position: absolute; bottom: 3px; display: flex; max-width: 100%; align-items: center; justify-content: center; gap: 5px; color: var(--muted); font-family: var(--values); font-size: 10px; font-weight: 600; line-height: 1; white-space: nowrap; pointer-events: none; }
+  .mobile-status { position: absolute; bottom: 3px; display: flex; max-width: 100%; align-items: center; justify-content: center; gap: 5px; color: var(--muted); font-family: var(--values); font-size: 11px; font-weight: 600; line-height: 1; white-space: nowrap; pointer-events: none; }
   .mobile-status .icon { width: 11px; height: 11px; }
   .mobile-status .ready-count, .mobile-status .missing-count { display: inline-flex; align-items: center; gap: 1px; }
   .mobile-status .ready-count { color: var(--parsley); }
@@ -695,15 +695,15 @@ button.planner-recipe-stat { cursor: pointer; }
   .planner-month-heading { margin: 0 7px 9px; }
   .planner-month-heading h2 { font-size: 16px; }
   .planner-calendar-card .calendar { width: 100%; margin: 0; border-spacing: 3px 7px; }
-  .planner-calendar-card .calendar th { height: 18px; font-size: 10px; }
+  .planner-calendar-card .calendar th { height: 18px; font-size: 11px; }
   .planner-calendar-card .weekday-long { display: none; }
   .planner-calendar-card .weekday-short { display: inline; }
-  .planner-calendar-card .calendar td { height: 71px; }
-  .planner-calendar-card .day-cell { position: relative; align-items: center; gap: 2px; min-height: 71px; padding: 5px 1px; border: 1px solid var(--planner-rule); border-radius: 13px; background: var(--planner-surface); }
+  .planner-calendar-card .calendar td { height: 71px; max-height: 71px; overflow: hidden; }
+  .planner-calendar-card .day-cell { position: relative; height: 71px; min-height: 71px; max-height: 71px; align-items: center; gap: 1px; padding: 3px 1px; border: 1px solid var(--planner-rule); border-radius: 13px; background: var(--planner-surface); }
   .planner-calendar-card .day-cell.selected { border: 2px solid var(--planner-ready); background: rgb(63 150 85 / .035); }
-  .planner-calendar-card .day-number { width: 30px; height: 30px; font-size: 13px; }
-  .planner-meal-thumbnail { width: 25px; height: 25px; }
-  .planner-meal-thumbnails { gap: 2px; }
+  .planner-calendar-card .day-number { width: 28px; height: 28px; font-size: 13px; }
+  .planner-meal-thumbnail { width: 16px; height: 16px; border-radius: 4px; }
+  .planner-meal-thumbnails { display: grid; max-height: 34px; grid-template-columns: repeat(2, 16px); grid-auto-rows: 16px; gap: 2px; overflow: hidden; }
   .planner-shopping-card { width: 100%; padding: 15px; border-radius: 20px; }
   .planner-shopping-heading h2 { font-size: 16px; }
   .planner-shopping-list li { min-height: 45px; }
