@@ -18,10 +18,12 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - The closed planner keeps the calendar authoritative and shows a compact shopping-list preview for the selected day; `Start Shopping` opens the existing cart route.
 - `/planner/day/:date` owns the selected-day modal; closing it returns to `/planner`, while nested recipe and cart routes replace rather than stack over the day surface.
 - Reference-only controls without existing behavior may remain inert presentation controls; do not invent mutations or client state merely to animate a mockup button.
+- Until cooking-session behavior exists in the domain model, the reference `Start Cooking` control remains presentation-only; recipe summary values must come from the current projection rather than fabricated timing data.
 - Recipe and day drag-and-drop must persist through generated planner mutations and preserve each planned recipe's stable `id`.
 - The day modal people field stays in its header, uses a people icon, accepts non-negative integers, and saves the day multiplier.
 - The recipe three-dot menu labels the user-facing control `Amount to make`; it accepts a positive multiplier and offers `Use day default` to remove the recipe override.
 - Cart `toGet` measurements look unchanged at rest. Hover or keyboard focus reveals edit affordance; activation changes that row to original measurement, arrow, and editable amount/unit controls.
+- Cart checklist marks are derived from the existing normalized obtained percentage; they do not toggle persisted state or introduce a new mutation.
 - Cart measurement edits remain local drafts until `Save changes`; one save submits all drafts through `BulkSetCartToGet` and the modal widens while drafts exist.
 - A recipe that cannot be made offers `Add missing ingredients to cart`; the action adds its projected deficits to that recipe's planner day and exposes pending, success, and failure states at the button.
 - Escape closes a modal normally, but a cart modal with unsaved measurement drafts must ask for confirmation first.

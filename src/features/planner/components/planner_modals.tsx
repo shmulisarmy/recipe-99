@@ -25,6 +25,7 @@ import {
   StatusText,
 } from "../../../components/ui";
 import { Select } from "../../../components/Select";
+import { RecipeImage } from "../../../components/menu";
 
 function longDay(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(undefined, {
@@ -163,6 +164,13 @@ export function RecipeModal(props: {
   );
   const coveredEntries = () =>
     Object.entries(props.item.scratchPadOfIngredientsNeededToUse);
+  const totalIngredientCount = () =>
+    coveredEntries().length + props.item.unfulfilledIngredients.length;
+  const readyIngredientCount = () => coveredEntries().length;
+  const availabilityPercent = () =>
+    totalIngredientCount()
+      ? Math.round((readyIngredientCount() / totalIngredientCount()) * 100)
+      : 100;
 
   const addMissing = async () => {
     const ingredients: IngredientSet = {};
@@ -194,153 +202,91 @@ export function RecipeModal(props: {
     <>
       <Overlay
         kind="inspection"
-        title={recipeId().title}
-        eyebrow={`${longDay(props.dateStr)} · ${props.item.multiplier} people`}
+        title="Recipe Details"
+        eyebrow={longDay(props.dateStr)}
         onClose={props.onClose}
         footer={
-          <button
-            class="button button-secondary"
-            type="button"
-            onClick={props.onClose}
-          >
-            Close
+          <button class="button button-primary recipe-start-button" type="button">
+            Start Cooking
           </button>
         }
       >
-        <div class="section-head">
-          <Show
-            when={props.item.couldMake}
-            fallback={<StatusText kind="missing" />}
-          >
-            <StatusText kind="ready" />
-          </Show>
-          <button
-            class="button button-secondary"
-            type="button"
-            onClick={() => setAmountOpen(true)}
-          >
-            Amount to make, {props.item.multiplier}
-          </button>
-        </div>
-        <Show when={recipe.isLoading()}>
-          <p>Checking the projected pantry…</p>
-        </Show>
-        <Show when={recipe.error()}>
-          <div class="inline-notice notice-error">
-            <p>Recipe details couldn’t load.</p>
-            <button
-              class="button button-secondary"
-              type="button"
-              onClick={recipe.refetch}
+        <div class="planner-recipe-modal">
+          <RecipeImage title={recipeId().title} class="planner-recipe-hero" />
+          <div class="planner-recipe-title-row">
+            <h2>{recipeId().title}</h2>
+            <Show
+              when={props.item.couldMake}
+              fallback={<StatusText kind="missing" />}
             >
-              Try again
+              <StatusText kind="ready" />
+            </Show>
+          </div>
+          <div class="planner-recipe-stats">
+            <div class="planner-recipe-stat"><strong>{props.item.dayMultiplier}</strong><span>Day amount</span></div>
+            <div class="planner-recipe-stat"><strong>{readyIngredientCount()} of {totalIngredientCount()}</strong><span>Ingredients ready</span></div>
+            <button
+              class="planner-recipe-stat"
+              type="button"
+              onClick={() => setAmountOpen(true)}
+            >
+              <strong>{props.item.multiplier}</strong>
+              <span>Amount to make</span>
             </button>
           </div>
-        </Show>
-        <Show when={recipe.data()}>
-          {(recipeData) => (
-            <p class="recipe-detail-description">{recipeData().description}</p>
-          )}
-        </Show>
-        <details class="disclosure" open>
-          <summary>What this meal uses</summary>
-          <p>
-            Amounts include the active serving amount for this planned meal.
-          </p>
-        </details>
-        <Show when={coveredEntries().length > 0}>
-          <section class="ingredient-group ready">
-            <h3>Covered</h3>
+
+          <section class="planner-availability" aria-labelledby="availability-title">
+            <div>
+              <h3 id="availability-title">Ingredients Availability</h3>
+              <strong>{readyIngredientCount()} of {totalIngredientCount()} ready</strong>
+            </div>
+            <div class="progress" role="progressbar" aria-label="Ingredients available" aria-valuemin="0" aria-valuemax="100" aria-valuenow={availabilityPercent()}><span style={{ width: `${availabilityPercent()}%` }} /></div>
+          </section>
+
+          <Show when={recipe.isLoading()}><p>Checking the projected pantry…</p></Show>
+          <Show when={recipe.error()}>
+            <div class="inline-notice notice-error"><p>Recipe details couldn’t load.</p><button class="button button-secondary" type="button" onClick={recipe.refetch}>Try again</button></div>
+          </Show>
+          <Show when={recipe.data()}>{(recipeData) => <p class="recipe-detail-description">{recipeData().description}</p>}</Show>
+
+          <section class="planner-ingredient-list" aria-label="Recipe ingredients">
             <For each={coveredEntries()}>
               {([name, measurement]) => (
-                <div class="ingredient-line">
+                <div class="planner-ingredient-row is-ready">
+                  <span class="planner-ingredient-check"><Icon name="check" /></span>
                   <strong>{name}</strong>
-                  <span>
-                    Use <Amount measurement={measurement} />
-                  </span>
-                  <Show
-                    when={Object.values(
-                      props.item.substitutedIngredientUses,
-                    ).includes(name)}
-                  >
-                    <span>Substitute</span>
-                  </Show>
+                  <Amount measurement={measurement} />
+                  <Show when={Object.values(props.item.substitutedIngredientUses).includes(name)}><small>Substitute</small></Show>
                 </div>
               )}
             </For>
-          </section>
-        </Show>
-        <Show
-          when={Object.keys(props.item.substitutedIngredientUses).length > 0}
-        >
-          <section class="ingredient-group">
-            <h3>Substitutions</h3>
-            <For each={Object.entries(props.item.substitutedIngredientUses)}>
-              {([primary, substitute]) => (
-                <p>
-                  Use {substitute} instead of {primary}.
-                </p>
-              )}
-            </For>
-          </section>
-        </Show>
-        <Show when={props.item.unfulfilledIngredients.length > 0}>
-          <section class="ingredient-group missing">
-            <h3>Still needed</h3>
             <For each={props.item.unfulfilledIngredients}>
               {(item) => {
-                const missing = () =>
-                  Measurement_Minus(
-                    item.RequiredIngredient.Measurement,
-                    item.have,
-                  );
+                const missing = () => Measurement_Minus(item.RequiredIngredient.Measurement, item.have);
                 return (
-                  <div class="ingredient-line">
+                  <div class="planner-ingredient-row is-missing">
+                    <span class="planner-ingredient-check"><Icon name="warning" /></span>
                     <strong>{item.RequiredIngredient.name}</strong>
-                    <span>
-                      Need{" "}
-                      <Amount
-                        measurement={item.RequiredIngredient.Measurement}
-                      />
-                    </span>
-                    <span>
-                      Available <Amount measurement={item.have} />
-                    </span>
-                    <span>
-                      Missing <Amount measurement={missing()} />
-                    </span>
+                    <Amount measurement={item.RequiredIngredient.Measurement} />
+                    <small>Available <Amount measurement={item.have} /> · Missing <Amount measurement={missing()} /></small>
                   </div>
                 );
               }}
             </For>
           </section>
-        </Show>
-        <Show when={!props.item.couldMake}>
-          <div class="missing-cart-action">
-            <button
-              class="button button-primary"
-              type="button"
-              disabled={isAdding() || added()}
-              onClick={() => void addMissing()}
-            >
-              {isAdding()
-                ? "Adding missing ingredients…"
-                : added()
-                  ? "Added to this day’s cart"
-                  : "Add missing ingredients to cart"}
-            </button>
-            <Show when={added()}>
-              <p class="inline-notice notice-success" role="status">
-                Added to this day’s cart.
-              </p>
-            </Show>
-            <Show when={addError()}>
-              <p class="field-error" role="alert">
-                {addError()}
-              </p>
-            </Show>
-          </div>
-        </Show>
+
+          <Show when={Object.keys(props.item.substitutedIngredientUses).length > 0}>
+            <section class="planner-substitutions"><h3>Substitutions</h3><For each={Object.entries(props.item.substitutedIngredientUses)}>{([primary, substitute]) => <p>Use {substitute} instead of {primary}.</p>}</For></section>
+          </Show>
+
+          <Show when={!props.item.couldMake}>
+            <div class="missing-cart-action">
+              <button class="button button-primary" type="button" disabled={isAdding() || added()} onClick={() => void addMissing()}>{isAdding() ? "Adding missing ingredients…" : added() ? "Added to this day’s cart" : "Add missing ingredients to cart"}</button>
+              <Show when={added()}><p class="inline-notice notice-success" role="status">Added to this day’s cart.</p></Show>
+              <Show when={addError()}><p class="field-error" role="alert">{addError()}</p></Show>
+            </div>
+          </Show>
+        </div>
       </Overlay>
       <Show when={amountOpen()}>
         <AmountToMakeSurface
@@ -688,13 +634,14 @@ export function CartModal(props: {
     <>
       <Overlay
         kind="transaction"
-        title={`Shopping for ${longDay(props.dateStr)}`}
-        eyebrow={`${completedCount()} of ${entries().length} items complete`}
+        title="Shopping Cart"
+        eyebrow={`${longDay(props.dateStr)} · ${completedCount()} of ${entries().length} complete`}
         onClose={requestClose}
         onEscape={requestClose}
         footer={footer()}
         wide={hasDrafts()}
       >
+        <div class="planner-cart-modal">
         <Show
           when={plannedDay()}
           fallback={
@@ -720,18 +667,26 @@ export function CartModal(props: {
                   return (
                     <section
                       class="cart-row"
+                      classList={{ "is-complete": rowPercent() === 100 }}
                       aria-labelledby={`${name}-cart-title`}
                     >
                       <div class="cart-row-head">
-                        <h3 id={`${name}-cart-title`}>{name}</h3>
-                        <strong class="value">{rowPercent()}%</strong>
+                        <span class="cart-check" aria-hidden="true">
+                          <Show when={rowPercent() === 100}>
+                            <Icon name="check" />
+                          </Show>
+                        </span>
+                        <div>
+                          <h3 id={`${name}-cart-title`}>{name}</h3>
+                          <span class="cart-obtained-copy">
+                            Obtained <Amount measurement={alreadyGot(name)} />
+                          </span>
+                        </div>
+                        <Amount measurement={target} />
                       </div>
                       <div class="cart-values">
                         <span>
-                          To get <Amount measurement={target} />
-                        </span>
-                        <span>
-                          Obtained <Amount measurement={alreadyGot(name)} />
+                          {rowPercent()}% obtained
                         </span>
                       </div>
                       <div
@@ -821,6 +776,7 @@ export function CartModal(props: {
             </p>
           </Show>
         </Show>
+        </div>
       </Overlay>
       <Show when={confirmOpen()}>
         <ConfirmDialog
