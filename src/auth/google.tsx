@@ -242,7 +242,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
         <Show when={isAuthenticated()} fallback={
             <main class="auth-page" id="main">
                 <section class="auth-thesis" aria-labelledby="sign-in-title">
-                    <a class="wordmark auth-wordmark" href="/sign-in"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>
+                    <a class="wordmark auth-wordmark" href="/sign-in"><img class="wordmark-mark" src="/brand/captain-cook.png" alt="" width="256" height="256"/>Recipe 99</a>
                     <h1 id="sign-in-title">Plan meals from what’s already in your kitchen.</h1>
                     <p>Recipe 99 connects your pantry, recipes, calendar, and shopping needs.</p>
                     <div class="auth-chain" aria-hidden="true"><span>Planner</span><span>Recipes</span><span>Pantry</span><span>Intake</span></div>

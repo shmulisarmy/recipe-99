@@ -28,13 +28,13 @@ The palette is a **traffic system**, not a mood board. Color carries *meaning* h
 | Surface / card | `--surface` | `bg-white` | Cards float above canvas → each recipe is a discrete decision unit. |
 | Ink | `--text` | `text-stone-800` | Softer than pure black; less fatigue over a long list. |
 | Muted | `--muted` | `text-stone-500` | Descriptions, units, secondary metadata. Recedes so status wins. |
-| **Ready** | `--ok` | `emerald-*` (`bg-emerald-50` / `text-emerald-700` / `ring-emerald-500`) | Green = go. Reserved **only** for "you can make this." Never decorative. |
+| **Ready** | `--ok` | Captain blue `#1E4A7A` on an 8% tint | The brand blue = go. Reserved **only** for "you can make this." Never decorative. |
 | **Blocked** | `--warn` | `amber-*` (`bg-amber-50` / `text-amber-700`) | Amber, not red. You're not *broken* — you're one grocery run away. Amber = "almost." |
 | Missing chip | `--missing` | `rose-*` (`bg-rose-50` / `text-rose-700`) | The specific missing ingredient is the sharpest note — it's the actionable atom. |
-| Have chip | `--have` | `emerald-50 / emerald-700` | Owned ingredients confirmed in calm green. |
+| Have chip | `--have` | Captain blue on an 8% tint | Owned ingredients confirmed in calm brand blue. |
 | Brand accent | `--accent` | `text-stone-900` / subtle | The app is the stage, not the star. Minimal branding. |
 
-**Opinion:** never render a recipe in neutral-only. A card with no color state is a bug — the user learns nothing. Every card is either green-blessed or amber-flagged.
+**Opinion:** never render a recipe in neutral-only. A card with no color state is a bug — the user learns nothing. Every card is either blue-blessed or amber-flagged.
 
 **Contrast rule:** all status text/badges must clear WCAG AA (4.5:1). The `-700` text on `-50` background pairs above are chosen to pass.
 
@@ -67,7 +67,7 @@ Long lists punish typographic noise. Three levels, no more.
   1. **Status badge** (top-right or full-width strip) — the verdict, first.
   2. **Title.**
   3. **Description** (muted, 1–2 lines).
-  4. **Ingredient chips** — have (green) + missing (rose), missing sorted first.
+  4. **Ingredient chips** — have (Captain blue) + missing (rose), missing sorted first.
   5. If blocked: a quiet substitute hint where one exists.
 
 **Opinion:** the status badge comes *visually before or above* the title in the reading path even though the title is bigger. Big ≠ first. Color and position put the verdict first; size makes the title the anchor once the eye lands.
@@ -79,14 +79,14 @@ Long lists punish typographic noise. Three levels, no more.
 Two states, unmistakably different **without relying on color alone** (accessibility + glanceability):
 
 **READY**
-- Card: subtle emerald ring (`ring-1 ring-emerald-200`) + faint tint or clean white.
-- Badge: `✓ Ready to make` — emerald, filled.
-- Chips: all ingredients green "have."
+- Card: subtle Captain-blue ring + faint tint or clean white.
+- Badge: `✓ Ready to make` — Captain blue, filled.
+- Chips: all ingredients blue "have."
 
 **MISSING**
 - Card: neutral/amber-tinged, softer, slightly de-emphasized (it's not tonight's dinner).
 - Badge: `Missing 2` — amber, with a **count** (the count is the single most useful number in the app: it's the size of your grocery gap).
-- Chips: missing ingredients in rose, listed first, with the required amount; owned ones in calm green after.
+- Chips: missing ingredients in rose, listed first, with the required amount; owned ones in calm Captain blue after.
 - Substitute hint: if a `substitute` exists, show `try {substitute}` — this is *progressive disclosure of a path forward*, not clutter.
 
 **Why the count matters (UX):** "Missing 2" vs "Missing 5" instantly ranks near-misses above lost causes. The user's next action ("what's a small shop away?") is answered before they read the ingredient list. Surface the count in the badge.

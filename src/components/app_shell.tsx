@@ -44,7 +44,7 @@ export function AppShell(props: RouteSectionProps) {
   window.addEventListener("keydown", closeOnEscape);
   onCleanup(() => window.removeEventListener("keydown", closeOnEscape));
 
-  const Wordmark = () => <A class="wordmark" href="/planner"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</A>;
+  const Wordmark = () => <A class="wordmark" href="/planner"><img class="wordmark-mark" src="/brand/captain-cook.png" alt="" width="256" height="256"/>Recipe 99</A>;
   const NavLinks = (navProps: { mode: "primary" | "tablet" | "bottom" }) => (
     <For each={destinations}>{(destination) => (
       <A

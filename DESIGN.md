@@ -13,7 +13,7 @@ Detailed route and component contracts live in `docs/design/`. This file is the 
 - Give every screen one clear task hierarchy; do not build a collage of equal cards.
 - Preserve the real kitchen workflow. Do not invent features to produce a more dramatic interface.
 
-The cultural home is household prep: enamel cookware, a clean counter, an annotated shopping list, and a dated meal plan. Avoid the predictable recipe-blog aesthetic, restaurant metaphors, generic dashboard KPI cards, dark-neon productivity styling, and warm cream/serif “AI lifestyle” presentation.
+The cultural home is household prep: enamel cookware, a clean counter, an annotated shopping list, and a dated meal plan. The Captain Cook badge is the app mark and the single source of the brand colour. Avoid the predictable recipe-blog aesthetic, restaurant metaphors, generic dashboard KPI cards, dark-neon productivity styling, and warm cream/serif “AI lifestyle” presentation.
 
 ## Hierarchy and information architecture
 
@@ -25,15 +25,14 @@ Recipes prioritizes search and readiness, then an image-led comparison stream. P
 
 ## Visual world
 
-Use a restrained light palette derived from cool enamel cookware and clean prep surfaces:
+Use a restrained light palette built on the Captain Cook badge blue over clean prep surfaces:
 
 | Role | Token | Value | Use |
 | --- | --- | --- | --- |
 | Page | Chalk | `#F3F6F2` | App background and quiet grouped regions |
 | Work surface | Porcelain | `#FFFFFF` | Primary surfaces and overlays |
 | Content | Ink | `#182421` | Text, rules by alpha mix, icons |
-| Action | Enamel | `#1F5B62` | Primary action, active navigation, focus, selection |
-| Ready | Parsley | `#347249` | Ready and success, always with text or shape |
+| Brand | Captain | `#1E4A7A` | Primary action, active navigation, focus, selection, ready and success — always with text or shape |
 | Missing | Paprika | `#B84632` | Missing, invalid, destructive, always with explicit copy |
 
 Ordinary sections are flat. Separate them with whitespace, rules, or a quiet surface shift. Reserve persistent lift for the planner's calendar and shopping cards; use stronger shadows only for the day sheet, drawers, and transactional dialogs. No glass, decorative gradients, glowing borders, or status-filled cards.
@@ -56,9 +55,9 @@ Responsive changes are structural. The planner is a single centred column of car
 
 ## Component language
 
-- Navigation: quiet by default, enamel for active state, icon plus text where space permits.
+- Navigation: quiet by default, Captain blue for active state, icon plus text where space permits.
 - Buttons: primary, secondary, quiet, and destructive share one shape and state vocabulary.
-- Status: inline local SVG plus Ready, Missing, Checking, Saved, or Error text; never a decorative pill.
+- Status: inline local SVG plus Ready, Missing, Checking, Saved, or Error text; never a decorative pill. Ready shares the brand blue, so status always carries its word or shape.
 - Amounts: aligned, tabular, and adjacent to their units.
 - Tables and ledgers: flat rows separated by rules; reflow into labeled mobile rows without losing header meaning.
 - Recipe results: image-led horizontal bands on wide screens and a single stacked stream on mobile; imagery never hides status or actions.
