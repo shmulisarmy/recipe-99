@@ -21,6 +21,7 @@ Own Recipe-99's persisted data model and authenticated server functions.
 - Read `_generated/ai/guidelines.md` before editing Convex code; its version-specific rules are binding.
 - Define all tables in `schema.ts`, validate every public function argument, and add return validators when changing or adding functions.
 - Derive ownership from `ctx.auth.getUserIdentity()` through `authenticatedUserId`; never trust a client-provided user identifier for authorization.
+- Temporary redesign exception: when no identity exists, `authenticatedUserId` may resolve the single stored owner through indexed Planner/Pantry data. Keep this fallback server-side and do not accept a client user ID.
 - Keep LLM credentials in typed Convex environment variables and authenticate public agent functions before accessing the Agent component.
 - Pass captured images to Agent generation through `Id<"_storage">`, validate their media type in the background action, and delete the temporary upload after the Agent ingests it.
 - Schedule background Agent generation through a registered internal action; await scheduling in the public action and await model generation inside the worker.

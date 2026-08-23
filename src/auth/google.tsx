@@ -36,6 +36,7 @@ declare global {
 }
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const REDESIGN_AUTH_BYPASS = true;
 const GOOGLE_ID_TOKEN_SESSION_KEY = "recipe-99.google-id-token";
 let currentGoogleIdToken: string | null = null;
 
@@ -213,17 +214,17 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     };
 
     onMount(() => {
-        void setupGoogle();
+        if (!REDESIGN_AUTH_BYPASS) void setupGoogle();
     });
 
     createEffect(() => {
-        if (isAuthenticated() && window.location.pathname === "/sign-in") {
+        if ((isAuthenticated() || REDESIGN_AUTH_BYPASS) && window.location.pathname === "/sign-in") {
             window.history.replaceState(null, "", "/planner");
         }
     });
 
     createEffect(() => {
-        if (!isAuthenticated()) document.title = "Sign in — Recipe 99";
+        if (!isAuthenticated() && !REDESIGN_AUTH_BYPASS) document.title = "Sign in — Recipe 99";
     });
 
     createEffect(() => {
@@ -239,7 +240,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     }
 
     return (
-        <Show when={isAuthenticated()} fallback={
+        <Show when={isAuthenticated() || REDESIGN_AUTH_BYPASS} fallback={
             <main class="auth-page" id="main">
                 <section class="auth-thesis" aria-labelledby="sign-in-title">
                     <a class="wordmark auth-wordmark" href="/sign-in"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</a>

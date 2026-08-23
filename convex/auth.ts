@@ -1,6 +1,12 @@
 import { v } from "convex/values";
-import { action, query } from "./_generated/server";
-import { UserValidator } from "./UserValidator";
+import { internalQuery, query } from "./_generated/server";
+import { singleStoredUserId } from "./utils/auth";
+
+export const resolveSingleUserIdForRedesign = internalQuery({
+    args: {},
+    returns: v.string(),
+    handler: singleStoredUserId,
+});
 
 export const getCurrentUserOAuthId = query({
     args: {},
@@ -11,7 +17,14 @@ export const getCurrentUserOAuthId = query({
     }),
     handler: async (ctx) => {
         const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("Not authenticated");
+        if (!identity) {
+            const userId = await singleStoredUserId(ctx);
+            return {
+                oauthId: userId,
+                tokenIdentifier: userId,
+                email: null,
+            };
+        }
 
         return {
             oauthId: identity.subject,

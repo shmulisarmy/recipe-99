@@ -12,6 +12,7 @@ Own browser authentication and the authenticated application gate.
 - Keep the ID token in session storage, clear unusable or signed-out tokens, and never treat decoded browser claims as server authorization.
 - Use `convexClient.setAuth` to deliver tokens. Server functions remain responsible for identity and ownership checks.
 - Mount authenticated children only after Convex accepts the token, and expose identity and sign-out through `useAuth` inside `GoogleAuthGate`.
+- Temporary redesign exception: `REDESIGN_AUTH_BYPASS` may mount children without Google while the Planner visual finish runs. Preserve the normal Google flow in place for later restoration.
 
 # Work Guidance
 
@@ -21,5 +22,6 @@ Own browser authentication and the authenticated application gate.
 
 - Run `npm run build`.
 - Verify fresh sign-in, session restoration, failed token handling, and sign-out in the browser after authentication-flow changes.
+- While the redesign bypass is active, also verify an unauthenticated fresh browser reaches the real Planner data without a sign-in detour.
 
 # Child DOX Index
