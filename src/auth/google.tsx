@@ -244,8 +244,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
             <main class="auth-page" id="main">
                 <section class="auth-welcome" aria-labelledby="sign-in-title">
                     <img class="auth-badge" src="/brand/captain-cook.png" alt="" width="256" height="256"/>
-                    <p class="auth-wordmark">Captain Cook</p>
-                    <h1 id="sign-in-title">Welcome aboard.</h1>
+                    <h1 id="sign-in-title">Captain Cook</h1>
                     <p class="auth-lede">Plan the week from what is already in your kitchen. Captain Cook keeps the pantry, the recipes, and each day’s shopping in one plan.</p>
                     <ul class="auth-points">
                         <li><span class="auth-point-icon"><Icon name="calendar"/></span><span><strong>Plan</strong> meals day by day</span></li>

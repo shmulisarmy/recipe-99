@@ -144,8 +144,7 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .auth-page { display: grid; min-height: 100vh; align-items: stretch; grid-template-columns: minmax(0, 1.05fr) minmax(380px, .95fr); background: var(--chalk); }
 .auth-welcome { display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: clamp(36px, 6vw, 76px); color: var(--porcelain); background: var(--captain); }
 .auth-badge { width: clamp(92px, 11vw, 124px); height: auto; border-radius: 50%; background: #e8f4fd; box-shadow: 0 14px 34px rgb(6 20 38 / .34), 0 0 0 6px rgb(255 255 255 / .1); }
-.auth-wordmark { margin: 6px 0 0; color: rgb(255 255 255 / .74); font-family: var(--major); font-size: 14px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
-.auth-welcome h1 { max-width: 12ch; margin: 0; color: var(--porcelain); font-size: clamp(40px, 5vw, 62px); line-height: 1.02; letter-spacing: -.035em; }
+.auth-welcome h1 { max-width: 12ch; margin: 4px 0 0; color: var(--porcelain); font-size: clamp(40px, 5vw, 62px); line-height: 1.02; letter-spacing: -.035em; }
 .auth-lede { max-width: 44ch; margin: 0; color: rgb(255 255 255 / .82); font-size: 17px; line-height: 1.55; }
 .auth-points { display: grid; gap: 10px; margin: 10px 0 0; padding: 0; list-style: none; }
 .auth-points li { display: flex; align-items: center; gap: 12px; color: rgb(255 255 255 / .92); font-size: 15px; }
@@ -468,14 +467,13 @@ body.is-dragging-meal .meal-end-drop { border-color: var(--rule); color: var(--m
   .auth-page:not(.auth-page-solo) { display: flex; flex-direction: column; justify-content: center; min-height: 100dvh; padding: 30px 22px calc(30px + env(safe-area-inset-bottom)); background: var(--captain); }
   .auth-page:not(.auth-page-solo) .auth-welcome { align-items: center; gap: 16px; padding: 0; border-radius: 0; text-align: center; }
   .auth-badge { width: 112px; }
-  .auth-welcome h1 { font-size: 36px; line-height: 1.04; }
+  .auth-welcome h1 { font-size: 40px; line-height: 1.04; }
   .auth-lede { max-width: 30ch; font-size: 15px; }
   .auth-points { display: none; }
   .auth-page:not(.auth-page-solo) .sign-in-panel { width: 100%; padding: 30px 0 0; }
   .auth-page:not(.auth-page-solo) .sign-in-card { width: 100%; align-items: center; gap: 6px; padding: 0; border-radius: 0; background: transparent; box-shadow: none; text-align: center; }
   /* Nothing but the badge, the welcome, and the button. The panel heading
      stays in the accessibility tree so its region keeps a name. */
-  .auth-page:not(.auth-page-solo) .auth-wordmark,
   .auth-page:not(.auth-page-solo) .auth-lede,
   .auth-page:not(.auth-page-solo) .sign-in-card > p:not(.auth-status) { display: none; }
   .auth-page:not(.auth-page-solo) .sign-in-card h2 { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap; }
