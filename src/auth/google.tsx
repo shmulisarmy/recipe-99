@@ -2,6 +2,7 @@ import { Show, createContext, createEffect, createSignal, onMount, useContext, t
 import { useQuery } from "convex-solidjs";
 import { api } from "../../convex/_generated/api";
 import { convexClient } from "../convex_client";
+import { Icon } from "../components/ui";
 
 type GoogleCredentialResponse = {
     credential: string;
@@ -147,7 +148,7 @@ function AuthenticatedApp(props: { children: JSX.Element; onSignOut(): void }) {
         <AuthContext.Provider value={{ identity: identity.data, signOut: props.onSignOut }}>
             <Show
                 when={!identity.error()}
-                fallback={<main class="auth-page"><section class="sign-in-panel"><h1>Sign-in could not be confirmed.</h1><p>Return to sign-in and try again.</p><button class="button button-primary" type="button" onClick={props.onSignOut}>Return to sign-in</button></section></main>}
+                fallback={<main class="auth-page auth-page-solo"><section class="sign-in-panel"><div class="sign-in-card"><h1>Sign-in could not be confirmed.</h1><p>Return to sign-in and try again.</p><button class="button button-primary" type="button" onClick={props.onSignOut}>Return to sign-in</button></div></section></main>}
             >
                 {props.children}
             </Show>
@@ -223,7 +224,7 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     });
 
     createEffect(() => {
-        if (!isAuthenticated()) document.title = "Sign in — Recipe 99";
+        if (!isAuthenticated()) document.title = "Sign in — Captain Cook";
     });
 
     createEffect(() => {
@@ -241,19 +242,27 @@ export function GoogleAuthGate(props: { children: JSX.Element }) {
     return (
         <Show when={isAuthenticated()} fallback={
             <main class="auth-page" id="main">
-                <section class="auth-thesis" aria-labelledby="sign-in-title">
-                    <a class="wordmark auth-wordmark" href="/sign-in"><img class="wordmark-mark" src="/brand/captain-cook.png" alt="" width="256" height="256"/>Recipe 99</a>
-                    <h1 id="sign-in-title">Plan meals from what’s already in your kitchen.</h1>
-                    <p>Recipe 99 connects your pantry, recipes, calendar, and shopping needs.</p>
-                    <div class="auth-chain" aria-hidden="true"><span>Planner</span><span>Recipes</span><span>Pantry</span><span>Intake</span></div>
+                <section class="auth-welcome" aria-labelledby="sign-in-title">
+                    <img class="auth-badge" src="/brand/captain-cook.png" alt="" width="256" height="256"/>
+                    <p class="auth-wordmark">Captain Cook</p>
+                    <h1 id="sign-in-title">Welcome aboard.</h1>
+                    <p class="auth-lede">Plan the week from what is already in your kitchen. Captain Cook keeps the pantry, the recipes, and each day’s shopping in one plan.</p>
+                    <ul class="auth-points">
+                        <li><span class="auth-point-icon"><Icon name="calendar"/></span><span><strong>Plan</strong> meals day by day</span></li>
+                        <li><span class="auth-point-icon"><Icon name="pantry"/></span><span><strong>See</strong> what each meal still needs</span></li>
+                        <li><span class="auth-point-icon"><Icon name="cart"/></span><span><strong>Shop</strong> for the gaps, nothing more</span></li>
+                    </ul>
                 </section>
                 <section class="sign-in-panel" aria-labelledby="sign-in-panel-title">
-                    <h2 id="sign-in-panel-title">Sign in to your kitchen plan</h2>
-                    <p>Your pantry, recipes, and shopping amounts stay with your account.</p>
-                    <div class="google-button-slot" classList={{ "is-loading": googleState() === "loading", "is-failed": googleState() === "failed" }} ref={googleButton}/>
-                    <Show when={googleState() === "loading"}><p class="auth-status">Loading Google sign-in…</p></Show>
-                    <Show when={isSigningIn()}><p class="auth-status" aria-live="polite">Signing in…</p></Show>
-                    <Show when={authError()}>{(message) => <div ref={errorNotice} class="inline-notice notice-error" role="alert" tabindex="-1"><p>{message()}</p><Show when={googleState() === "failed" && !!GOOGLE_CLIENT_ID}><button class="button button-secondary" type="button" onClick={() => { setGoogleState("loading"); setAuthError(undefined); void setupGoogle(); }}>Try again</button></Show></div>}</Show>
+                    <div class="sign-in-card">
+                        <h2 id="sign-in-panel-title">Sign in to your kitchen</h2>
+                        <p>Your pantry, recipes, and shopping amounts stay with your account.</p>
+                        <div class="google-button-slot" classList={{ "is-loading": googleState() === "loading", "is-failed": googleState() === "failed" }} ref={googleButton}/>
+                        <Show when={googleState() === "loading"}><p class="auth-status">Loading Google sign-in…</p></Show>
+                        <Show when={isSigningIn()}><p class="auth-status" aria-live="polite">Signing in…</p></Show>
+                        <Show when={authError()}>{(message) => <div ref={errorNotice} class="inline-notice notice-error" role="alert" tabindex="-1"><p>{message()}</p><Show when={googleState() === "failed" && !!GOOGLE_CLIENT_ID}><button class="button button-secondary" type="button" onClick={() => { setGoogleState("loading"); setAuthError(undefined); void setupGoogle(); }}>Try again</button></Show></div>}</Show>
+                        <p class="auth-footnote">Signing in uses your Google account. Nothing is shared with anyone else.</p>
+                    </div>
                 </section>
             </main>
         }>

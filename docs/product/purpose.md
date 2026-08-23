@@ -2,7 +2,7 @@
 
 ## Product purpose
 
-Recipe 99 is a personal meal-planning workspace that connects four everyday questions:
+Captain Cook is a personal meal-planning workspace that connects four everyday questions:
 
 1. What food do I have?
 2. What can I make with it?

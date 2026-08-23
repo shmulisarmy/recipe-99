@@ -15,8 +15,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Meal Planner',
-        short_name: 'Meal Planner',
+        name: 'Captain Cook',
+        short_name: 'Captain Cook',
         description: 'Plan meals from your pantry and keep each day\'s shopping needs in sync.',
         theme_color: '#f3f6f2',
         background_color: '#f3f6f2',

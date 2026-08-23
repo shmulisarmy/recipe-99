@@ -1,6 +1,6 @@
-# Recipe 99 product functionality
+# Captain Cook product functionality
 
-This directory is the durable product behavior contract for Recipe 99.
+This directory is the durable product behavior contract for Captain Cook.
 
 - [Purpose and people](purpose.md) — product purpose, primary user, core loop, and authentication.
 - [Workflows](workflows.md) — pantry, intake, recipes, planner, and shopping-cart behavior.

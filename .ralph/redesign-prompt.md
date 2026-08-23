@@ -1,4 +1,4 @@
-# Recipe 99 autonomous redesign iteration
+# Captain Cook autonomous redesign iteration
 
 You are one fresh iteration in an incremental UI/UX redesign of an existing working SolidJS + Convex application.
 

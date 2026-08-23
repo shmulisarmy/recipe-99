@@ -1,8 +1,8 @@
-# Recipe 99 design specification
+# Captain Cook design specification
 
-Status: implementation-ready presentation specification for the fixed [Recipe 99 product contract](../product/README.md).
+Status: implementation-ready presentation specification for the fixed [Captain Cook product contract](../product/README.md).
 
-Recipe 99 is a calm, sturdy, highly legible household-kitchen utility. Its single visual job is to make the relationship between pantry, recipe readiness, planned meal order, and shopping remainder easy to scan and act on.
+Captain Cook is a calm, sturdy, highly legible household-kitchen utility. Its single visual job is to make the relationship between pantry, recipe readiness, planned meal order, and shopping remainder easy to scan and act on.
 
 ## Specification index
 

@@ -264,7 +264,7 @@ export function DayDetail(props: {
             <details class="disclosure">
               <summary>How readiness works</summary>
               <p>
-                Recipe 99 looks ahead in date and meal order. It adds what is
+                Captain Cook looks ahead in date and meal order. It adds what is
                 still expected from each day’s cart, then subtracts ingredients
                 as planned meals use them.
               </p>

@@ -1,6 +1,6 @@
 # Purpose
 
-Own the durable product and presentation contracts for Recipe 99, plus static checkpoints used to evaluate the redesign before implementation.
+Own the durable product and presentation contracts for Captain Cook, plus static checkpoints used to evaluate the redesign before implementation.
 
 # Ownership
 

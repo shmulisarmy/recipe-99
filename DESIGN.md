@@ -1,6 +1,6 @@
-# Recipe 99 design direction
+# Captain Cook design direction
 
-Recipe 99 is an Operate-mode household kitchen tool. The interface should disappear into planning while making one unusual relationship unmistakable: pantry on hand → recipe readiness → planned order → day shopping need.
+Captain Cook is an Operate-mode household kitchen tool. The interface should disappear into planning while making one unusual relationship unmistakable: pantry on hand → recipe readiness → planned order → day shopping need.
 
 Detailed route and component contracts live in `docs/design/`. This file is the durable top-level direction future redesign iterations must read first.
 

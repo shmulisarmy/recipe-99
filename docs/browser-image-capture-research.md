@@ -20,7 +20,7 @@ The user must initiate the file control. The capture specification expects the o
 
 ## When a custom live preview is justified
 
-Use `getUserMedia()` only if Recipe 99 needs an in-app viewfinder or custom controls such as a receipt guide, crop overlay, torch control, or repeated captures without leaving the page. That flow should:
+Use `getUserMedia()` only if Captain Cook needs an in-app viewfinder or custom controls such as a receipt guide, crop overlay, torch control, or repeated captures without leaving the page. That flow should:
 
 1. Start only after a user action and request `video` with an `environment` facing-mode preference and no audio.
 2. Show the returned stream in a visible, inline `<video>` preview.

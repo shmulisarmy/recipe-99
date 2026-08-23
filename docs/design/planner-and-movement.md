@@ -74,7 +74,7 @@ Planner readiness presents the fixed chronological projection:
 
 The Day Ticket has a quiet `How readiness works` disclosure:
 
-`Recipe 99 looks ahead in date and meal order. It adds what is still expected from each day’s cart, then subtracts ingredients as planned meals use them.`
+`Captain Cook looks ahead in date and meal order. It adds what is still expected from each day’s cart, then subtracts ingredients as planned meals use them.`
 
 ## Planned-recipe detail
 

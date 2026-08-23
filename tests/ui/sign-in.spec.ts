@@ -22,12 +22,14 @@ test("sign-in presents the product and stays free of browser errors", async ({ p
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Plan meals from what’s already in your kitchen.",
+      name: "Welcome aboard.",
     }),
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Sign in to your kitchen plan" }),
+    page.getByRole("region", { name: "Sign in to your kitchen" }),
   ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Welcome aboard." })).toBeVisible();
+  await expect(page.locator(".auth-badge")).toBeVisible();
   await expect(page.locator("body")).not.toHaveCSS("overflow-x", "scroll");
   expect(errors).toEqual([]);
 });

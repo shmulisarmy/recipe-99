@@ -15,7 +15,7 @@ Avoid repeated eyebrow, breadcrumb, title, and support labels that say the same 
 Above 900px, use two columns: the product thesis and a quiet sign-in panel. Below it, use one column.
 
 - heading: `Plan meals from what’s already in your kitchen.`
-- support: `Recipe 99 connects your pantry, recipes, calendar, and shopping needs.`
+- support: `Captain Cook connects your pantry, recipes, calendar, and shopping needs.`
 - preserve Google's rendered `Sign in with Google` control.
 - loading: reserve the button area and show `Loading Google sign-in…`.
 - missing configuration: `Google sign-in is not configured for this app.`

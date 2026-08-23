@@ -15,7 +15,7 @@
 | `/pantry` | Pantry ledger and inline amount editing. |
 | `/intake` | Batch review workspace. |
 | `/intake/reconcile` | Separate second-step reconciliation workspace. Direct entry without a live handoff returns to `/intake` with guidance. |
-| `*` | `That page is not in Recipe 99` and `Go to planner`. |
+| `*` | `That page is not in Captain Cook` and `Go to planner`. |
 
 Opening and closing a route-owned overlay updates browser history. Back closes the overlay before leaving its owning destination.
 
@@ -46,7 +46,7 @@ On desktop viewports around 1600px and wider, Planner uses the available shell w
 
 ```text
 ┌──────────────┬──────────────────────────────────────────────────────┐
-│ Recipe 99    │ August 2026                            Account      │
+│ Captain Cook    │ August 2026                            Account      │
 │ Planner      ├──────────────────────────────────────────────────────┤
 │ Recipes      │ ┌──────────────────────────┐ ┌─────────────────────┐ │
 │ Pantry       │ │ current-month calendar   │ │ Wed, Aug 5         │ │
@@ -61,7 +61,7 @@ On desktop viewports around 1600px and wider, Planner uses the available shell w
 
 ```text
 ┌───────────────────────────┐
-│ Recipe 99         Account │
+│ Captain Cook         Account │
 ├───────────────────────────┤
 │ August 2026               │
 │ S  M  T  W  T  F  S       │

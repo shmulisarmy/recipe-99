@@ -8,11 +8,11 @@ web
 
 ## Users
 
-Recipe 99 is for a person planning meals for themselves, a household, or guests. They use it while moving between pantry inventory, recipe choice, a dated meal plan, and shopping. Their job is to make a credible plan without manually recalculating ingredient quantities after every change.
+Captain Cook is for a person planning meals for themselves, a household, or guests. They use it while moving between pantry inventory, recipe choice, a dated meal plan, and shopping. Their job is to make a credible plan without manually recalculating ingredient quantities after every change.
 
 ## Product Purpose
 
-Recipe 99 connects four everyday questions:
+Captain Cook connects four everyday questions:
 
 1. What food is already in the kitchen?
 2. What recipes can be made from it?
@@ -23,7 +23,7 @@ Success means the user can keep inventory accurate, choose feasible recipes, arr
 
 ## Positioning
 
-Recipe 99 is not a recipe magazine or a generic calendar. Its distinctive mechanism is a chronological pantry projection: each day's outstanding shopping is added before that day's meals, planned recipes then consume projected inventory in order, and readiness reflects the resulting future state rather than only today's pantry snapshot.
+Captain Cook is not a recipe magazine or a generic calendar. Its distinctive mechanism is a chronological pantry projection: each day's outstanding shopping is added before that day's meals, planned recipes then consume projected inventory in order, and readiness reflects the resulting future state rather than only today's pantry snapshot.
 
 ## Operating Context
 
@@ -52,9 +52,9 @@ The product is a responsive authenticated web application used on desktop and mo
 
 ## Brand Commitments
 
-- Product name: Recipe 99.
+- Product name: Captain Cook.
 - Voice: plain, specific household language; active verbs; no marketing hype.
-- Existing wordmark: the `99` mark paired with “Recipe 99.”
+- Existing wordmark: the `99` mark paired with “Captain Cook.”
 - Product vocabulary: Pantry, Recipes, Planner, Intake, Day Ticket, Ready, Missing, Amount to make, and shopping cart.
 
 ## Evidence on Hand

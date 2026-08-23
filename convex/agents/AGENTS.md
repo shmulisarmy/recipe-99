@@ -1,6 +1,6 @@
 # Purpose
 
-Own Recipe 99's named AI Agents and Agent-adjacent storage boundaries.
+Own Captain Cook's named AI Agents and Agent-adjacent storage boundaries.
 
 # Ownership
 

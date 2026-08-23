@@ -2,7 +2,7 @@
 
 ## Concrete subject
 
-Recipe 99 is a working household-kitchen planner for a person arranging meals for themselves, a household, or guests. It is not a recipe magazine, restaurant system, grocery storefront, or general productivity dashboard.
+Captain Cook is a working household-kitchen planner for a person arranging meals for themselves, a household, or guests. It is not a recipe magazine, restaurant system, grocery storefront, or general productivity dashboard.
 
 The authenticated application's single job is:
 

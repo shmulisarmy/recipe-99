@@ -1,4 +1,4 @@
-# Recipe 99 design examples
+# Captain Cook design examples
 
 These are disposable, static visual checkpoints for the design specification. They use sample data, contain no application code or persistence, and load no remote assets. Recipe artwork and interface icons are local SVG files so every checkpoint remains reviewable offline.
 

@@ -1,6 +1,6 @@
 # Functional invariants
 
-This is the regression contract for the Recipe 99 redesign. Presentation may change; the behavior below must remain available, discoverable, and semantically equivalent.
+This is the regression contract for the Captain Cook redesign. Presentation may change; the behavior below must remain available, discoverable, and semantically equivalent.
 
 ## Authentication and shell
 

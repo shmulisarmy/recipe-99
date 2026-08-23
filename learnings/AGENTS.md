@@ -1,6 +1,6 @@
 # Purpose
 
-Own educational artifacts derived from Recipe 99 work without making them part of the runtime application contract.
+Own educational artifacts derived from Captain Cook work without making them part of the runtime application contract.
 
 # Ownership
 
