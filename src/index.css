@@ -447,6 +447,7 @@ body.is-dragging-meal .meal-end-drop { border-color: var(--rule); color: var(--m
   .auth-welcome h1 { max-width: none; font-size: 40px; }
   .auth-lede { max-width: none; font-size: 16px; }
   .sign-in-panel { width: min(100%, 560px); justify-self: center; padding: 26px 24px 44px; }
+  .auth-page-solo { align-content: center; }
 }
 @media (max-width: 767px) {
   .topbar { min-height: 56px; padding: 6px 16px; }
@@ -463,12 +464,23 @@ body.is-dragging-meal .meal-end-drop { border-color: var(--rule); color: var(--m
   .button, .icon-button, .input, .select, .toggle { min-height: 44px; }
   .section-head { align-items: stretch; flex-direction: column; }
   .inline-notice { align-items: flex-start; flex-direction: column; }
-  .auth-welcome { padding: 36px 20px 34px; }
-  .auth-badge { width: 84px; }
-  .auth-welcome h1 { font-size: 34px; line-height: 1.06; }
-  .auth-points li { font-size: 14px; }
-  .auth-point-icon { width: 34px; height: 34px; }
-  .sign-in-panel { padding: 22px 16px calc(32px + env(safe-area-inset-bottom)); }
+  /* A phone gets one navy screen with the sign-in centred in it. */
+  .auth-page:not(.auth-page-solo) { display: flex; flex-direction: column; justify-content: center; min-height: 100dvh; padding: 30px 22px calc(30px + env(safe-area-inset-bottom)); background: var(--captain); }
+  .auth-page:not(.auth-page-solo) .auth-welcome { align-items: center; gap: 12px; padding: 0; border-radius: 0; text-align: center; }
+  .auth-badge { width: 96px; }
+  .auth-welcome h1 { font-size: 36px; line-height: 1.04; }
+  .auth-lede { max-width: 30ch; font-size: 15px; }
+  .auth-points { display: none; }
+  .auth-page:not(.auth-page-solo) .sign-in-panel { width: 100%; padding: 24px 0 0; }
+  .auth-page:not(.auth-page-solo) .sign-in-card { width: 100%; align-items: center; gap: 6px; padding: 0; border-radius: 0; background: transparent; box-shadow: none; text-align: center; }
+  .auth-page:not(.auth-page-solo) .sign-in-card h2 { color: var(--porcelain); font-size: 19px; }
+  .auth-page:not(.auth-page-solo) .sign-in-card > p:not(.auth-footnote) { display: none; }
+  .auth-page:not(.auth-page-solo) .google-button-slot { display: flex; justify-content: center; margin-top: 16px; }
+  .auth-page:not(.auth-page-solo) .google-button-slot.is-loading { background: rgb(255 255 255 / .14); }
+  .auth-page:not(.auth-page-solo) .auth-status { color: rgb(255 255 255 / .74); }
+  .auth-page:not(.auth-page-solo) .auth-footnote { max-width: 34ch; border-top-color: rgb(255 255 255 / .18); color: rgb(255 255 255 / .68); }
+  .auth-page:not(.auth-page-solo) .inline-notice { border-radius: 12px; background: var(--porcelain); text-align: left; }
+  .auth-page-solo .sign-in-panel { padding: 22px 16px calc(32px + env(safe-area-inset-bottom)); }
 
   .filters { align-items: stretch; flex-direction: column; }
   .toggle { width: 100%; }
