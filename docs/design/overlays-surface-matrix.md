@@ -4,9 +4,10 @@ Use surfaces by task consequence, not by component convenience.
 
 | Task | Desktop | Mobile | Scrim |
 | --- | --- | --- | --- |
-| Planned-recipe detail | Right drawer, 560-620px | Full-height drawer | Light inspection scrim |
+| Selected planner day | Centered compact modal, up to 620px | Bottom sheet, maximum 72dvh, above primary navigation | Strong transaction scrim |
+| Planned-recipe detail | Right drawer, 520-600px | Tall bottom sheet between the top bar and primary navigation | Light inspection scrim |
 | Recipe-library detail | Right drawer, 560px | Full-height drawer | Light inspection scrim |
-| Shopping-cart editing | Centered modal, 720px at rest and up to 760px with drafts | Full-height modal | Strong transaction scrim |
+| Shopping-cart editing | Centered modal, 720px at rest and up to 760px with drafts | Bottom sheet, maximum 72dvh, above primary navigation | Strong transaction scrim |
 | Move meal | Compact centered modal, about 520px | Bottom sheet, maximum 85dvh | Strong transaction scrim |
 | Amount to make | Anchored popover, about 320px | Bottom sheet | Light scrim only on mobile |
 | Convert unit | Anchored popover, about 360px | Bottom sheet | Light scrim only on mobile |
@@ -33,9 +34,11 @@ All overlays:
 - keep header and footer fixed while the drawer or modal body flexes and scrolls;
 - account for bottom safe area in mobile footers.
 
+The selected-day, planned-recipe, and shopping-cart planner routes are sibling modal states over the Planner base surface. Opening recipe or cart detail from a day replaces the day modal instead of stacking dialogs; closing the nested route returns to the selected-day route.
+
 ## Shopping-cart modal
 
-Title: `Shopping for {day label}`. Summary: `{obtained count} of {item count} items complete`.
+Title: `Shopping Cart`. Subtitle: `{day label} · {obtained count} of {item count} complete`.
 
 Each row shows ingredient, To get, Obtained, numeric percent, progress bar, and target edit affordance. Progress is obtained divided by target after unit normalization, clamped to 0-100%; target zero is 100%.
 

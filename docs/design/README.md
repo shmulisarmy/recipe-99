@@ -6,11 +6,11 @@ Recipe 99 is a calm, sturdy, highly legible household-kitchen utility. Its singl
 
 ## Specification index
 
-- [Direction](direction.md) — subject, principles, visual character, and the selected-day signature.
+- [Direction](direction.md) — subject, principles, visual character, and the Planner's calendar-to-modal composition.
 - [Routes and responsive layout](routes-responsive-layout.md) — Solid Router destinations, shell modes, and wireframes.
 - [Tokens](tokens.md) — palette, typography, spacing, surfaces, iconography, and density.
 - [Shell and shared components](shell-shared-components.md) — authentication, navigation, primitives, and state presentation.
-- [Planner and movement](planner-and-movement.md) — calendar, Day Ticket, servings, recipe detail, drag-and-drop, keyboard, and touch.
+- [Planner and movement](planner-and-movement.md) — calendar, shopping preview, selected-day modal, servings, recipe detail, drag-and-drop, keyboard, and touch.
 - [Recipes](recipes.md) — search, filtering, cards, details, and empty/error states.
 - [Pantry and intake](pantry-and-intake.md) — inline pantry editing and sequential batch/reconciliation pages.
 - [Overlay surface matrix](overlays-surface-matrix.md) — drawers, modals, popovers, sheets, and dismissal rules.

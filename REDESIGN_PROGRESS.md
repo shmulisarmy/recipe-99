@@ -30,7 +30,7 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 - The routed shell already establishes Planner, Recipes, Pantry, and Intake as distinct destinations.
 - Recipes has effective imagery, search, readiness status, result counts, and desktop/mobile structural changes.
 - Pantry uses a clear flat ledger and reflows into labeled mobile rows.
-- Planner exposes a rich accessible date summary and a selected-day Day Ticket.
+- Planner exposes a rounded thumbnail calendar, an accessible date summary, a selected-day shopping preview, and coordinated route-owned day, recipe, and cart modals.
 - The existing `docs/product/` and `docs/design/` contracts are unusually detailed and should remain the deeper source of truth.
 
 ## Current problems
@@ -41,7 +41,6 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ### Significant follow-ups
 
-- Planner cell metadata is compact enough that icon meaning and counts require learning; selected-day context must carry more of the explanatory burden.
 - Pantry mobile action rows split a strong outlined Edit action and a much quieter Convert action without a clear shared action rhythm.
 - Intake still needs an explicit camera-permission failure state. Preserve capture, OCR, upload, Agent, and handoff semantics when addressing it.
 - Impeccable's baseline detector reports four warnings in `src/index.css`: two side-accent borders (`.inline-notice` and `.cart-match`) and two width transitions (`.progress > span` and the widened cart modal). Evaluate them in context rather than mechanically changing all four.
@@ -51,7 +50,7 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 - This is an incremental redesign of an existing routed system, not a new visual identity.
 - `docs/design/` remains the detailed presentation contract. Root `DESIGN.md` is the autonomous loop's concise entry point.
 - The visual world remains the light six-color enamel system. Do not infer a dark-theme redesign from the authenticated Chrome profile's rendering treatment.
-- The Day Ticket remains the signature surface and authoritative selected-day control center.
+- The Planner calendar remains the authoritative base surface; a route-owned selected-day modal is the focused control center for people, ordered meals, readiness, shopping progress, and movement.
 - Intake is the first redesign target because it is structurally incomplete and accessibility-poor, not because it needs decorative polish.
 - No backend, domain, measurement, persistence, or API changes are authorized for visual convenience.
 
@@ -70,6 +69,11 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 2. Run an accessibility and interaction audit across overlays, focus restoration, and route-change warnings.
 
 ## Iteration log
+
+### Planner reference rebuild documentation — 2026-08-23
+
+- Reconciled the durable planner design contract with the implemented reference-image rebuild across `a98d7c5`, `68898ea`, `9d0855b`, and `5fe2443`: the closed route is now a thumbnail calendar plus shopping preview, selecting a date opens a route-owned day modal, and recipe/cart routes use the coordinated modal family without stacking over the day surface.
+- Preserved planner behavior and mutation semantics; this pass changed documentation only. Source, commit, reference-image, Markdown-link, and diff checks were used as evidence. Authenticated browser verification remains blocked because the available preview is signed out.
 
 ### Overlay keyboard contract: conversion popover + ConfirmDialog — 2026-08-16
 

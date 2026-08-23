@@ -6,10 +6,10 @@
 | --- | --- |
 | `/` | Redirect authenticated users to `/planner` and unauthenticated users to `/sign-in`. |
 | `/sign-in` | Google sign-in. Successful authentication enters the planner. |
-| `/planner` | Current-month planner with today selected in the UI. |
-| `/planner/day/:date` | Planner with the selected date reflected in the Day Ticket. `:date` is local-calendar `YYYY-MM-DD`. |
-| `/planner/day/:date/recipe/:plannedRecipeId` | Planned-recipe right drawer over the selected planner day. |
-| `/planner/day/:date/cart` | Centered shopping-cart modal over the selected planner day. |
+| `/planner` | Current-month calendar and today's compact shopping preview. |
+| `/planner/day/:date` | Selected-day modal over the Planner base surface. `:date` is local-calendar `YYYY-MM-DD`. |
+| `/planner/day/:date/recipe/:plannedRecipeId` | Planned-recipe drawer over the Planner base surface; it replaces rather than stacks over the day modal. |
+| `/planner/day/:date/cart` | Shopping-cart modal over the Planner base surface; it replaces rather than stacks over the day modal. |
 | `/recipes` | Recipe library. Search and ready-only state use `?q=...&ready=1`. |
 | `/recipes/:recipeKey` | Recipe-library right drawer; `:recipeKey` is encoded `title@version`. |
 | `/pantry` | Pantry ledger and inline amount editing. |
@@ -38,23 +38,23 @@ Shopping is reached through a planner day because each cart belongs to a date.
 | `768-1099px` | 64px top identity bar and horizontal route navigation | 20px gutters; single main column. |
 | `< 768px` | 56px top bar and fixed 64px bottom navigation | 16px gutters plus safe-area and bottom-navigation padding. |
 
-The planner's calendar and 320px Day Ticket sit side by side only when the viewport is approximately 1280px or wider. Between 768px and that threshold, the Day Ticket follows the full-width calendar. At 200% zoom, allow the layout to enter a smaller mode rather than forcing horizontal page scrolling.
+The planner's calendar and shopping-list preview sit side by side at 1200px and wider. Below that threshold, the preview follows the full-width calendar. At 200% zoom, allow the layout to enter a smaller mode rather than forcing horizontal page scrolling.
 
 ## Wide planner
 
-On desktop viewports around 1600px and wider, Planner uses the available shell width up to 1600px instead of the ordinary 1440px route cap. The extra width belongs to the month calendar while the Day Ticket stays at 320px, preserving the selected-day authority without stranding the planning workspace in the center of the screen.
+On desktop viewports around 1600px and wider, Planner uses the available shell width up to 1600px instead of the ordinary 1440px route cap. The calendar receives the larger share of the two-column base layout while the shopping preview remains compact.
 
 ```text
-┌──────────────┬──────────────────────────────────────────────────────┐
-│ Recipe 99    │ August 2026                            Account      │
-│ Planner      ├──────────────────────────────────────────────────────┤
+┌──────────────┬───────────────────────────────────────────────────────┐
+│ Recipe 99    │ Meal Schedule                           Account      │
+│ Planner      ├────────────────────────────────────────────────────────┤
 │ Recipes      │ ┌──────────────────────────┐ ┌─────────────────────┐ │
-│ Pantry       │ │ current-month calendar   │ │ Wed, Aug 5         │ │
-│ Intake       │ │ max 2 meals per day      │ │ People 3           │ │
-│              │ │ then +n                  │ │ all 5 meals        │ │
-│              │ │                          │ │ readiness + cart   │ │
+│ Pantry       │ │ current-month calendar   │ │ Shopping List       │ │
+│ Intake       │ │ up to 3 thumbnails      │ │ first 4 items       │ │
+│              │ │ then +n                  │ │ then +n            │ │
+│              │ │                          │ │ Start Shopping      │ │
 │              │ └──────────────────────────┘ └─────────────────────┘ │
-└──────────────┴──────────────────────────────────────────────────────┘
+└──────────────┴─────────────────────────────────────────────────────────┘
 ```
 
 ## Mobile planner
@@ -63,21 +63,22 @@ On desktop viewports around 1600px and wider, Planner uses the available shell w
 ┌───────────────────────────┐
 │ Recipe 99         Account │
 ├───────────────────────────┤
-│ August 2026               │
-│ S  M  T  W  T  F  S       │
-│       3  4 [5] 6  7       │
-│       check 4 warn 1      │
-│                           │
+│ Meal Schedule  Plan Meal │
 │ ┌───────────────────────┐ │
-│ │ Wed, Aug 5  People 3  │ │ ← non-modal bottom sheet
-│ │ all meals + actions   │ │
-│ │ shopping progress     │ │
+│ │ August 2026           │ │
+│ │ S  M  T  W  T  F  S   │ │
+│ │    [recipe thumbnails]│ │
+│ └───────────────────────┘ │
+│ ┌───────────────────────┐ │
+│ │ Shopping List         │ │
+│ │ first 4 items + more  │ │
+│ │ Start Shopping        │ │
 │ └───────────────────────┘ │
 ├───────────────────────────┤
 │ Planner Recipes Pantry +  │
 └───────────────────────────┘
 ```
 
-Mobile calendar cells are at least 52px high and remain within seven equal columns. At 320px, the calendar alone may span through the 16px content gutters so every date target remains at least 44 by 44px without horizontal page scrolling; the fixed Day Ticket stays aligned to the normal gutters above the bottom navigation. Cells show a day number plus complete Ready and Missing shape-and-count totals such as check `4` and warning `1`; there is no `+n`, and color is supplementary. Meal names, touch handles, and all actions live in the internally scrolling Day Ticket.
+Mobile calendar cells are about 71px high and use the same thumbnail language as desktop. At 385px and below, the calendar card owns an internal horizontal scroll area with a 344px calendar minimum; the page itself does not scroll horizontally. The shopping preview follows the calendar. Selecting a date opens a bottom sheet up to 72dvh that clears the fixed navigation; meal names, readiness, touch handles, and all actions live in its internally scrolling body.
 
 Recipes are three columns only when content width supports them, two at intermediate widths, and one on mobile. Pantry remains a ledger that reflows into labeled rows. Intake and reconciliation are separate full-page, single-column workspaces on mobile.

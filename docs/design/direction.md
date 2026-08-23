@@ -27,11 +27,11 @@ The palette takes its cues from cool enamel cookware and clean household prep su
 
 Typography supplies most of the personality. Atkinson Hyperlegible Next carries the interface. Chivo appears only in the wordmark and major headings. IBM Plex Mono appears only where alignment materially helps dates, order, quantities, and counts.
 
-## Signature element: selected-day Day Ticket
+## Planner signature: calendar into day modal
 
-The one signature element is the selected-day **Day Ticket**. The name describes its role, not a restaurant metaphor: it is the household's compact daily plan.
+The Planner's signature is the transition from a scannable current-month calendar into a focused selected-day modal. The closed route keeps the calendar authoritative and pairs it with a compact shopping-list preview for the selected date; choosing a date opens the complete daily plan without replacing or shrinking the calendar beneath it.
 
-It combines:
+The selected-day modal combines:
 
 - selected date;
 - number of people;
@@ -40,10 +40,10 @@ It combines:
 - shopping count and progress;
 - the full set of day actions.
 
-The surface has softly clipped 8px top corners, one quiet divider below its date, and the design system's only persistent lift shadow. Remove faux perforation, ticket numbering, and other decorative metaphor.
+Its meal rows use real recipe imagery, rounded bordered containers, and compact readiness labels. On desktop the day is a centered compact dialog; on mobile it becomes a bottom sheet that stops above primary navigation. Recipe and cart routes replace the day modal instead of stacking another surface over it.
 
-Placement is inline with the calendar only when the current shell leaves enough content width, approximately a 1280px viewport in the current 208px-navigation shell. At intermediate widths it follows the calendar. On mobile it remains fixed above primary navigation as a non-modal bottom sheet while the calendar stays visible.
+The Planner alone may use its reference-derived cool-blue page, cyan action, rounded calendar card, image thumbnails, and pale shopping panel as a route-scoped expression. These tokens do not replace the global enamel palette on Recipes, Pantry, Intake, or the shell.
 
 ## Uniqueness check
 
-The direction avoids warm editorial recipe-journal styling, dark neon dashboards, newspaper layouts, and generic KPI cards. Its specificity comes from the real relationship between day order, kitchen quantities, and shopping progress. The Day Ticket is the single expressive shape; every other surface stays restrained.
+The direction avoids warm editorial recipe-journal styling, dark neon dashboards, newspaper layouts, and generic KPI cards. Its specificity comes from the real relationship between day order, kitchen quantities, and shopping progress. Planner expression is concentrated in its calendar, shopping preview, and coordinated modal family; unrelated routes stay restrained.

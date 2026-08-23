@@ -55,7 +55,7 @@ The product is a responsive authenticated web application used on desktop and mo
 - Product name: Recipe 99.
 - Voice: plain, specific household language; active verbs; no marketing hype.
 - Existing wordmark: the `99` mark paired with “Recipe 99.”
-- Product vocabulary: Pantry, Recipes, Planner, Intake, Day Ticket, Ready, Missing, Amount to make, and shopping cart.
+- Product vocabulary: Pantry, Recipes, Planner, Intake, selected day, Ready, Missing, Amount to make, and shopping cart.
 
 ## Evidence on Hand
 

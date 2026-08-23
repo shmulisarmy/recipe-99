@@ -17,6 +17,25 @@ Standard rule is ink at 18%; muted text is ink at 68%; hover fill is enamel at 7
 
 Color never carries status alone. Ready uses a local check SVG and text; Missing uses a warning SVG and text; errors include explicit copy.
 
+### Planner-scoped expression
+
+Planner derives a route-local reference palette without changing the six global tokens:
+
+| Token | Hex | Use |
+| --- | --- | --- |
+| `--planner-page` | `#EEF7FB` | Planner page field. |
+| `--planner-surface` | `#FFFFFF` | Calendar, shopping preview, meal rows, and planner overlays. |
+| `--planner-ink` | `#14251D` | Planner text and strong scrims. |
+| `--planner-muted` | `#52645A` | Planner labels and supporting values. |
+| `--planner-action` | `#2C96AD` | Planner primary actions, focus accents, and progress. |
+| `--planner-action-deep` | `#247F94` | Planner action hover. |
+| `--planner-ready` | `#3F9655` | Selected dates and ready state. |
+| `--planner-ready-soft` | `#E9F5EC` | Quiet ready state. |
+| `--planner-rule` | `#DCE8DF` | Planner card and row boundaries. |
+| `--planner-action-soft` | `#E8F4F8` | Shopping preview and quiet action surfaces. |
+
+Planner uses 22px outer card corners, 15px calendar-cell corners, pill-shaped primary actions, and 20px planner-modal corners. Keep these values scoped to Planner; do not globalize them into Recipes, Pantry, Intake, or the shell.
+
 ## Typography
 
 Production self-hosts WOFF2 files. Offline examples use deliberate system fallbacks and require no downloads.
@@ -56,7 +75,7 @@ Mobile status summaries are 10-11px. Avoid pervasive uppercase and letter spacin
 - Do not use blur or translucent glass.
 - Inspection drawers use `0 12px 36px rgb(24 36 33 / 0.14)`.
 - Transaction modals use `0 18px 52px rgb(24 36 33 / 0.20)`.
-- The Day Ticket may use `0 4px 18px rgb(24 36 33 / 0.10)` as the one persistent lifted surface.
+- Planner's calendar and shopping preview stay bordered and unshadowed; selected-day, recipe, and cart overlays use modal or drawer elevation only while open.
 
 ## Icons
 

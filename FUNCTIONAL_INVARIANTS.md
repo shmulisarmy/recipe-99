@@ -43,8 +43,8 @@ This is the regression contract for the Recipe 99 redesign. Presentation may cha
 - The planner renders the current month with the leading and trailing dates needed to complete its weeks. The product does not currently promise month navigation.
 - Today and the selected date remain distinguishable.
 - Each planned day can expose its ordered recipes, recipe readiness, people count, and shopping-item count.
-- Selecting a date updates the authoritative selected-day Day Ticket and the route when appropriate.
-- On mobile, calendar cells keep compact complete Ready and Missing totals while full meal names and actions remain in the Day Ticket.
+- Selecting a date updates the route and opens the authoritative selected-day modal.
+- On mobile, calendar cells keep compact meal thumbnails while full meal names, readiness, and actions remain in the selected-day modal.
 - Date buttons retain keyboard calendar navigation and meaningful accessible summaries.
 
 ## Meal order and movement
@@ -53,7 +53,7 @@ This is the regression contract for the Recipe 99 redesign. Presentation may cha
 - Dropping a recipe on a date moves it to the beginning of that date.
 - Dropping on another recipe places it immediately before that recipe.
 - Dropping at a day's end marker places it last.
-- Dragging from desktop calendar summaries and Day Ticket rows remains supported where currently available.
+- Dragging from desktop calendar meal thumbnails and selected-day modal rows remains supported where currently available.
 - Keyboard lift/move/drop and an explicit Move meal surface remain equivalent alternatives to pointer or touch dragging.
 - Invalid, self, and same-position drops are no-ops. Failed persistence restores confirmed order and remains recoverable.
 

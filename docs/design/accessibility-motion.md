@@ -41,12 +41,12 @@ Target WCAG 2.2 AA.
 
 ## Motion
 
-Motion is concentrated on selected-day context and overlay entry:
+Motion is concentrated on overlay entry and direct state changes:
 
-- Day Ticket content change: 140ms opacity transition; the shell remains fixed.
+- Selected-day modal: 160ms overlay entry with at most 6px translation; the calendar beneath remains fixed.
 - Drawer/modal: 160ms opacity plus at most 6px translation; exit 120ms.
 - Drag lift: 100ms elevation change with no scale required.
 - Success check: one 120ms opacity transition.
 - No ambient motion, staggered cards, parallax, confetti, bounce, or skeleton shimmer.
 
-Under `prefers-reduced-motion: reduce`, remove translation, smooth scrolling, and pulsing; change selected day and overlay state immediately while preserving focus, pending, target, and success cues.
+Under `prefers-reduced-motion: reduce`, remove translation, smooth scrolling, and pulsing; open the selected day and change overlay state immediately while preserving focus, pending, target, and success cues.

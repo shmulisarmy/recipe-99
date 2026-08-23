@@ -19,7 +19,7 @@ The cultural home is household prep: enamel cookware, a clean counter, an annota
 
 The product has four primary destinations in fixed order: Planner, Recipes, Pantry, Intake. Shopping remains attached to a selected planner day because carts are date-owned.
 
-Planner is the home base. Its hierarchy is month → calendar → selected-day Day Ticket → focused meal/cart surface. The Day Ticket is the product's signature component and the bridge between meals, servings, readiness, and shopping.
+Planner is the home base. Its hierarchy is meal-schedule heading → current-month calendar and selected-day shopping preview → route-owned day, recipe, or cart modal. The calendar remains the authoritative base surface; opening a date moves the complete ordered plan, people control, readiness explanation, and cart progress into the selected-day modal.
 
 Recipes prioritizes search and readiness, then an image-led comparison stream. Pantry is a quantity ledger. Intake is a guided capture-and-review flow, not a bare camera or a generic form dashboard. Reconciliation is a separate second step.
 
@@ -36,7 +36,7 @@ Use a restrained light palette derived from cool enamel cookware and clean prep 
 | Ready | Parsley | `#347249` | Ready and success, always with text or shape |
 | Missing | Paprika | `#B84632` | Missing, invalid, destructive, always with explicit copy |
 
-Ordinary sections are flat. Separate them with whitespace, rules, or a quiet surface shift. Reserve persistent lift for the Day Ticket; use stronger shadows only for drawers and transactional dialogs. No glass, decorative gradients, glowing borders, nested cards, or status-filled cards.
+Ordinary sections are flat. Separate them with whitespace, rules, or a quiet surface shift; use stronger shadows only for drawers and transactional dialogs. The Planner may use its scoped cool-blue page, cyan action, rounded calendar, and shopping-preview surfaces from the committed reference world without changing the global six-color system elsewhere. No glass, decorative gradients, glowing borders, nested card collages, or status-filled cards.
 
 ## Typography
 
@@ -50,9 +50,9 @@ Ordinary sections are flat. Separate them with whitespace, rules, or a quiet sur
 
 Use a `4, 8, 12, 16, 24, 32, 48px` spacing rhythm. Default controls are 40px on desktop and 44px on touch. Ordinary radius is 8px; modal radius is 12px; mobile full-height overlays have no radius.
 
-Desktop uses a 208px left navigation, a 64px identity bar, and most content up to 1440px with 24px gutters. The Planner may expand to 1600px on wide desktop screens so the calendar and Day Ticket use the available planning workspace. Tablet uses top identity plus horizontal primary navigation and a single content column. Mobile uses a 56px top bar, 16px content gutters, and a fixed 64px bottom navigation with safe-area spacing.
+Desktop uses a 208px left navigation, a 64px identity bar, and most content up to 1440px with 24px gutters. The Planner may expand to 1600px on wide desktop screens so its calendar and shopping preview use the available planning workspace. Tablet uses top identity plus horizontal primary navigation and a single content column. Mobile uses a 56px top bar, 16px content gutters, and a fixed 64px bottom navigation with safe-area spacing.
 
-Responsive changes are structural. The planner calendar and 320px Day Ticket sit side by side only when space genuinely supports both. On mobile the calendar stays visible and the non-modal Day Ticket sits above—never under—the bottom navigation, with its own scrolling body.
+Responsive changes are structural. The planner calendar and shopping preview sit side by side only when space genuinely supports both; below 1200px the shopping preview follows the calendar. The selected-day surface is a centered compact modal on desktop and a bottom sheet above—never under—mobile navigation, with its own scrolling body.
 
 ## Component language
 
@@ -67,7 +67,7 @@ Responsive changes are structural. The planner calendar and 320px Day Ticket sit
 
 ## Interaction conventions
 
-- The selected day owns all planner actions. Calendar summaries remain scannable and do not grow on hover.
+- The selected-day modal owns meal, people, readiness, cart-progress, and movement actions. Calendar summaries remain scannable and do not grow on hover; the closed planner's shopping preview can open the cart directly.
 - Direct manipulation is additive: drag-and-drop, keyboard movement, touch movement, and explicit Move meal all reach the same result.
 - Pending and failure state stays at the initiating control or row; unrelated work remains available.
 - Search and filters update the URL without creating history on every keystroke.
