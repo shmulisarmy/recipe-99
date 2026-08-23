@@ -74,6 +74,7 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 - Reconciled the durable planner design contract with the implemented reference-image rebuild across `a98d7c5`, `68898ea`, `9d0855b`, and `5fe2443`: the closed route is now a thumbnail calendar plus shopping preview, selecting a date opens a route-owned day modal, and recipe/cart routes use the coordinated modal family without stacking over the day surface.
 - Preserved planner behavior and mutation semantics; this pass changed documentation only. Source, commit, reference-image, Markdown-link, and diff checks were used as evidence. Authenticated browser verification remains blocked because the available preview is signed out.
+- Leadership transfer details, the new Captain Cook logo conflict, unresolved visual gaps, and the required authenticated finish sequence now live in `PLANNER_REDESIGN_HANDOFF.md`.
 
 ### Overlay keyboard contract: conversion popover + ConfirmDialog — 2026-08-16
 
