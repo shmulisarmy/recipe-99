@@ -14,7 +14,7 @@ import {
   MoveMealModal,
   RecipeModal,
 } from "./planner_modals";
-import { Icon } from "../../../components/ui";
+import { Amount, Icon } from "../../../components/ui";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -364,10 +364,270 @@ export function Planner() {
   };
   onCleanup(clearTouchListeners);
 
+  const selectedCartEntries = () =>
+    Object.entries(selectedDay()?.shoppingCart.toGet ?? {});
+  const visibleCartEntries = () => selectedCartEntries().slice(0, 4);
+  const hiddenCartCount = () =>
+    Math.max(0, selectedCartEntries().length - visibleCartEntries().length);
+
   return (
-    <main class="main planner-page" id="main" aria-busy="true">
-      <h1>Planner</h1>
-      <p>Planner redesign in progress…</p>
+    <main class="main planner-page" id="main">
+      <header class="planner-heading">
+        <h1>Meal Schedule</h1>
+        <button class="planner-plan-button" type="button">
+          <Icon name="plus" />
+          Plan Meal
+        </button>
+      </header>
+
+      <Show when={planner.isLoading()}>
+        <div class="planner-loading" aria-live="polite">
+          <p>Loading your meal plan…</p>
+          <div class="skeleton skeleton-calendar" />
+        </div>
+      </Show>
+
+      <Show when={planner.error()}>
+        <div class="empty-state notice-error">
+          <h2>Your meal plan couldn’t load.</h2>
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={planner.refetch}
+          >
+            Try again
+          </button>
+        </div>
+      </Show>
+
+      <Show when={planner.data()}>
+        <Show when={moveError()}>
+          <div class="inline-notice notice-error" role="alert">
+            <p>{moveError()}</p>
+            <div class="notice-actions">
+              <Show when={pointerRetry()}>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  disabled={isRetryingMove()}
+                  onClick={() => void retryPointerMove()}
+                >
+                  {isRetryingMove() ? "Retrying…" : "Retry move"}
+                </button>
+              </Show>
+              <button
+                class="button button-quiet"
+                type="button"
+                onClick={() => {
+                  setMoveError("");
+                  setPointerRetry(undefined);
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </Show>
+
+        <div class="planner-base-layout">
+          <section class="planner-calendar-card" aria-labelledby="calendar-title">
+            <div class="planner-month-heading">
+              <h2 id="calendar-title">{monthTitle}</h2>
+              <Icon name="chevron" />
+            </div>
+            <div class="planner-calendar-scroll">
+            <table class="calendar" aria-label={`${monthTitle} meal plan`}>
+              <thead>
+                <tr>
+                  <For each={WEEKDAYS}>
+                    {(weekday) => (
+                      <th scope="col">
+                        <span class="weekday-long">{weekday}</span>
+                        <span class="weekday-short" aria-hidden="true">
+                          {weekday.slice(0, 3)}
+                        </span>
+                      </th>
+                    )}
+                  </For>
+                </tr>
+              </thead>
+              <tbody>
+                <For
+                  each={Array.from(
+                    { length: days.length / 7 },
+                    (_, row) => row,
+                  )}
+                >
+                  {(row) => (
+                    <tr>
+                      <For each={days.slice(row * 7, row * 7 + 7)}>
+                        {(date, column) => {
+                          const index = row * 7 + column();
+                          const dateStr = date.toDateString();
+                          const day = () => planner.data()?.[dateStr];
+                          return (
+                            <td>
+                              <DayCell
+                                date={date}
+                                inMonth={date.getMonth() === today.getMonth()}
+                                isToday={dateStr === today.toDateString()}
+                                selected={dateStr === selectedDateStr()}
+                                recipes={projection[dateStr] ?? []}
+                                cartCount={cartCount(dateStr)}
+                                peopleCount={day()?.multiplier}
+                                onSelectDay={() => selectDay(date)}
+                                onFocusKey={(event) =>
+                                  onDayFocusKey(index, event)
+                                }
+                                registerButton={(element) => {
+                                  dayButtons[index] = element;
+                                }}
+                                touchDropActive={
+                                  touchMove()?.targetDate === dateStr
+                                }
+                                onStartRecipeDrag={() => {
+                                  if (dateStr !== selectedDateStr())
+                                    selectDay(date);
+                                }}
+                                onMoveFailure={onPointerMoveFailure}
+                              />
+                            </td>
+                          );
+                        }}
+                      </For>
+                    </tr>
+                  )}
+                </For>
+              </tbody>
+            </table>
+            </div>
+          </section>
+
+          <section class="planner-shopping-card" aria-labelledby="shopping-title">
+            <header class="planner-shopping-heading">
+              <div>
+                <Icon name="cart" />
+                <h2 id="shopping-title">Shopping List</h2>
+              </div>
+              <span>
+                {selectedCartEntries().length}{" "}
+                {selectedCartEntries().length === 1 ? "item" : "items"}
+              </span>
+            </header>
+
+            <Show
+              when={selectedCartEntries().length > 0}
+              fallback={
+                <p class="planner-shopping-empty">
+                  Nothing to buy for this day.
+                </p>
+              }
+            >
+              <ul class="planner-shopping-list">
+                <For each={visibleCartEntries()}>
+                  {([name, measurement]) => (
+                    <li>
+                      <span>{name}</span>
+                      <Amount measurement={measurement} />
+                    </li>
+                  )}
+                </For>
+              </ul>
+              <Show when={hiddenCartCount() > 0}>
+                <p class="planner-shopping-more">
+                  + {hiddenCartCount()} more items
+                </p>
+              </Show>
+            </Show>
+
+            <div class="planner-shopping-actions">
+              <button
+                class="planner-shopping-action"
+                type="button"
+                onClick={openCart}
+              >
+                Start Shopping
+              </button>
+              <button class="planner-shopping-action" type="button">
+                <Icon name="intake" />
+                Auto Shop
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <Show when={touchMove()}>
+          {(move) => (
+            <div
+              class="touch-drag-preview"
+              style={{ left: `${move().x}px`, top: `${move().y}px` }}
+              aria-hidden="true"
+            >
+              <Icon name="grip" />
+              {move().item.plannedRecipeReference.recipeId.title}
+            </div>
+          )}
+        </Show>
+      </Show>
+
+      <Show when={routeRecipe()}>
+        {(item) => (
+          <RecipeModal
+            item={item()}
+            dateStr={selectedDateStr()}
+            onClose={closeOverlay}
+          />
+        )}
+      </Show>
+      <Show
+        when={params.plannedRecipeId && !routeRecipe() && !planner.isLoading()}
+      >
+        <div class="inline-notice notice-error overlay-route-error">
+          <Icon name="warning" />
+          That planned recipe is not available.
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={closeOverlay}
+          >
+            Back to day
+          </button>
+        </div>
+      </Show>
+      <Show when={isCartOpen() && planner.data()}>
+        <CartModal
+          dateStr={selectedDateStr()}
+          plannerData={planner.data()!}
+          onClose={closeOverlay}
+        />
+      </Show>
+      <Show when={amountItem()}>
+        {(item) => (
+          <AmountToMakeSurface
+            item={item()}
+            onClose={() => setAmountItem(undefined)}
+          />
+        )}
+      </Show>
+      <Show when={moveItem()}>
+        {(item) => (
+          <Show when={planner.data()}>
+            {(plannerData) => (
+              <MoveMealModal
+                item={item()}
+                dateStr={selectedDateStr()}
+                plannerData={plannerData()}
+                onMoved={(dateStr, position, total) =>
+                  announce(
+                    `Moved ${item().plannedRecipeReference.recipeId.title} to ${new Date(dateStr).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}, position ${position} of ${total}.`,
+                  )
+                }
+                onClose={() => setMoveItem(undefined)}
+              />
+            )}
+          </Show>
+        )}
+      </Show>
     </main>
   );
 }

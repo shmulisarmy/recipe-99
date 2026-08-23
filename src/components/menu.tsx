@@ -31,7 +31,7 @@ const recipeImages = new Map<string, string>([
 ]);
 const imageForRecipe = (title: string) => recipeImages.get(title.toLowerCase());
 
-function RecipeImage(props: { title: string; class?: string }) {
+export function RecipeImage(props: { title: string; class?: string }) {
   const source = () => imageForRecipe(props.title);
   const [loaded, setLoaded] = createSignal(false);
   const [failed, setFailed] = createSignal(false);

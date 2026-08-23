@@ -4,7 +4,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 
 # Ownership
 
-- `planner.tsx` coordinates calendar selection, open modal state, keyboard movement, and touch-drag targeting.
+- `planner.tsx` coordinates the calendar and selected-day shopping preview, open modal state, keyboard movement, and touch-drag targeting.
 - `day_cell.tsx` owns calendar-cell selection, desktop meal drag sources, and calendar-date drop targets.
 - `day_detail.tsx` owns the selected day's route-owned modal, people-eating input, and beginning/end drop targets.
 - `recipe_pill.tsx` owns recipe display plus pointer, touch, and keyboard movement controls.
@@ -13,6 +13,10 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 
 # Local Contracts
 
+- `design/planner/*.png` is the visual source of truth for the planner base page and its day, recipe, and cart modal states.
+- Planner presentation uses planner-scoped theme variables derived from the reference images; do not leak route-specific palette overrides into unrelated features.
+- The closed planner keeps the calendar authoritative and shows a compact shopping-list preview for the selected day; `Start Shopping` opens the existing cart route.
+- Reference-only controls without existing behavior may remain inert presentation controls; do not invent mutations or client state merely to animate a mockup button.
 - Recipe and day drag-and-drop must persist through generated planner mutations and preserve each planned recipe's stable `id`.
 - The day modal people field stays in its header, uses a people icon, accepts non-negative integers, and saves the day multiplier.
 - The recipe three-dot menu labels the user-facing control `Amount to make`; it accepts a positive multiplier and offers `Use day default` to remove the recipe override.

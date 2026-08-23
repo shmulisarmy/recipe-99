@@ -5,6 +5,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Icon, StatusText } from "../../../components/ui";
 import { useNavigate } from "@solidjs/router";
 import { toRouteDate } from "../utils";
+import { RecipeImage } from "../../../components/menu";
 
 export function DayCell(props: {
   date: Date;
@@ -126,6 +127,37 @@ export function DayCell(props: {
         onKeyDown={props.onFocusKey}
       >
         <span class="day-number">{props.date.getDate()}</span>
+        <span class="planner-meal-thumbnails" aria-hidden="true">
+          <For each={props.recipes.slice(0, 3)}>
+            {(recipe) => (
+              <span
+                class="planner-meal-thumbnail"
+                draggable="true"
+                onDragStart={(event) => {
+                  event.stopPropagation();
+                  event.dataTransfer?.setData(
+                    "text/plain",
+                    recipe.plannedRecipeReference.id,
+                  );
+                  if (event.dataTransfer)
+                    event.dataTransfer.effectAllowed = "move";
+                  props.onStartRecipeDrag(recipe);
+                  document.body.classList.add("is-dragging-meal");
+                }}
+                onDragEnd={() =>
+                  document.body.classList.remove("is-dragging-meal")
+                }
+              >
+                <RecipeImage
+                  title={recipe.plannedRecipeReference.recipeId.title}
+                />
+              </span>
+            )}
+          </For>
+          <Show when={props.recipes.length > 3}>
+            <span class="planner-thumbnail-more">+{props.recipes.length - 3}</span>
+          </Show>
+        </span>
         <span class="desktop-meals">
           <For each={visibleRecipes()}>
             {(recipe) => (

@@ -255,6 +255,70 @@ h3 { margin-bottom: 6px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .route-notice { width: min(calc(100% - 48px), 852px); margin: 24px auto 0; }
 
 /* Planner */
+.planner-page {
+  --planner-page: #eef7fb;
+  --planner-surface: #fff;
+  --planner-ink: #14251d;
+  --planner-muted: #52645a;
+  --planner-action: #2c96ad;
+  --planner-action-deep: #247f94;
+  --planner-ready: #3f9655;
+  --planner-ready-soft: #e9f5ec;
+  --planner-rule: #dce8df;
+  --planner-action-soft: #e8f4f8;
+  --planner-radius: 22px;
+  --planner-row-radius: 15px;
+  color: var(--planner-ink);
+}
+.app-content:has(.planner-page) { background: var(--planner-page, #eef7fb); }
+.planner-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.planner-heading h1 { margin: 0; font-size: 30px; line-height: 1.15; }
+.planner-plan-button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 7px; padding: 8px 18px; border: 0; border-radius: 999px; color: var(--planner-surface); background: var(--planner-action); font-weight: 650; cursor: pointer; }
+.planner-plan-button:hover { background: var(--planner-action-deep); }
+.planner-plan-button .icon { width: 18px; height: 18px; stroke-width: 2.2; }
+.planner-loading { color: var(--planner-muted); }
+.planner-base-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(310px, .7fr); align-items: start; gap: 24px; }
+.planner-calendar-card, .planner-shopping-card { border: 1px solid var(--planner-rule); border-radius: var(--planner-radius); background: var(--planner-surface); }
+.planner-calendar-card { min-width: 0; padding: 18px 18px 20px; }
+.planner-calendar-scroll { overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-color: var(--planner-action) var(--planner-action-soft); }
+.planner-month-heading { display: flex; align-items: center; gap: 5px; margin-bottom: 11px; }
+.planner-month-heading h2 { margin: 0; font-size: 17px; line-height: 1.25; }
+.planner-month-heading .icon { width: 18px; height: 18px; color: var(--planner-muted); }
+.planner-calendar-card .calendar { border-spacing: 5px; }
+.planner-calendar-card .calendar th { height: 24px; color: var(--planner-muted); font-size: 11px; text-align: center; text-transform: uppercase; }
+.planner-calendar-card .calendar td { height: 104px; }
+.planner-calendar-card .day-cell { gap: 4px; padding: 7px; border-color: var(--planner-rule); border-radius: var(--planner-row-radius); color: var(--planner-ink); background: var(--planner-surface); text-align: center; }
+.planner-calendar-card .day-cell.outside { opacity: .42; }
+.planner-calendar-card .day-cell.selected { border: 2px solid var(--planner-ready); background: rgb(63 150 85 / .035); }
+.planner-calendar-card .day-number { margin-inline: auto; color: var(--planner-ink); font-size: 14px; }
+.planner-calendar-card .day-cell.selected .day-number { color: var(--planner-ready); background: transparent; }
+.planner-calendar-card .day-cell.today .day-number { box-shadow: inset 0 0 0 2px var(--planner-action); }
+.planner-meal-thumbnails { display: flex; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.planner-meal-thumbnail { display: block; width: 30px; height: 30px; overflow: hidden; border-radius: 5px; cursor: grab; }
+.planner-meal-thumbnail:active { cursor: grabbing; }
+.planner-meal-thumbnail .recipe-image { height: 100%; aspect-ratio: 1; }
+.planner-meal-thumbnail .recipe-image-fallback { gap: 0; padding: 3px; }
+.planner-meal-thumbnail .recipe-image-fallback .icon { width: 16px; height: 16px; }
+.planner-meal-thumbnail .recipe-image-fallback span { display: none; }
+.planner-thumbnail-more { align-self: center; color: var(--planner-muted); font-size: 10px; font-weight: 650; }
+.planner-calendar-card .desktop-meals, .planner-calendar-card .mobile-status, .planner-calendar-card .cell-meta { display: none; }
+.planner-shopping-card { padding: 17px 15px 15px; border-color: var(--planner-action); background: var(--planner-action-soft); }
+.planner-shopping-heading, .planner-shopping-heading > div { display: flex; align-items: center; }
+.planner-shopping-heading { justify-content: space-between; gap: 12px; }
+.planner-shopping-heading > div { min-width: 0; gap: 9px; }
+.planner-shopping-heading .icon { color: var(--planner-action); }
+.planner-shopping-heading h2 { margin: 0; color: var(--planner-muted); font-size: 17px; }
+.planner-shopping-heading > span { color: var(--planner-muted); font-size: 13px; white-space: nowrap; }
+.planner-shopping-list { display: grid; gap: 0; margin: 14px 0 0; padding: 0; list-style: none; }
+.planner-shopping-list li { display: flex; min-height: 45px; align-items: center; justify-content: space-between; gap: 16px; color: var(--planner-ink); }
+.planner-shopping-list .amount-value { color: var(--planner-muted); font-family: var(--body); font-size: 13px; }
+.planner-shopping-more, .planner-shopping-empty { margin: 5px 0 8px; color: var(--planner-muted); font-size: 13px; }
+.planner-shopping-empty { padding: 22px 0; }
+.planner-shopping-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+.planner-shopping-action { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 7px; padding: 8px 10px; border: 1px solid var(--planner-rule); border-radius: 999px; color: var(--planner-ink); background: var(--planner-surface); font-weight: 650; cursor: pointer; }
+.planner-shopping-action:hover { border-color: var(--planner-action); }
+.planner-shopping-action:last-child { color: var(--planner-muted); }
+.planner-shopping-action .icon { width: 18px; height: 18px; }
 .planner-layout { display: grid; align-items: start; grid-template-columns: minmax(620px, 1fr) 320px; gap: 24px; }
 .calendar-wrap { min-width: 0; }
 .calendar-note { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
@@ -525,6 +589,41 @@ body.is-dragging-meal .meal-end-drop { color: var(--muted); border-color: var(--
   .bottom-nav { position: fixed; z-index: 50; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 5px 6px calc(5px + env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); background: var(--porcelain); }
   .bottom-link { min-width: 0; min-height: 54px; flex-direction: column; justify-content: center; gap: 2px; padding: 4px 2px; font-size: 11px; }
   .bottom-link .icon { width: 19px; height: 19px; }
+}
+
+@media (max-width: 1199px) {
+  .planner-base-layout { grid-template-columns: minmax(0, 1fr); }
+  .planner-shopping-card { width: min(100%, 680px); }
+}
+
+@media (max-width: 767px) {
+  .planner-page { padding-top: 26px; padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .planner-heading { margin-bottom: 24px; }
+  .planner-heading h1 { font-size: 28px; }
+  .planner-plan-button { min-height: 40px; padding-inline: 16px; font-size: 14px; }
+  .planner-base-layout { gap: 24px; }
+  .planner-calendar-card { width: 100%; padding: 16px 10px 15px; border-radius: 22px; }
+  .planner-month-heading { margin: 0 7px 9px; }
+  .planner-month-heading h2 { font-size: 16px; }
+  .planner-calendar-card .calendar { width: 100%; margin: 0; border-spacing: 3px 7px; }
+  .planner-calendar-card .calendar th { height: 18px; font-size: 10px; }
+  .planner-calendar-card .weekday-long { display: none; }
+  .planner-calendar-card .weekday-short { display: inline; }
+  .planner-calendar-card .calendar td { height: 71px; }
+  .planner-calendar-card .day-cell { position: relative; align-items: center; gap: 2px; min-height: 71px; padding: 5px 1px; border: 1px solid var(--planner-rule); border-radius: 13px; background: var(--planner-surface); }
+  .planner-calendar-card .day-cell.selected { border: 2px solid var(--planner-ready); background: rgb(63 150 85 / .035); }
+  .planner-calendar-card .day-number { width: 30px; height: 30px; font-size: 13px; }
+  .planner-meal-thumbnail { width: 25px; height: 25px; }
+  .planner-meal-thumbnails { gap: 2px; }
+  .planner-shopping-card { width: 100%; padding: 15px; border-radius: 20px; }
+  .planner-shopping-heading h2 { font-size: 16px; }
+  .planner-shopping-list li { min-height: 45px; }
+  .planner-shopping-actions { gap: 10px; }
+  .planner-shopping-action { min-height: 42px; padding-inline: 7px; font-size: 14px; }
+}
+
+@media (max-width: 385px) {
+  .planner-calendar-card .calendar { min-width: 344px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,7 +7,7 @@ Own shared route-level UI and reusable presentation that is not private to one f
 - `app_shell.tsx` owns responsive navigation, page framing, and the signed-in user menu.
 - `ui.tsx` owns shared icons, amount/status presentation, overlays, and confirmation dialogs.
 - `inventory_editor.tsx` owns pantry listing, inline measurement editing, custom-unit selection, and pantry mutations.
-- `menu.tsx` owns the searchable recipe library, readiness presentation, recipe detail route, and add-to-planner flow.
+- `menu.tsx` owns the searchable recipe library, readiness presentation, shared recipe imagery, recipe detail route, and add-to-planner flow.
 - `loading_animation.tsx` owns the shared loading indicator used by Intake.
 
 # Local Contracts
