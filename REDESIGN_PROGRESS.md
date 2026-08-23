@@ -70,6 +70,13 @@ The authenticated Chrome profile applies a dark rendering treatment even though 
 
 ## Iteration log
 
+### Planner finish rejected; ground-up Captain Cook rebuild queued — 2026-08-23
+
+- The user explicitly rejected the prior finish claim and directed the next context to remove the relevant Planner display code and reimplement the supplied references from the beginning, including the Captain Cook logo and branding.
+- No implementation changes were made after that directive. Read-only agents completed a TypeScript Language Service behavior trace, a runtime/durable branding inventory, and an original-resolution pixel inventory of all four reference images. An Impeccable asset-producer spawn was interrupted and must be rerun.
+- `PLANNER_REDESIGN_HANDOFF.md` now replaces the invalid finish record with the controlling rebuild brief, sampled reference geometry and palette, safe logo derivation, preserved interaction/Convex contract, temporary auth-bypass risk, exact workspace state, and the required verification sequence.
+- Commit `f819773` remains a rejected checkpoint, not an accepted finish. Preserve the isolated temporary bypass at `27dad03` during visual work and leave unrelated `solid-table/` untouched.
+
 ### Planner reference rebuild finish — 2026-08-23
 
 - Completed the five-state real-data visual review through the explicitly authorized temporary authentication bypass: closed Planner at 1440×900 and 390×844, a 320px narrow check, populated day modal, recipe modal, and cart modal. Evidence is saved under `.impeccable/review/` as `desktop.png`, `mobile.png`, `user-390.png`, `user-320.png`, `day.png`, `recipe.png`, and `cart.png`.

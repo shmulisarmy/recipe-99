@@ -14,7 +14,7 @@ Define the repository-wide contract for Recipe-99, a SolidJS meal-planning appli
 - `.agents/skills/` and `.claude/skills/` contain tool-generated, repo-local Convex guidance for supported coding agents.
 - Root configuration files own build tooling, dependency versions, and environment wiring; root Markdown files own repository-level project notes.
 - `PRODUCT.md`, `FUNCTIONAL_INVARIANTS.md`, `DESIGN.md`, and `REDESIGN_PROGRESS.md` are the persistent context contract for autonomous redesign iterations.
-- `PLANNER_REDESIGN_HANDOFF.md` is the active restoration checkpoint for the finished reference-driven Planner redesign's temporary authentication bypass; remove or archive it after authentication is restored and the authenticated finish review closes.
+- `PLANNER_REDESIGN_HANDOFF.md` is the active checkpoint for the user-rejected Planner presentation's ground-up Captain Cook reference rebuild; keep it until the rebuilt UI passes reference-fidelity review and authentication is later restored.
 - `.ralph/` owns the fresh-context redesign-loop configuration and prompt; `.impeccable/` owns local visual-review artifacts and shared Impeccable configuration.
 
 # Local Contracts
