@@ -1,16 +1,19 @@
-import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import { For, Show, createMemo, createSignal } from "solid-js";
 import { useMutation } from "convex-solidjs";
 import type { RecipeProjection } from "./types";
 import { api } from "../../../../convex/_generated/api";
-import { Icon, StatusText } from "../../../components/ui";
-import { useNavigate } from "@solidjs/router";
-import { toRouteDate } from "../utils";
+import { StatusText } from "../../../components/ui";
+import { RecipeThumb } from "../../../components/recipe_image";
+
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export function DayCell(props: {
   date: Date;
   inMonth: boolean;
   isToday: boolean;
   selected: boolean;
+  /** Dots instead of meal thumbnails, so the day sheet keeps the calendar readable. */
+  compact: boolean;
   recipes: RecipeProjection[];
   cartCount: number | undefined;
   peopleCount: number | undefined;
@@ -31,8 +34,9 @@ export function DayCell(props: {
     () => props.recipes.filter((recipe) => recipe.couldMake).length,
   );
   const missingCount = createMemo(() => props.recipes.length - readyCount());
-  const recipesToShow: number = 2;
+  const recipesToShow: number = 3;
   const visibleRecipes = () => props.recipes.slice(0, recipesToShow);
+  const dots = () => props.recipes.slice(0, 3);
   const fullLabel = createMemo(() => {
     const parts = [
       props.date.toLocaleDateString(undefined, {
@@ -97,7 +101,101 @@ export function DayCell(props: {
       setIsMoving(false);
     }
   };
-  const navigate = useNavigate();
 
-  return <></>;
+  return (
+    <div
+      class="calendar-cell-wrap"
+      data-day-drop-date={props.date.toDateString()}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={(event) => void handleDrop(event)}
+    >
+      <button
+        ref={props.registerButton}
+        class="day-cell"
+        classList={{
+          outside: !props.inMonth,
+          selected: props.selected,
+          today: props.isToday,
+          "drop-valid": true,
+          "is-drag-over": isDragOver() || props.touchDropActive,
+          "is-moving": isMoving(),
+        }}
+        type="button"
+        aria-label={fullLabel()}
+        aria-pressed={props.selected}
+        aria-current={props.isToday ? "date" : undefined}
+        onClick={props.onSelectDay}
+        onKeyDown={props.onFocusKey}
+      >
+        <span class="day-weekday">{WEEKDAY_LABELS[props.date.getDay()]}</span>
+        <span class="day-number">{props.date.getDate()}</span>
+        <Show
+          when={!props.compact}
+          fallback={
+            <span class="day-dots">
+              <For each={dots()}>
+                {(recipe) => (
+                  <span
+                    class="day-dot"
+                    classList={{
+                      "status-ready": recipe.couldMake,
+                      "status-missing": !recipe.couldMake,
+                    }}
+                  />
+                )}
+              </For>
+            </span>
+          }
+        >
+          <Show when={props.recipes.length > 0}>
+            <span class="day-meals">
+              <For each={visibleRecipes()}>
+                {(recipe) => (
+                  <span
+                    class="day-meal"
+                    draggable="true"
+                    title={recipe.plannedRecipeReference.recipeId.title}
+                    classList={{
+                      "status-ready": recipe.couldMake,
+                      "status-missing": !recipe.couldMake,
+                    }}
+                    onDragStart={(event) => {
+                      event.stopPropagation();
+                      event.dataTransfer?.setData(
+                        "text/plain",
+                        recipe.plannedRecipeReference.id,
+                      );
+                      if (event.dataTransfer)
+                        event.dataTransfer.effectAllowed = "move";
+                      props.onStartRecipeDrag(recipe);
+                      document.body.classList.add("is-dragging-meal");
+                    }}
+                    onDragEnd={() =>
+                      document.body.classList.remove("is-dragging-meal")
+                    }
+                  >
+                    <RecipeThumb
+                      title={recipe.plannedRecipeReference.recipeId.title}
+                      size="calendar"
+                    />
+                  </span>
+                )}
+              </For>
+              <Show when={props.recipes.length > recipesToShow}>
+                <span class="more-meals">
+                  +{props.recipes.length - recipesToShow}
+                </span>
+              </Show>
+            </span>
+          </Show>
+        </Show>
+      </button>
+      <Show when={moveError()}>
+        <span class="drop-error" role="status">
+          <StatusText kind="error">{moveError()}</StatusText>
+        </span>
+      </Show>
+    </div>
+  );
 }

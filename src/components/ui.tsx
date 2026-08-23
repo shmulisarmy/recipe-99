@@ -13,6 +13,8 @@ export type IconName =
   | "calendar"
   | "cart"
   | "check"
+  | "chef"
+  | "sparkle"
   | "chevron"
   | "close"
   | "edit"
@@ -45,6 +47,12 @@ export function Icon(props: { name: IconName; class?: string; label?: string }) 
         </Match>
         <Match when={props.name === "check"}>
           <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </Match>
+        <Match when={props.name === "chef"}>
+          <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 14.2A4.2 4.2 0 0 1 8 6.1a4.3 4.3 0 0 1 8 0 4.2 4.2 0 0 1 1.5 8.1V18h-11z"/><path d="M6.5 20.5h11"/></g>
+        </Match>
+        <Match when={props.name === "sparkle"}>
+          <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 13.6 9 18 10.6 13.6 12.2 12 16.7 10.4 12.2 6 10.6 10.4 9z"/><path d="M18 16.5 18.7 18.3 20.5 19 18.7 19.7 18 21.5 17.3 19.7 15.5 19 17.3 18.3z"/></g>
         </Match>
         <Match when={props.name === "chevron"}>
           <path d="m8 10 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>

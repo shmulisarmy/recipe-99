@@ -9,7 +9,7 @@ Own the meal-planning feature: Convex planner data, day-by-day projections, cale
 - `logic.ts` owns the deterministic projection from planner days, pantry inventory, and recipes.
 - `utils.ts` owns planner date helpers.
 - `outside_feature_exports.ts` owns the helper surface consumed by other features.
-- `components/` owns rendered planner behavior and all direct planner mutations.
+- `components/` owns rendered planner behavior and all direct planner mutations: the calendar card, the selected-day sheet, the shopping list card, and the planner modals.
 
 # Local Contracts
 

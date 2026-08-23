@@ -87,7 +87,61 @@ export function AmountToMakeSurface(props: {
     }
   };
 
-  return <></>;
+  return (
+    <Overlay
+      kind="sheet"
+      title="Amount to make"
+      eyebrow={props.item.plannedRecipeReference.recipeId.title}
+      onClose={props.onClose}
+    >
+      <form class="amount-form" onSubmit={save}>
+        <p>
+          {initialOverride === undefined
+            ? `Using the day amount: ${props.item.dayMultiplier} people.`
+            : `This meal overrides the day amount of ${props.item.dayMultiplier} people.`}
+        </p>
+        <label class="field">
+          <span>People</span>
+          <input
+            class="input"
+            inputmode="decimal"
+            value={draft()}
+            aria-invalid={!!error()}
+            onInput={(event) => setDraft(event.currentTarget.value)}
+          />
+        </label>
+        <Show when={error()}>
+          <p class="field-error" role="alert">
+            {error()}
+          </p>
+        </Show>
+        <Show when={notice()}>
+          <p class="inline-notice notice-success" role="status">
+            {notice()}
+          </p>
+        </Show>
+        <div class="form-actions">
+          <Show when={initialOverride !== undefined}>
+            <button
+              class="button button-quiet"
+              type="button"
+              disabled={saving()}
+              onClick={() => void useDefault()}
+            >
+              Use day default
+            </button>
+          </Show>
+          <button
+            class="button button-primary"
+            type="submit"
+            disabled={saving()}
+          >
+            {saving() ? "Saving…" : "Save amount"}
+          </button>
+        </div>
+      </form>
+    </Overlay>
+  );
 }
 
 export function RecipeModal(props: {
@@ -136,7 +190,166 @@ export function RecipeModal(props: {
     }
   };
 
-  return <></>;
+  return (
+    <>
+      <Overlay
+        kind="inspection"
+        title={recipeId().title}
+        eyebrow={`${longDay(props.dateStr)} · ${props.item.multiplier} people`}
+        onClose={props.onClose}
+        footer={
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={props.onClose}
+          >
+            Close
+          </button>
+        }
+      >
+        <div class="section-head">
+          <Show
+            when={props.item.couldMake}
+            fallback={<StatusText kind="missing" />}
+          >
+            <StatusText kind="ready" />
+          </Show>
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={() => setAmountOpen(true)}
+          >
+            Amount to make, {props.item.multiplier}
+          </button>
+        </div>
+        <Show when={recipe.isLoading()}>
+          <p>Checking the projected pantry…</p>
+        </Show>
+        <Show when={recipe.error()}>
+          <div class="inline-notice notice-error">
+            <p>Recipe details couldn’t load.</p>
+            <button
+              class="button button-secondary"
+              type="button"
+              onClick={recipe.refetch}
+            >
+              Try again
+            </button>
+          </div>
+        </Show>
+        <Show when={recipe.data()}>
+          {(recipeData) => (
+            <p class="recipe-detail-description">{recipeData().description}</p>
+          )}
+        </Show>
+        <details class="disclosure" open>
+          <summary>What this meal uses</summary>
+          <p>
+            Amounts include the active serving amount for this planned meal.
+          </p>
+        </details>
+        <Show when={coveredEntries().length > 0}>
+          <section class="ingredient-group ready">
+            <h3>Covered</h3>
+            <For each={coveredEntries()}>
+              {([name, measurement]) => (
+                <div class="ingredient-line">
+                  <strong>{name}</strong>
+                  <span>
+                    Use <Amount measurement={measurement} />
+                  </span>
+                  <Show
+                    when={Object.values(
+                      props.item.substitutedIngredientUses,
+                    ).includes(name)}
+                  >
+                    <span>Substitute</span>
+                  </Show>
+                </div>
+              )}
+            </For>
+          </section>
+        </Show>
+        <Show
+          when={Object.keys(props.item.substitutedIngredientUses).length > 0}
+        >
+          <section class="ingredient-group">
+            <h3>Substitutions</h3>
+            <For each={Object.entries(props.item.substitutedIngredientUses)}>
+              {([primary, substitute]) => (
+                <p>
+                  Use {substitute} instead of {primary}.
+                </p>
+              )}
+            </For>
+          </section>
+        </Show>
+        <Show when={props.item.unfulfilledIngredients.length > 0}>
+          <section class="ingredient-group missing">
+            <h3>Still needed</h3>
+            <For each={props.item.unfulfilledIngredients}>
+              {(item) => {
+                const missing = () =>
+                  Measurement_Minus(
+                    item.RequiredIngredient.Measurement,
+                    item.have,
+                  );
+                return (
+                  <div class="ingredient-line">
+                    <strong>{item.RequiredIngredient.name}</strong>
+                    <span>
+                      Need{" "}
+                      <Amount
+                        measurement={item.RequiredIngredient.Measurement}
+                      />
+                    </span>
+                    <span>
+                      Available <Amount measurement={item.have} />
+                    </span>
+                    <span>
+                      Missing <Amount measurement={missing()} />
+                    </span>
+                  </div>
+                );
+              }}
+            </For>
+          </section>
+        </Show>
+        <Show when={!props.item.couldMake}>
+          <div class="missing-cart-action">
+            <button
+              class="button button-primary"
+              type="button"
+              disabled={isAdding() || added()}
+              onClick={() => void addMissing()}
+            >
+              {isAdding()
+                ? "Adding missing ingredients…"
+                : added()
+                  ? "Added to this day’s cart"
+                  : "Add missing ingredients to cart"}
+            </button>
+            <Show when={added()}>
+              <p class="inline-notice notice-success" role="status">
+                Added to this day’s cart.
+              </p>
+            </Show>
+            <Show when={addError()}>
+              <p class="field-error" role="alert">
+                {addError()}
+              </p>
+            </Show>
+          </div>
+        </Show>
+      </Overlay>
+      <Show when={amountOpen()}>
+        <AmountToMakeSurface
+          item={props.item}
+          onClose={() => setAmountOpen(false)}
+        />
+      </Show>
+    </>
+  );
 }
 
 export function MoveMealModal(props: {
@@ -204,7 +417,122 @@ export function MoveMealModal(props: {
     }
   };
 
-  return <></>;
+  return (
+    <Overlay
+      kind="compact"
+      title="Move meal"
+      eyebrow={props.item.plannedRecipeReference.recipeId.title}
+      onClose={props.onClose}
+    >
+      <form class="move-form" onSubmit={move}>
+        <fieldset class="date-strip">
+          <legend>Choose a day</legend>
+          <For each={routeDates()}>
+            {(date) => {
+              const key = date.toDateString();
+              return (
+                <button
+                  class="date-choice"
+                  classList={{ selected: targetDate() === key }}
+                  type="button"
+                  onClick={() => {
+                    setTargetDate(key);
+                    setPosition("first");
+                  }}
+                >
+                  <span>
+                    {date.toLocaleDateString(undefined, { weekday: "short" })}
+                  </span>
+                  <strong>{date.getDate()}</strong>
+                </button>
+              );
+            }}
+          </For>
+        </fieldset>
+        <label class="field">
+          <span>Date</span>
+          <input
+            class="input"
+            type="date"
+            value={toRouteDate(new Date(targetDate()))}
+            onChange={(event) => {
+              const value = event.currentTarget.valueAsDate;
+              if (value) {
+                setTargetDate(
+                  new Date(
+                    value.getUTCFullYear(),
+                    value.getUTCMonth(),
+                    value.getUTCDate(),
+                  ).toDateString(),
+                );
+                setPosition("first");
+              }
+            }}
+          />
+        </label>
+        <fieldset class="radio-list">
+          <legend class="field-label">Position</legend>
+          <label>
+            <input
+              type="radio"
+              name="move-position"
+              value="first"
+              checked={position() === "first"}
+              onChange={() => setPosition("first")}
+            />
+            First
+          </label>
+          <For each={targetMeals()}>
+            {(meal) => (
+              <label>
+                <input
+                  type="radio"
+                  name="move-position"
+                  value={meal.id}
+                  checked={position() === meal.id}
+                  onChange={() => setPosition(meal.id)}
+                />
+                Before {meal.recipeId.title}
+              </label>
+            )}
+          </For>
+          <Show when={targetMeals().length > 0}>
+            <label>
+              <input
+                type="radio"
+                name="move-position"
+                value="last"
+                checked={position() === "last"}
+                onChange={() => setPosition("last")}
+              />
+              Last
+            </label>
+          </Show>
+        </fieldset>
+        <Show when={error()}>
+          <p class="field-error" role="alert">
+            {error()}
+          </p>
+        </Show>
+        <div class="form-actions">
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={props.onClose}
+          >
+            Cancel
+          </button>
+          <button
+            class="button button-primary"
+            type="submit"
+            disabled={saving()}
+          >
+            {saving() ? "Moving…" : "Move meal"}
+          </button>
+        </div>
+      </form>
+    </Overlay>
+  );
 }
 
 export function CartModal(props: {
@@ -319,5 +647,190 @@ export function CartModal(props: {
     }
   };
 
-  return <></>;
+  const footer = () =>
+    hasDrafts() ? (
+      <>
+        <p class="unsaved-count">
+          {Object.keys(drafts()).length} unsaved{" "}
+          {Object.keys(drafts()).length === 1 ? "change" : "changes"}
+        </p>
+        <button
+          class="button button-secondary"
+          type="button"
+          disabled={isSaving()}
+          onClick={() => {
+            setDrafts({});
+            setErrors({});
+          }}
+        >
+          Cancel edits
+        </button>
+        <button
+          class="button button-primary"
+          type="button"
+          disabled={isSaving()}
+          onClick={() => void save()}
+        >
+          {isSaving() ? "Saving changes…" : "Save changes"}
+        </button>
+      </>
+    ) : (
+      <button
+        class="button button-secondary"
+        type="button"
+        onClick={requestClose}
+      >
+        Close
+      </button>
+    );
+
+  return (
+    <>
+      <Overlay
+        kind="transaction"
+        title={`Shopping for ${longDay(props.dateStr)}`}
+        eyebrow={`${completedCount()} of ${entries().length} items complete`}
+        onClose={requestClose}
+        onEscape={requestClose}
+        footer={footer()}
+        wide={hasDrafts()}
+      >
+        <Show
+          when={plannedDay()}
+          fallback={
+            <div class="empty-state">
+              <h3>Nothing to buy for this day.</h3>
+            </div>
+          }
+        >
+          <Show
+            when={entries().length > 0}
+            fallback={
+              <div class="empty-state">
+                <Icon name="cart" />
+                <h3>Nothing to buy for this day.</h3>
+              </div>
+            }
+          >
+            <div class="cart-list">
+              <For each={entries()}>
+                {([name, target]) => {
+                  const draft = () => drafts()[name];
+                  const rowPercent = () => percent(name, target);
+                  return (
+                    <section
+                      class="cart-row"
+                      aria-labelledby={`${name}-cart-title`}
+                    >
+                      <div class="cart-row-head">
+                        <h3 id={`${name}-cart-title`}>{name}</h3>
+                        <strong class="value">{rowPercent()}%</strong>
+                      </div>
+                      <div class="cart-values">
+                        <span>
+                          To get <Amount measurement={target} />
+                        </span>
+                        <span>
+                          Obtained <Amount measurement={alreadyGot(name)} />
+                        </span>
+                      </div>
+                      <div
+                        class="progress"
+                        role="progressbar"
+                        aria-label={`${name} shopping progress`}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow={rowPercent()}
+                      >
+                        <span style={{ width: `${rowPercent()}%` }} />
+                      </div>
+                      <Show
+                        when={draft()}
+                        fallback={
+                          <button
+                            class="button button-quiet edit-target"
+                            type="button"
+                            onClick={() => beginEdit(name, target)}
+                          >
+                            <Icon name="edit" />
+                            Edit target amount
+                          </button>
+                        }
+                      >
+                        {(activeDraft) => (
+                          <div class="draft-editor">
+                            <span class="draft-original">
+                              <Amount measurement={target} />
+                            </span>
+                            <Icon name="arrow-right" />
+                            <label class="field">
+                              <span>Amount</span>
+                              <input
+                                class="input"
+                                inputmode="decimal"
+                                value={activeDraft().amount}
+                                aria-invalid={!!errors()[name]}
+                                aria-describedby={
+                                  errors()[name]
+                                    ? `${name}-draft-error`
+                                    : undefined
+                                }
+                                onInput={(event) =>
+                                  updateDraft(name, {
+                                    amount: event.currentTarget.value,
+                                  })
+                                }
+                              />
+                            </label>
+                            <label class="field">
+                              <span>Unit</span>
+
+                              {function(){
+                            const getCustomUnits = useQuery(api.customUnit_exports.getCustomUnits, {associatedIngredient: name})
+                          return <Select
+                          options={(BuiltinUnitOptions as Unit[]).concat(getCustomUnits.data()?.map(unit => ({type: 'custom', name: unit.unitName, gramsPerUnit: unit.gramsPerUnit})) || [])}
+                          toString={(unit) => `${unit.type === 'builtin' ? unit.unit : unit.name}`}  
+                          whenSelected={(unit) => {
+                                    updateDraft(name, {unit: unit});
+                                }}
+                          />
+                        }()}
+                            </label>
+                            <Show when={errors()[name]}>
+                              <p class="field-error" id={`${name}-draft-error`}>
+                                {errors()[name]}
+                              </p>
+                            </Show>
+                          </div>
+                        )}
+                      </Show>
+                    </section>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
+          <Show when={saveError()}>
+            <p class="inline-notice notice-error" role="alert">
+              {saveError()}
+            </p>
+          </Show>
+          <Show when={saved()}>
+            <p class="inline-notice notice-success" role="status">
+              Shopping amounts saved.
+            </p>
+          </Show>
+        </Show>
+      </Overlay>
+      <Show when={confirmOpen()}>
+        <ConfirmDialog
+          title="Discard shopping changes?"
+          body="Your edited amounts have not been saved."
+          confirmLabel="Discard changes"
+          onConfirm={discard}
+          onCancel={keepEditing}
+        />
+      </Show>
+    </>
+  );
 }

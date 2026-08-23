@@ -15,8 +15,21 @@ import {
   RecipeModal,
 } from "./planner_modals";
 import { Icon } from "../../../components/ui";
+import { ShoppingListCard } from "./shopping_list_card";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+/** Two weeks from the week the plan is anchored on; the month view expands from here. */
+function twoWeekDays(anchor: Date): Date[] {
+  const start = new Date(
+    anchor.getFullYear(),
+    anchor.getMonth(),
+    anchor.getDate() - anchor.getDay(),
+  );
+  return Array.from(
+    { length: 14 },
+    (_, offset) =>
+      new Date(start.getFullYear(), start.getMonth(), start.getDate() + offset),
+  );
+}
 
 function monthGridDays(): Date[] {
   const first = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -69,7 +82,7 @@ export function Planner() {
     api.planner_exports.MoveRecipeOnTopOfOtherRecipe,
   );
   const insertEnd = useMutation(api.planner_exports.InsertRecipeAtEndOfDate);
-  const days = monthGridDays();
+  const [showMonth, setShowMonth] = createSignal(false);
   const [amountItem, setAmountItem] = createSignal<RecipeProjection>();
   const [moveItem, setMoveItem] = createSignal<RecipeProjection>();
   const [keyboardMove, setKeyboardMove] = createSignal<KeyboardMove>();
@@ -83,6 +96,14 @@ export function Planner() {
 
   const routeDate = createMemo(() => fromRouteDate(params.date));
   const selectedDate = () => routeDate() ?? today;
+  const days = createMemo(() =>
+    showMonth() ? monthGridDays() : twoWeekDays(selectedDate()),
+  );
+  const weeks = createMemo(() =>
+    Array.from({ length: days().length / 7 }, (_, row) =>
+      days().slice(row * 7, row * 7 + 7),
+    ),
+  );
   const selectedDateStr = () => selectedDate().toDateString();
   const selectedRecipes = () => projection[selectedDateStr()] ?? [];
   const selectedDay = () => planner.data()?.[selectedDateStr()];
@@ -96,13 +117,24 @@ export function Planner() {
         )
       : undefined,
   );
-  const monthTitle = today.toLocaleDateString(undefined, {
-    month: "long",
-    year: "numeric",
-  });
+  const monthTitle = () =>
+    selectedDate().toLocaleDateString(undefined, {
+      month: "long",
+      year: "numeric",
+    });
 
+  // The route owns the day sheet: a planner day URL is the open sheet, and
+  // closing it returns to the plan itself.
+  const sheetOpen = () => !!routeDate();
   const selectDay = (date: Date) =>
     navigate(`/planner/day/${toRouteDate(date)}`);
+  const closeSheet = () => {
+    const index = days().findIndex(
+      (date) => date.toDateString() === selectedDateStr(),
+    );
+    navigate("/planner");
+    if (index >= 0) queueMicrotask(() => dayButtons[index]?.focus());
+  };
   const openRecipe = (item: RecipeProjection) =>
     navigate(
       `/planner/day/${toRouteDate(selectedDate())}/recipe/${encodeURIComponent(item.plannedRecipeReference.id)}`,
@@ -117,7 +149,7 @@ export function Planner() {
   };
 
   const focusDay = (index: number) =>
-    dayButtons[Math.max(0, Math.min(days.length - 1, index))]?.focus();
+    dayButtons[Math.max(0, Math.min(days().length - 1, index))]?.focus();
   const onDayFocusKey = (index: number, event: KeyboardEvent) => {
     let target: number | undefined;
     if (event.key === "ArrowLeft") target = index - 1;
@@ -364,5 +396,243 @@ export function Planner() {
   };
   onCleanup(clearTouchListeners);
 
-  return <></>;
+  // Escape closes the day sheet, but a modal opened above it answers first.
+  const onWindowKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || !sheetOpen()) return;
+    if (document.querySelector(".overlay")) return;
+    event.preventDefault();
+    closeSheet();
+  };
+  window.addEventListener("keydown", onWindowKeyDown);
+  onCleanup(() => window.removeEventListener("keydown", onWindowKeyDown));
+
+  return (
+    <main class="main planner-page" id="main">
+      <header class="planner-heading">
+        <h1>Meal schedule</h1>
+        <button
+          class="button button-primary plan-meal"
+          type="button"
+          onClick={() => navigate("/recipes")}
+        >
+          <Icon name="plus" />
+          Plan meal
+        </button>
+      </header>
+      <Show when={planner.isLoading()}>
+        <div aria-live="polite">
+          <p>Loading your meal plan…</p>
+          <div class="skeleton skeleton-calendar" />
+        </div>
+      </Show>
+      <Show when={planner.error()}>
+        <div class="empty-state notice-error">
+          <h2>Your meal plan couldn’t load.</h2>
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={planner.refetch}
+          >
+            Try again
+          </button>
+        </div>
+      </Show>
+      <Show when={planner.data()}>
+        <Show when={moveError()}>
+          <div class="inline-notice notice-error" role="alert">
+            <p>{moveError()}</p>
+            <div class="notice-actions">
+              <Show when={pointerRetry()}>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  disabled={isRetryingMove()}
+                  onClick={() => void retryPointerMove()}
+                >
+                  {isRetryingMove() ? "Retrying…" : "Retry move"}
+                </button>
+              </Show>
+              <button
+                class="button button-quiet"
+                type="button"
+                onClick={() => {
+                  setMoveError("");
+                  setPointerRetry(undefined);
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </Show>
+        <section class="calendar-card" aria-labelledby="calendar-title">
+          <button
+            class="month-toggle"
+            type="button"
+            aria-expanded={showMonth()}
+            onClick={() => setShowMonth((open) => !open)}
+          >
+            <span id="calendar-title">{monthTitle()}</span>
+            <Icon name="chevron" />
+            <span class="sr-only">
+              {showMonth() ? "Show two weeks" : "Show the whole month"}
+            </span>
+          </button>
+          <div
+            class="calendar-weeks"
+            role="grid"
+            aria-label={`${monthTitle()} meal plan`}
+          >
+            <For each={weeks()}>
+              {(week, row) => (
+                <div class="calendar-week" role="row">
+                  <For each={week}>
+                    {(date, column) => {
+                      const index = row() * 7 + column();
+                      const dateStr = date.toDateString();
+                      const day = () => planner.data()?.[dateStr];
+                      return (
+                        <div class="calendar-slot" role="gridcell">
+                          <DayCell
+                            date={date}
+                            inMonth={
+                              date.getMonth() === selectedDate().getMonth()
+                            }
+                            isToday={dateStr === today.toDateString()}
+                            selected={dateStr === selectedDateStr()}
+                            compact={sheetOpen()}
+                            recipes={projection[dateStr] ?? []}
+                            cartCount={cartCount(dateStr)}
+                            peopleCount={day()?.multiplier}
+                            onSelectDay={() => selectDay(date)}
+                            onFocusKey={(event) => onDayFocusKey(index, event)}
+                            registerButton={(element) => {
+                              dayButtons[index] = element;
+                            }}
+                            touchDropActive={
+                              touchMove()?.targetDate === dateStr
+                            }
+                            onStartRecipeDrag={() => {
+                              if (dateStr !== selectedDateStr())
+                                navigate(`/planner/day/${toRouteDate(date)}`);
+                            }}
+                            onMoveFailure={onPointerMoveFailure}
+                          />
+                        </div>
+                      );
+                    }}
+                  </For>
+                </div>
+              )}
+            </For>
+          </div>
+        </section>
+        <ShoppingListCard
+          dateStr={selectedDateStr()}
+          plannedDay={selectedDay()}
+          onOpenCart={openCart}
+        />
+        <Show when={sheetOpen()}>
+          <DayDetail
+            dateStr={selectedDateStr()}
+            plannedDay={selectedDay()}
+            recipes={selectedRecipes()}
+            onOpenRecipe={openRecipe}
+            onOpenAmount={setAmountItem}
+            onMoveRecipe={setMoveItem}
+            onMoveKeyDown={onMoveKeyDown}
+            isLifted={(item) =>
+              keyboardMove()?.item.plannedRecipeReference.id ===
+              item.plannedRecipeReference.id
+            }
+            moveLabel={moveLabel}
+            registerRow={(item, element) => {
+              const id = item.plannedRecipeReference.id;
+              mealRows.set(id, element);
+              if (pendingMealFocus() === id)
+                queueMicrotask(() => {
+                  element.focus();
+                  setPendingMealFocus(undefined);
+                });
+            }}
+            touchTargetMealId={touchMove()?.targetMealId}
+            touchTargetEndDate={touchMove()?.targetEndDate}
+            onTouchMoveStart={startTouchMove}
+            onCloseSheet={closeSheet}
+            onMoveFailure={onPointerMoveFailure}
+          />
+        </Show>
+        <Show when={touchMove()}>
+          {(move) => (
+            <div
+              class="touch-drag-preview"
+              style={{ left: `${move().x}px`, top: `${move().y}px` }}
+              aria-hidden="true"
+            >
+              <Icon name="grip" />
+              {move().item.plannedRecipeReference.recipeId.title}
+            </div>
+          )}
+        </Show>
+      </Show>
+      <Show when={routeRecipe()}>
+        {(item) => (
+          <RecipeModal
+            item={item()}
+            dateStr={selectedDateStr()}
+            onClose={closeOverlay}
+          />
+        )}
+      </Show>
+      <Show
+        when={params.plannedRecipeId && !routeRecipe() && !planner.isLoading()}
+      >
+        <div class="inline-notice notice-error overlay-route-error">
+          <Icon name="warning" />
+          That planned recipe is not available.
+          <button
+            class="button button-secondary"
+            type="button"
+            onClick={closeOverlay}
+          >
+            Back to day
+          </button>
+        </div>
+      </Show>
+      <Show when={isCartOpen() && planner.data()}>
+        <CartModal
+          dateStr={selectedDateStr()}
+          plannerData={planner.data()!}
+          onClose={closeOverlay}
+        />
+      </Show>
+      <Show when={amountItem()}>
+        {(item) => (
+          <AmountToMakeSurface
+            item={item()}
+            onClose={() => setAmountItem(undefined)}
+          />
+        )}
+      </Show>
+      <Show when={moveItem()}>
+        {(item) => (
+          <Show when={planner.data()}>
+            {(plannerData) => (
+              <MoveMealModal
+                item={item()}
+                dateStr={selectedDateStr()}
+                plannerData={plannerData()}
+                onMoved={(dateStr, position, total) =>
+                  announce(
+                    `Moved ${item().plannedRecipeReference.recipeId.title} to ${new Date(dateStr).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}, position ${position} of ${total}.`,
+                  )
+                }
+                onClose={() => setMoveItem(undefined)}
+              />
+            )}
+          </Show>
+        )}
+      </Show>
+    </main>
+  );
 }
