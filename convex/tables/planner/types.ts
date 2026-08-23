@@ -35,8 +35,15 @@ export const PlannedDay = v.object({
 });
 
 
+export const PlannedDayDocument = PlannedDay.extend({
+    _id: v.id("plannerTable"),
+    _creationTime: v.number(),
+});
+
+
 export type RecipeIdT = Infer<typeof recipeId>;
 export type PlannedDayT = Infer<typeof PlannedDay>;
+export type PlannedDayDocumentT = Infer<typeof PlannedDayDocument>;
 export type PlannedRecipeT = Infer<typeof PlannedRecipe>;
 export type IngredientSetT = Infer<typeof IngredientSet>;
 export type ShoppingCartT = Infer<typeof ShoppingCart>;

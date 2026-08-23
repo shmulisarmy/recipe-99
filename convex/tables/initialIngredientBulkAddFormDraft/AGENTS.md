@@ -16,6 +16,7 @@ Own authenticated ingredient bulk-add drafts and the AI tools that operate on th
 - Scheduled Agent tools receive the already-authenticated owner through Agent `ctx.userId` and may pass it only to internal mutations that recheck draft ownership.
 - Keep database access in registered Convex functions; agent tools call them through `ctx.runMutation` or `ctx.runQuery`.
 - Keep tool input schemas aligned with the validators used by their target functions.
+- Updating an ingredient the draft does not carry appends it, so a correction or rename never drops the ingredient.
 - Agent measurement instructions require an immediate first write containing every obvious builtin-unit ingredient, then preserve the user's unit and package representation, define custom-unit conversion as grams for one unit, sequence custom-unit creation before its draft write, and require a complete-item check before finishing.
 - After the complete-item check passes, the Agent calls `markAsDone` exactly once as its final tool call; the mutation rechecks draft ownership before setting `isDoneInitialGeneration`.
 - Add required persisted fields through widen-migrate-narrow so existing drafts remain deployable during backfills.

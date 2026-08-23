@@ -16,6 +16,7 @@ Own the interactive calendar, day sheet, and modal UI for planner days, recipes,
 
 - Recipe and day drag-and-drop must persist through generated planner mutations and preserve each planned recipe's stable `id`.
 - The day sheet's people field stays in its body, uses a people icon, accepts non-negative integers, and saves the day multiplier.
+- The day sheet opens for any date, including one with no planner document yet: it shows the default people count and accepts meals and edits, because the planner mutations create the day on the first write.
 - The recipe three-dot menu labels the user-facing control `Amount to make`; it accepts a positive multiplier and offers `Use day default` to remove the recipe override.
 - Cart `toGet` measurements look unchanged at rest. Hover or keyboard focus reveals edit affordance; activation changes that row to original measurement, arrow, and editable amount/unit controls.
 - Cart measurement edits remain local drafts until `Save changes`; one save submits all drafts through `BulkSetCartToGet` and the modal widens while drafts exist.

@@ -14,7 +14,8 @@ Own the meal-planning feature: Convex planner data, day-by-day projections, cale
 # Local Contracts
 
 - Planner map keys and mutation date arguments use `Date.prototype.toDateString()` consistently.
-- A day `multiplier` means the number of people eating that day.
+- A day `multiplier` means the number of people eating that day; a date missing from the planner map has no document yet and reads as an empty day at the default of one person.
+- The planner query returns only the authenticated user's days, so every projection and calendar cell is built from that user's data alone.
 - A planned recipe uses its optional `overrideDayMultiplier` when present and otherwise inherits the day multiplier.
 - Projection order is chronological; each day's cart is applied before simulating that day's recipes.
 - Read planner days and persist planner edits through `api.planner_exports.*`; do not recreate local query or mutation wrappers under `src/features/planner/actions`.

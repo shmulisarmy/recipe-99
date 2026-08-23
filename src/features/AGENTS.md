@@ -12,6 +12,7 @@ Keep product workflows cohesive while making their cross-feature dependencies ex
 - Prefer imports from `outside_feature_exports.ts` when consuming a feature from another feature.
 - Export only values and types that external consumers need; keep implementation helpers private.
 - Cross-feature calls must preserve the owning feature's data semantics instead of mutating its internal state opportunistically.
+- Reconciling a receipt against today's shopping list does not require a planned day for today; the cart mutations create it.
 - Backend persistence belongs in generated Convex queries and mutations, not in duplicated client action modules.
 - Receipt capture uses a narrow 1:2 frame at an ideal 960 by 1920 resolution, preferring the rear camera on touch-first mobile devices and the user-facing camera on computers while allowing device fallback; callers own its displayed dimensions through `styles`.
 

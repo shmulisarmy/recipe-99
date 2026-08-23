@@ -19,7 +19,9 @@ export function FormTemplateWithDataStructure(props: { handoff: IntakeHandoff; o
   const [saveError, setSaveError] = createSignal("");
   const [complete, setComplete] = createSignal(false);
   const entries = () => Object.entries(props.handoff.allocations);
-  const plannedToday = () => planner.data()?.[today.toDateString()];
+  const todayAsString = today.toDateString();
+  // Today may have nothing planned yet; the cart mutations create the day.
+  const plannedToday = () => planner.data()?.[todayAsString];
   const stillNeeded = (name: string) => {
     const target = plannedToday()?.shoppingCart.toGet[name] ?? ZeroedMeasurement();
     const prior = plannedToday()?.shoppingCart.alreadyGot[name] ?? ZeroedMeasurement();
@@ -28,21 +30,23 @@ export function FormTemplateWithDataStructure(props: { handoff: IntakeHandoff; o
 
   const finish = async (event: SubmitEvent) => {
     event.preventDefault();
+    if (!planner.data()) { setSaveError("Today’s shopping list couldn’t load. Try again."); return; }
     const day = plannedToday();
-    if (!day) { setSaveError("Today’s shopping list couldn’t load. Try again."); return; }
+    const dateAsString = day?.date ?? todayAsString;
+    const priorAlreadyGot = day?.shoppingCart.alreadyGot ?? {};
     setIsSaving(true);
     setSaveError("");
     try {
       const updatedAlreadyGot: Record<string, ReturnType<typeof Measurement_Plus>> = {};
       for (const [name, obtained] of entries()) {
-        const measurement = Measurement_Plus(day.shoppingCart.alreadyGot[name] ?? ZeroedMeasurement(), obtained);
+        const measurement = Measurement_Plus(priorAlreadyGot[name] ?? ZeroedMeasurement(), obtained);
         updatedAlreadyGot[name] = measurement;
-        await updateAlreadyGot.mutate({ date: day.date, ingredient: { name, measurement } });
+        await updateAlreadyGot.mutate({ date: dateAsString, ingredient: { name, measurement } });
       }
       const moveNames = entries().filter(([name]) => actions[name] === "move").map(([name]) => name);
-      if (moveNames.length) await pushToTomorrow.mutate({ ingredientNames: moveNames, dayAsString: day.date });
+      if (moveNames.length) await pushToTomorrow.mutate({ ingredientNames: moveNames, dayAsString: dateAsString });
       const removals = entries().filter(([name]) => actions[name] === "remove").map(([name]) => ({ name, measurement: updatedAlreadyGot[name] }));
-      if (removals.length) await setCartTargets.mutate({ date: day.date, ingredients: removals });
+      if (removals.length) await setCartTargets.mutate({ date: dateAsString, ingredients: removals });
       setComplete(true);
     } catch {
       setSaveError("Shopping lists weren’t fully updated. Try again.");
@@ -59,7 +63,7 @@ export function FormTemplateWithDataStructure(props: { handoff: IntakeHandoff; o
         <Show when={entries().length > 0} fallback={<div class="empty-state completion-state"><Icon name="check"/><h2>Pantry updated. Today’s shopping list needs no follow-up.</h2><button class="button button-primary" type="button" onClick={props.onComplete}>Back to pantry</button></div>}>
           <Show when={planner.isLoading()}><p>Checking today’s shopping list…</p></Show>
           <Show when={planner.error()}><div class="inline-notice notice-error"><p>Today’s shopping list couldn’t load.</p><button class="button button-secondary" type="button" onClick={planner.refetch}>Try again</button></div></Show>
-          <Show when={plannedToday()}>
+          <Show when={planner.data()}>
             <form onSubmit={finish}>
               <div class="reconcile-list"><For each={entries()}>{([name, obtained]) => (
                 <section class="reconcile-row" aria-labelledby={`${name}-reconcile-heading`}><div><h2 id={`${name}-reconcile-heading`}>{name}</h2><div class="amount-triplet"><span>Obtained <Amount measurement={obtained}/></span><span>Still needed <Amount measurement={stillNeeded(name)}/></span></div></div><fieldset class="radio-list"><legend class="field-label">What should happen to the remainder?</legend><label><input type="radio" name={`${name}-action`} checked={actions[name] === "keep"} onChange={() => setActions(name, "keep")}/>Keep remainder on today’s cart</label><label><input type="radio" name={`${name}-action`} checked={actions[name] === "move"} onChange={() => setActions(name, "move")}/>Move remainder to tomorrow’s cart</label><label><input type="radio" name={`${name}-action`} checked={actions[name] === "remove"} onChange={() => setActions(name, "remove")}/>Remove remainder from today’s cart</label></fieldset></section>

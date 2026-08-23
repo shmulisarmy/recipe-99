@@ -49,10 +49,12 @@ async function updateIngredientForUser(
     const index = draft.ingredients.findIndex(
         (existingIngredient) => existingIngredient.name === args.ingredientName,
     );
-    if (index === -1) throw new Error("Ingredient not found");
 
+    // Correcting an ingredient the draft does not carry yet simply adds it,
+    // so a rename or a late correction never drops the ingredient.
     const ingredients = [...draft.ingredients];
-    ingredients[index] = args.ingredient;
+    if (index === -1) ingredients.push(args.ingredient);
+    else ingredients[index] = args.ingredient;
     await ctx.db.patch(args.draftId, { ingredients });
 }
 

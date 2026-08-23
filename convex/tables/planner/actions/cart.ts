@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation } from "../../../_generated/server";
 import { measurementT } from "../../../types";
 import { authenticatedUserId } from "../../../utils/auth";
+import { getOrCreatePlannerDay } from "../days";
 import {
     Measurement,
     Measurement_Minus,
@@ -23,14 +24,7 @@ export const BulkUpdateCartToGet = mutation({
     returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
-        const day = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", args.date)
-            )
-            .unique();
-
-        if (!day) throw new Error(`No planned day for ${args.date}`);
+        const day = await getOrCreatePlannerDay(ctx, userId, args.date);
 
         const toGet = { ...day.shoppingCart.toGet };
         for (const [name, measurement] of Object.entries(args.ingredients)) {
@@ -59,14 +53,7 @@ export const BulkSetCartToGet = mutation({
     returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
-        const day = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", args.date)
-            )
-            .unique();
-
-        if (!day) throw new Error(`No planned day for ${args.date}`);
+        const day = await getOrCreatePlannerDay(ctx, userId, args.date);
 
         const toGet = { ...day.shoppingCart.toGet };
         for (const item of args.ingredients) {
@@ -89,16 +76,10 @@ export const UpdateCartToGet = mutation({
         date: v.string(),
         ingredient,
     },
+    returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
-        const day = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", args.date)
-            )
-            .unique();
-
-        if (!day) throw new Error(`No planned day for ${args.date}`);
+        const day = await getOrCreatePlannerDay(ctx, userId, args.date);
 
         await ctx.db.patch(day._id, {
             shoppingCart: {
@@ -119,16 +100,10 @@ export const UpdateCartAlreadyGot = mutation({
         date: v.string(),
         ingredient,
     },
+    returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
-        const day = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", args.date)
-            )
-            .unique();
-
-        if (!day) throw new Error(`No planned day for ${args.date}`);
+        const day = await getOrCreatePlannerDay(ctx, userId, args.date);
 
         await ctx.db.patch(day._id, {
             shoppingCart: {
@@ -149,39 +124,28 @@ export const PushOverIngredientShoppingItemsForTheNextDay = mutation({
         ingredientNames: v.array(v.string()),
         dayAsString: v.string(),
     },
+    returns: v.null(),
     handler: async (ctx, args) => {
         const userId = await authenticatedUserId(ctx);
-        const day = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", args.dayAsString)
-            )
-            .unique();
-
-        if (!day) throw new Error(`No planned day for ${args.dayAsString}`);
+        const day = await getOrCreatePlannerDay(ctx, userId, args.dayAsString);
 
         const nextDate = new Date(args.dayAsString);
         nextDate.setDate(nextDate.getDate() + 1);
         const nextDayAsString = nextDate.toDateString();
-        const nextDay = await ctx.db
-            .query("plannerTable")
-            .withIndex("by_userId_and_date", (q) =>
-                q.eq("userId", userId).eq("date", nextDayAsString)
-            )
-            .unique();
-
-        if (!nextDay) throw new Error(`No planned day for ${nextDayAsString}`);
+        const nextDay = await getOrCreatePlannerDay(
+            ctx,
+            userId,
+            nextDayAsString,
+        );
 
         const toGet = { ...day.shoppingCart.toGet };
         const nextDayToGet = { ...nextDay.shoppingCart.toGet };
 
         for (const ingredientName of args.ingredientNames) {
+            // An ingredient the day never asked for has nothing to push over,
+            // which is not a reason to fail the rest of the batch.
             const needed = toGet[ingredientName];
-            if (!needed) {
-                throw new Error(
-                    `PushOverIngredientShoppingItemsForTheNextDay: ingredient ${ingredientName} not found in shopping cart`,
-                );
-            }
+            if (!needed) continue;
 
             const alreadyGot =
                 day.shoppingCart.alreadyGot[ingredientName] ??

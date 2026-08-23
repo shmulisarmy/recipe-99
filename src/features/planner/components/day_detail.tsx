@@ -14,6 +14,9 @@ import { api } from "../../../../convex/_generated/api";
 import { Icon } from "../../../components/ui";
 import { RecipePill } from "./recipe_pill";
 
+/** Mirrors the planner day multiplier the server creates a fresh day with. */
+const DEFAULT_PEOPLE = 1;
+
 export function DayDetail(props: {
   dateStr: string;
   plannedDay: PlannedDay | undefined;
@@ -40,18 +43,19 @@ export function DayDetail(props: {
   const insertRecipeAtEnd = useMutation(
     api.planner_exports.InsertRecipeAtEndOfDate,
   );
-  const [peopleDraft, setPeopleDraft] = createSignal(
-    String(props.plannedDay?.multiplier ?? 0),
-  );
+  // A day with nothing on it yet has no document behind it; it still plans for
+  // the default one person, and the first write creates the day server-side.
+  const peopleCount = () => props.plannedDay?.multiplier ?? DEFAULT_PEOPLE;
+  const [peopleDraft, setPeopleDraft] = createSignal(String(peopleCount()));
   const [peopleError, setPeopleError] = createSignal("");
   const [peopleSaveError, setPeopleSaveError] = createSignal("");
   const [isDragOver, setIsDragOver] = createSignal(false);
-  let lastSavedPeople = props.plannedDay?.multiplier;
+  let lastSavedPeople = peopleCount();
 
   createEffect(() => {
-    if (props.plannedDay && props.plannedDay.multiplier !== lastSavedPeople) {
-      lastSavedPeople = props.plannedDay.multiplier;
-      setPeopleDraft(String(props.plannedDay.multiplier));
+    if (peopleCount() !== lastSavedPeople) {
+      lastSavedPeople = peopleCount();
+      setPeopleDraft(String(peopleCount()));
     }
   });
 
@@ -80,13 +84,12 @@ export function DayDetail(props: {
       : `${props.recipes.length} planned ${props.recipes.length === 1 ? "recipe" : "recipes"}${missingCount() ? ` · ${missingCount()} missing` : ""}`;
 
   const savePeople = async () => {
-    if (!props.plannedDay) return;
     const people = Number(peopleDraft());
     if (!peopleDraft().trim() || !Number.isInteger(people) || people < 0) {
       setPeopleError("Enter a whole number of 0 or more.");
       return;
     }
-    if (people === props.plannedDay.multiplier) return;
+    if (people === peopleCount()) return;
     setPeopleError("");
     setPeopleSaveError("");
     try {
@@ -96,7 +99,7 @@ export function DayDetail(props: {
       });
       lastSavedPeople = people;
     } catch {
-      setPeopleDraft(String(props.plannedDay.multiplier));
+      setPeopleDraft(String(peopleCount()));
       setPeopleSaveError("Couldn’t update people. Try again.");
     }
   };
@@ -105,7 +108,7 @@ export function DayDetail(props: {
     event.preventDefault();
     setIsDragOver(false);
     const draggedId = event.dataTransfer?.getData("text/plain");
-    if (!draggedId || !props.plannedDay) return;
+    if (!draggedId) return;
     try {
       await insertRecipeAtBeginning.mutate({
         recipeId: draggedId,
@@ -120,7 +123,7 @@ export function DayDetail(props: {
     event.preventDefault();
     event.stopPropagation();
     const draggedId = event.dataTransfer?.getData("text/plain");
-    if (!draggedId || !props.plannedDay) return;
+    if (!draggedId) return;
     try {
       await insertRecipeAtEnd.mutate({
         recipeId: draggedId,
@@ -147,7 +150,6 @@ export function DayDetail(props: {
         classList={{ "is-drag-over": isDragOver() }}
         aria-labelledby="day-sheet-title"
         onDragOver={(event) => {
-          if (!props.plannedDay) return;
           event.preventDefault();
           setIsDragOver(true);
         }}
@@ -177,99 +179,92 @@ export function DayDetail(props: {
           </button>
         </header>
         <div class="day-sheet-body">
+          <label class="people-control">
+            <Icon name="people" />
+            <span>People eating</span>
+            <input
+              class="people-number"
+              inputmode="numeric"
+              value={peopleDraft()}
+              aria-invalid={!!peopleError()}
+              aria-describedby={peopleError() ? "people-error" : undefined}
+              disabled={updatePeopleCount.isLoading()}
+              onInput={(event) => setPeopleDraft(event.currentTarget.value)}
+              onBlur={() => void savePeople()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void savePeople();
+                }
+              }}
+            />
+          </label>
+          <Show when={peopleError()}>
+            <p class="field-error" id="people-error">
+              {peopleError()}
+            </p>
+          </Show>
+          <Show when={peopleSaveError()}>
+            <p class="field-error" role="alert">
+              {peopleSaveError()}
+            </p>
+          </Show>
           <Show
-            when={props.plannedDay}
+            when={props.recipes.length > 0}
             fallback={
-              <p class="helper-text">No meals planned for {longDate()}.</p>
+              <p class="helper-text">No meals are on this day yet.</p>
             }
           >
-            <label class="people-control">
-              <Icon name="people" />
-              <span>People eating</span>
-              <input
-                class="people-number"
-                inputmode="numeric"
-                value={peopleDraft()}
-                aria-invalid={!!peopleError()}
-                aria-describedby={peopleError() ? "people-error" : undefined}
-                disabled={updatePeopleCount.isLoading()}
-                onInput={(event) => setPeopleDraft(event.currentTarget.value)}
-                onBlur={() => void savePeople()}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    void savePeople();
-                  }
-                }}
-              />
-            </label>
-            <Show when={peopleError()}>
-              <p class="field-error" id="people-error">
-                {peopleError()}
-              </p>
-            </Show>
-            <Show when={peopleSaveError()}>
-              <p class="field-error" role="alert">
-                {peopleSaveError()}
-              </p>
-            </Show>
-            <Show
-              when={props.recipes.length > 0}
-              fallback={
-                <p class="helper-text">No meals are on this day yet.</p>
-              }
+            <ol
+              class="day-sheet-meals"
+              data-ticket-end-date={props.dateStr}
+              classList={{
+                "is-touch-end-target":
+                  props.touchTargetEndDate === props.dateStr,
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => void handleEndDrop(event)}
             >
-              <ol
-                class="day-sheet-meals"
-                data-ticket-end-date={props.dateStr}
-                classList={{
-                  "is-touch-end-target":
-                    props.touchTargetEndDate === props.dateStr,
-                }}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => void handleEndDrop(event)}
-              >
-                <For each={props.recipes}>
-                  {(item, index) => (
-                    <RecipePill
-                      item={item}
-                      order={index() + 1}
-                      onOpen={() => props.onOpenRecipe(item)}
-                      onAmount={() => props.onOpenAmount(item)}
-                      onMove={() => props.onMoveRecipe(item)}
-                      onMoveKeyDown={(event) =>
-                        props.onMoveKeyDown(item, event)
-                      }
-                      isLifted={props.isLifted(item)}
-                      moveLabel={props.moveLabel(item)}
-                      registerRow={(element) =>
-                        props.registerRow(item, element)
-                      }
-                      touchDropActive={
-                        props.touchTargetMealId ===
-                        item.plannedRecipeReference.id
-                      }
-                      onTouchMoveStart={(event) =>
-                        props.onTouchMoveStart(item, event)
-                      }
-                      onMoveFailure={props.onMoveFailure}
-                    />
-                  )}
-                </For>
-                <li class="meal-end-drop" aria-hidden="true">
-                  Move to end
-                </li>
-              </ol>
-            </Show>
-            <details class="disclosure">
-              <summary>How readiness works</summary>
-              <p>
-                Captain Cook looks ahead in date and meal order. It adds what is
-                still expected from each day’s cart, then subtracts ingredients
-                as planned meals use them.
-              </p>
-            </details>
+              <For each={props.recipes}>
+                {(item, index) => (
+                  <RecipePill
+                    item={item}
+                    order={index() + 1}
+                    onOpen={() => props.onOpenRecipe(item)}
+                    onAmount={() => props.onOpenAmount(item)}
+                    onMove={() => props.onMoveRecipe(item)}
+                    onMoveKeyDown={(event) =>
+                      props.onMoveKeyDown(item, event)
+                    }
+                    isLifted={props.isLifted(item)}
+                    moveLabel={props.moveLabel(item)}
+                    registerRow={(element) =>
+                      props.registerRow(item, element)
+                    }
+                    touchDropActive={
+                      props.touchTargetMealId ===
+                      item.plannedRecipeReference.id
+                    }
+                    onTouchMoveStart={(event) =>
+                      props.onTouchMoveStart(item, event)
+                    }
+                    onMoveFailure={props.onMoveFailure}
+                  />
+                )}
+              </For>
+              <li class="meal-end-drop" aria-hidden="true">
+                Move to end
+              </li>
+            </ol>
           </Show>
+          <details class="disclosure">
+            <summary>How readiness works</summary>
+            <p>
+              Captain Cook looks ahead in date and meal order. It adds what is
+              still expected from each day’s cart, then subtracts ingredients
+              as planned meals use them.
+            </p>
+          </details>
         </div>
       </aside>
     </div>

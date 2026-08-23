@@ -43,6 +43,7 @@ This is the regression contract for the Captain Cook redesign. Presentation may 
 - The planner renders the current month with the leading and trailing dates needed to complete its weeks. The product does not currently promise month navigation.
 - Today and the selected date remain distinguishable.
 - Each planned day can expose its ordered recipes, recipe readiness, people count, and shopping-item count.
+- A date the user has never planned reads as an empty day at the default people count; opening it, setting its people count, adding a meal, or editing its cart creates the day rather than failing.
 - Selecting a date updates the authoritative selected-day Day Ticket and the route when appropriate.
 - On mobile, calendar cells keep compact complete Ready and Missing totals while full meal names and actions remain in the Day Ticket.
 - Date buttons retain keyboard calendar navigation and meaningful accessible summaries.
@@ -72,7 +73,7 @@ This is the regression contract for the Captain Cook redesign. Presentation may 
 
 ## Shopping carts
 
-- Every cart remains owned by one planner date.
+- Every cart remains owned by one planner date, which is created on the first cart write when that date has no planned day yet.
 - The cart exposes target, already-obtained amount, unit-aware progress, and an empty state.
 - Multiple target edits remain local drafts until bulk save.
 - Blank, negative, and non-numeric target amounts are rejected.
@@ -84,7 +85,7 @@ This is the regression contract for the Captain Cook redesign. Presentation may 
 - Receipt capture keeps its narrow 1:2 target, ideal 960 by 1920 capture, and device-aware camera preference with fallback.
 - Captured images continue through browser OCR, authenticated Convex storage upload, AI-assisted draft generation, and reactive draft updates.
 - The generated or supplied ingredient batch remains editable before persistence: name, amount, unit, add row, remove row, normalization, uniqueness, and validation.
-- When an ingredient is still needed on today's cart, the user can choose how much acquired quantity counts as obtained.
+- When an ingredient is still needed on today's cart, the user can choose how much acquired quantity counts as obtained. Reconciliation stays available when today has no planned day yet.
 - Pantry submission and shopping-list reconciliation remain separate confirmation steps.
 - Reconciliation preserves Keep remainder today, Move remainder to tomorrow, and Remove remainder from today.
 - A failed reconciliation does not report completion; no-follow-up and completed states remain explicit.
@@ -93,6 +94,7 @@ This is the regression contract for the Captain Cook redesign. Presentation may 
 
 - Pantry, recipes, planner days, ordered planned recipes, multipliers, carts, custom units, and generated intake drafts remain persisted through Convex for the authenticated user.
 - Ownership continues to derive from authenticated server identity, never a client-provided user identifier.
+- Planner reads return only the authenticated user's planned days and the planned recipes on them; no user can see another user's plan.
 - The browser continues to use generated `api.*` references and the existing public alias modules.
 - Redesign work must not change table shapes, validators, mutation semantics, measurement arithmetic, or Agent/storage lifecycle unless strictly required to preserve an existing UI flow.
 
