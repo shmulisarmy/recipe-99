@@ -16,7 +16,7 @@ import {
   Measurement_Minus,
   ZeroedMeasurement,
 } from "../../../primitives/measurement";
-import { Icon, StatusText } from "../../../components/ui";
+import { Icon, Overlay, StatusText } from "../../../components/ui";
 import { RecipePill } from "./recipe_pill";
 
 export function DayDetail(props: {
@@ -34,6 +34,7 @@ export function DayDetail(props: {
   touchTargetEndDate: string | undefined;
   onTouchMoveStart: (item: RecipeProjection, event: PointerEvent) => void;
   onOpenCart: () => void;
+  onClose: () => void;
   onMoveFailure: (message: string, retry: () => Promise<void>) => void;
 }): JSX.Element {
   const updatePeopleCount = useMutation(
@@ -67,9 +68,9 @@ export function DayDetail(props: {
       month: "long",
       day: "numeric",
     });
-  const shortDate = () =>
+  const modalDate = () =>
     date().toLocaleDateString(undefined, {
-      weekday: "short",
+      weekday: "long",
       month: "short",
       day: "numeric",
     });
@@ -154,29 +155,35 @@ export function DayDetail(props: {
   };
 
   return (
-    <div class="ticket-shell">
-      <aside
-        class="day-ticket"
-        classList={{ "is-drag-over": isDragOver() }}
-        aria-labelledby="ticket-title"
-        onDragOver={(event) => {
-          if (!props.plannedDay) return;
-          event.preventDefault();
-          setIsDragOver(true);
-        }}
-        onDragLeave={(event) => {
-          if (
-            !(event.currentTarget as Element).contains(
-              event.relatedTarget as Node,
+    <Overlay
+      kind="compact"
+      title={modalDate()}
+      eyebrow={`${props.recipes.length} planned ${props.recipes.length === 1 ? "recipe" : "recipes"}`}
+      onClose={props.onClose}
+    >
+      <div class="day-modal">
+        <aside
+          class="day-ticket"
+          classList={{ "is-drag-over": isDragOver() }}
+          aria-label={`Meal plan for ${longDate()}`}
+          onDragOver={(event) => {
+            if (!props.plannedDay) return;
+            event.preventDefault();
+            setIsDragOver(true);
+          }}
+          onDragLeave={(event) => {
+            if (
+              !(event.currentTarget as Element).contains(
+                event.relatedTarget as Node,
+              )
             )
-          )
-            setIsDragOver(false);
-        }}
-        onDrop={(event) => void handleTicketDrop(event)}
-      >
+              setIsDragOver(false);
+          }}
+          onDrop={(event) => void handleTicketDrop(event)}
+        >
         <header class="ticket-head">
           <div>
-            <p class="ticket-date">{shortDate()}</p>
+            <p class="ticket-date">Day settings</p>
             <Show when={date().toDateString() === new Date().toDateString()}>
               <p class="ticket-context">Today</p>
             </Show>
@@ -209,7 +216,7 @@ export function DayDetail(props: {
             when={props.plannedDay}
             fallback={
               <div class="empty-ticket">
-                <h2 id="ticket-title">No meals planned</h2>
+                <h3>No meals planned</h3>
                 <p>No meals planned for {longDate()}.</p>
               </div>
             }
@@ -225,7 +232,7 @@ export function DayDetail(props: {
               </p>
             </Show>
             <div class="ticket-summary">
-              <h2 id="ticket-title">Meals</h2>
+              <h3>Meals</h3>
               <Show
                 when={missingCount() > 0}
                 fallback={<StatusText kind="ready">All ready</StatusText>}
@@ -324,7 +331,8 @@ export function DayDetail(props: {
             </div>
           </Show>
         </div>
-      </aside>
-    </div>
+        </aside>
+      </div>
+    </Overlay>
   );
 }

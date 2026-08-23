@@ -16,6 +16,7 @@ Own the interactive calendar and modal UI for planner days, recipes, and shoppin
 - `design/planner/*.png` is the visual source of truth for the planner base page and its day, recipe, and cart modal states.
 - Planner presentation uses planner-scoped theme variables derived from the reference images; do not leak route-specific palette overrides into unrelated features.
 - The closed planner keeps the calendar authoritative and shows a compact shopping-list preview for the selected day; `Start Shopping` opens the existing cart route.
+- `/planner/day/:date` owns the selected-day modal; closing it returns to `/planner`, while nested recipe and cart routes replace rather than stack over the day surface.
 - Reference-only controls without existing behavior may remain inert presentation controls; do not invent mutations or client state merely to animate a mockup button.
 - Recipe and day drag-and-drop must persist through generated planner mutations and preserve each planned recipe's stable `id`.
 - The day modal people field stays in its header, uses a people icon, accepts non-negative integers, and saves the day multiplier.

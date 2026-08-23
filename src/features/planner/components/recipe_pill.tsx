@@ -3,6 +3,7 @@ import { useMutation } from "convex-solidjs";
 import type { RecipeProjection } from "./types";
 import { api } from "../../../../convex/_generated/api";
 import { Icon, StatusText } from "../../../components/ui";
+import { RecipeImage } from "../../../components/menu";
 
 export function RecipePill(props: {
   item: RecipeProjection;
@@ -71,7 +72,10 @@ export function RecipePill(props: {
       onDrop={(event) => void handleDrop(event)}
       tabindex="-1"
     >
-      <span class="meal-order">{props.order}</span>
+      <div class="meal-order">
+        <span class="sr-only">Meal {props.order}</span>
+        <RecipeImage title={title()} />
+      </div>
       <span class="meal-main"><button class="meal-title" type="button" onClick={props.onOpen}>{title()}</button><span class="meal-meta"><StatusText kind={props.item.couldMake ? "ready" : "missing"}/><Show when={override() !== undefined}><span class="serving-override">{override()} people</span></Show></span><Show when={props.moveLabel}><span class="move-proposal">{props.moveLabel}</span></Show><Show when={moveError()}><span class="field-error" role="status">{moveError()}</span></Show></span>
       <span class="meal-row-actions">
         <button

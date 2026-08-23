@@ -87,6 +87,8 @@ export function Planner() {
   const selectedRecipes = () => projection[selectedDateStr()] ?? [];
   const selectedDay = () => planner.data()?.[selectedDateStr()];
   const isCartOpen = () => location.pathname.endsWith("/cart");
+  const isDayOpen = () =>
+    !!params.date && !params.plannedRecipeId && !isCartOpen();
   const routeRecipe = createMemo(() =>
     params.plannedRecipeId
       ? selectedRecipes().find(
@@ -111,6 +113,7 @@ export function Planner() {
     navigate(`/planner/day/${toRouteDate(selectedDate())}/cart`);
   const closeOverlay = () =>
     navigate(`/planner/day/${toRouteDate(selectedDate())}`);
+  const closeDay = () => navigate("/planner");
   const cartCount = (dateStr: string) => {
     const day = planner.data()?.[dateStr];
     return day ? Object.keys(day.shoppingCart.toGet).length : undefined;
@@ -568,6 +571,38 @@ export function Planner() {
             </div>
           )}
         </Show>
+      </Show>
+
+      <Show when={isDayOpen() && planner.data()}>
+        <DayDetail
+          dateStr={selectedDateStr()}
+          plannedDay={selectedDay()}
+          recipes={selectedRecipes()}
+          onOpenRecipe={openRecipe}
+          onOpenAmount={setAmountItem}
+          onMoveRecipe={setMoveItem}
+          onMoveKeyDown={onMoveKeyDown}
+          isLifted={(item) =>
+            keyboardMove()?.item.plannedRecipeReference.id ===
+            item.plannedRecipeReference.id
+          }
+          moveLabel={moveLabel}
+          registerRow={(item, element) => {
+            const id = item.plannedRecipeReference.id;
+            mealRows.set(id, element);
+            if (pendingMealFocus() === id)
+              queueMicrotask(() => {
+                element.focus();
+                setPendingMealFocus(undefined);
+              });
+          }}
+          touchTargetMealId={touchMove()?.targetMealId}
+          touchTargetEndDate={touchMove()?.targetEndDate}
+          onTouchMoveStart={startTouchMove}
+          onOpenCart={openCart}
+          onClose={closeDay}
+          onMoveFailure={onPointerMoveFailure}
+        />
       </Show>
 
       <Show when={routeRecipe()}>
