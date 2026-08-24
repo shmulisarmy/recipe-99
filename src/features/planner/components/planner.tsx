@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
-import { For, Show, createMemo, createSignal, onCleanup } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { useMutation, useQuery } from "convex-solidjs";
 import { projection } from "../logic";
 import { today } from "../types";
@@ -15,8 +15,6 @@ import {
   RecipeModal,
 } from "./planner_modals";
 import { Amount, Icon } from "../../../components/ui";
-
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function monthGridDays(): Date[] {
   const first = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -80,6 +78,7 @@ export function Planner() {
   const [touchMove, setTouchMove] = createSignal<TouchMove>();
   const dayButtons: HTMLButtonElement[] = [];
   const mealRows = new Map<string, HTMLLIElement>();
+  let calendarViewport: HTMLDivElement | undefined;
 
   const routeDate = createMemo(() => fromRouteDate(params.date));
   const selectedDate = () => routeDate() ?? today;
@@ -101,6 +100,22 @@ export function Planner() {
   const monthTitle = today.toLocaleDateString(undefined, {
     month: "long",
     year: "numeric",
+  });
+
+  createEffect(() => {
+    planner.data();
+    const selected = selectedDateStr();
+    if (!calendarViewport || !window.matchMedia("(max-width: 767px)").matches)
+      return;
+    queueMicrotask(() => {
+      if (!calendarViewport) return;
+      const index = days.findIndex((date) => date.toDateString() === selected);
+      const rowCount = days.length / 7;
+      const row = Math.min(Math.max(0, Math.floor(index / 7)), rowCount - 2);
+      const rowElement = calendarViewport.querySelectorAll<HTMLElement>("tbody tr")[row];
+      if (rowElement)
+        calendarViewport.scrollTop = rowElement.offsetTop;
+    });
   });
 
   const selectDay = (date: Date) =>
@@ -196,7 +211,6 @@ export function Planner() {
       announce("Move failed. The confirmed meal order was restored.");
     }
   };
-  // TOUR 1 — This handler is the keyboard state machine for lifting, repositioning, dropping, or canceling one meal.
   const onMoveKeyDown = (item: RecipeProjection, event: KeyboardEvent) => {
     const move = keyboardMove();
     if (!move) {
@@ -438,22 +452,8 @@ export function Planner() {
               <h2 id="calendar-title">{monthTitle}</h2>
               <Icon name="chevron" />
             </div>
-            <div class="planner-calendar-scroll">
+            <div class="planner-calendar-scroll" ref={calendarViewport}>
             <table class="calendar" aria-label={`${monthTitle} meal plan`}>
-              <thead>
-                <tr>
-                  <For each={WEEKDAYS}>
-                    {(weekday) => (
-                      <th scope="col">
-                        <span class="weekday-long">{weekday}</span>
-                        <span class="weekday-short" aria-hidden="true">
-                          {weekday.slice(0, 3)}
-                        </span>
-                      </th>
-                    )}
-                  </For>
-                </tr>
-              </thead>
               <tbody>
                 <For
                   each={Array.from(

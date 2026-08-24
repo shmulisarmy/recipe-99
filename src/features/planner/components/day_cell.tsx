@@ -1,10 +1,8 @@
-import { For, Show, createEffect, createMemo, createSignal } from "solid-js";
+import { For, Show, createMemo, createSignal } from "solid-js";
 import { useMutation } from "convex-solidjs";
 import type { RecipeProjection } from "./types";
 import { api } from "../../../../convex/_generated/api";
 import { Icon, StatusText } from "../../../components/ui";
-import { useNavigate } from "@solidjs/router";
-import { toRouteDate } from "../utils";
 import { RecipeImage } from "../../../components/menu";
 
 export function DayCell(props: {
@@ -98,8 +96,6 @@ export function DayCell(props: {
       setIsMoving(false);
     }
   };
-  const navigate = useNavigate();
-
   return (
     <div
       class="calendar-cell-wrap"
@@ -126,6 +122,9 @@ export function DayCell(props: {
         onClick={props.onSelectDay}
         onKeyDown={props.onFocusKey}
       >
+        <span class="day-weekday" aria-hidden="true">
+          {props.date.toLocaleDateString(undefined, { weekday: "short" })}
+        </span>
         <span class="day-number">{props.date.getDate()}</span>
         <span class="planner-meal-thumbnails" aria-hidden="true">
           <For each={props.recipes.slice(0, 3)}>
@@ -215,12 +214,7 @@ export function DayCell(props: {
               {props.peopleCount}
             </Show>
           </span>
-          <span
-            onclick={function () {
-              navigate(`/planner/day/${toRouteDate(props.date)}/cart`);
-            }}
-            class="hover:border-black"
-          >
+          <span>
             <Show when={props.cartCount}>
               <Icon name="cart" />
               {props.cartCount}

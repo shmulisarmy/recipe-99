@@ -14,9 +14,9 @@ import IntakeRoute from "./features/intakeRoute";
 
 function NotFound() {
   onMount(() => {
-    document.title = "Page not found — Recipe 99";
+    document.title = "Page not found — Captain Cook";
   });
-  return <main class="main" id="main"><div class="empty-state not-found"><Icon name="warning"/><h1>That page is not in Recipe 99.</h1><a class="button button-primary" href="/planner">Go to planner</a></div></main>;
+  return <main class="main" id="main"><div class="empty-state not-found"><Icon name="warning"/><h1>That page is not in Captain Cook.</h1><a class="button button-primary" href="/planner">Go to planner</a></div></main>;
 }
 
 const [intakeHandoff, setIntakeHandoff] = createSignal<IntakeHandoff>();

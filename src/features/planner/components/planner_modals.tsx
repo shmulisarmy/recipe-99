@@ -621,13 +621,26 @@ export function CartModal(props: {
         </button>
       </>
     ) : (
-      <button
-        class="button button-secondary"
-        type="button"
-        onClick={requestClose}
-      >
-        Close
-      </button>
+      <>
+        <button
+          class="button button-secondary cart-footer-pill"
+          type="button"
+          disabled={entries().length === 0}
+          onClick={() => {
+            const first = entries()[0];
+            if (first) beginEdit(first[0], first[1]);
+          }}
+        >
+          Edit amounts
+        </button>
+        <button
+          class="button button-primary cart-footer-pill"
+          type="button"
+          onClick={requestClose}
+        >
+          Done
+        </button>
+      </>
     );
 
   return (
@@ -703,12 +716,11 @@ export function CartModal(props: {
                         when={draft()}
                         fallback={
                           <button
-                            class="button button-quiet edit-target"
+                            class="cart-row-trigger"
                             type="button"
                             onClick={() => beginEdit(name, target)}
                           >
-                            <Icon name="edit" />
-                            Edit target amount
+                            <span class="sr-only">Edit target amount for {name}</span>
                           </button>
                         }
                       >

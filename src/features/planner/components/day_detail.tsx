@@ -181,156 +181,150 @@ export function DayDetail(props: {
           }}
           onDrop={(event) => void handleTicketDrop(event)}
         >
-        <header class="ticket-head">
-          <div>
-            <p class="ticket-date">Day settings</p>
-            <Show when={date().toDateString() === new Date().toDateString()}>
-              <p class="ticket-context">Today</p>
-            </Show>
-          </div>
-          <Show when={props.plannedDay}>
-            <label class="people-control">
-              <Icon name="people" />
-              <span>People</span>
-              <input
-                class="people-number"
-                inputmode="numeric"
-                value={peopleDraft()}
-                aria-invalid={!!peopleError()}
-                aria-describedby={peopleError() ? "people-error" : undefined}
-                disabled={updatePeopleCount.isLoading()}
-                onInput={(event) => setPeopleDraft(event.currentTarget.value)}
-                onBlur={() => void savePeople()}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    void savePeople();
-                  }
-                }}
-              />
-            </label>
-          </Show>
-        </header>
-        <div class="ticket-body">
-          <Show
-            when={props.plannedDay}
-            fallback={
-              <div class="empty-ticket">
-                <h3>No meals planned</h3>
-                <p>No meals planned for {longDate()}.</p>
-              </div>
-            }
-          >
-            <Show when={peopleError()}>
-              <p class="field-error" id="people-error">
-                {peopleError()}
-              </p>
-            </Show>
-            <Show when={peopleSaveError()}>
-              <p class="field-error" role="alert">
-                {peopleSaveError()}
-              </p>
-            </Show>
-            <div class="ticket-summary">
-              <h3>Meals</h3>
-              <Show
-                when={missingCount() > 0}
-                fallback={<StatusText kind="ready">All ready</StatusText>}
-              >
-                <StatusText kind="missing">{missingCount()} missing</StatusText>
-              </Show>
-            </div>
+          <div class="ticket-body">
             <Show
-              when={props.recipes.length > 0}
+              when={props.plannedDay}
               fallback={
-                <p class="helper-text">No meals are on this day yet.</p>
+                <div class="empty-ticket">
+                  <h3>No meals planned</h3>
+                  <p>No meals planned for {longDate()}.</p>
+                </div>
               }
             >
-              <ol
-                class="ticket-meals"
-                data-ticket-end-date={props.dateStr}
-                classList={{
-                  "is-touch-end-target":
-                    props.touchTargetEndDate === props.dateStr,
-                }}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => void handleEndDrop(event)}
-              >
-                <For each={props.recipes}>
-                  {(item, index) => (
-                    <RecipePill
-                      item={item}
-                      order={index() + 1}
-                      onOpen={() => props.onOpenRecipe(item)}
-                      onAmount={() => props.onOpenAmount(item)}
-                      onMove={() => props.onMoveRecipe(item)}
-                      onMoveKeyDown={(event) =>
-                        props.onMoveKeyDown(item, event)
-                      }
-                      isLifted={props.isLifted(item)}
-                      moveLabel={props.moveLabel(item)}
-                      registerRow={(element) =>
-                        props.registerRow(item, element)
-                      }
-                      touchDropActive={
-                        props.touchTargetMealId ===
-                        item.plannedRecipeReference.id
-                      }
-                      onTouchMoveStart={(event) =>
-                        props.onTouchMoveStart(item, event)
-                      }
-                      onMoveFailure={props.onMoveFailure}
-                    />
-                  )}
-                </For>
-                <li class="meal-end-drop" aria-hidden="true">
-                  Move to end
-                </li>
-              </ol>
-            </Show>
-            <details class="disclosure">
-              <summary>How readiness works</summary>
-              <p>
-                Recipe 99 looks ahead in date and meal order. It adds what is
-                still expected from each day’s cart, then subtracts ingredients
-                as planned meals use them.
-              </p>
-            </details>
-            <div class="ticket-cart">
               <Show
-                when={cartEntries().length > 0}
-                fallback={<p>Nothing to buy for this day.</p>}
+                when={props.recipes.length > 0}
+                fallback={<p class="helper-text">No meals are on this day yet.</p>}
               >
-                <div class="ticket-cart-line">
-                  <strong>Shopping</strong>
-                  <span>
-                    {cartEntries().length}{" "}
-                    {cartEntries().length === 1 ? "item" : "items"},{" "}
-                    {cartPercent()}% obtained
-                  </span>
-                </div>
-                <div
-                  class="progress"
-                  role="progressbar"
-                  aria-label={`Shopping progress for ${longDate()}`}
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  aria-valuenow={cartPercent()}
+                <ol
+                  class="ticket-meals"
+                  data-ticket-end-date={props.dateStr}
+                  classList={{
+                    "is-touch-end-target":
+                      props.touchTargetEndDate === props.dateStr,
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => void handleEndDrop(event)}
                 >
-                  <span style={{ width: `${cartPercent()}%` }} />
-                </div>
-                <button
-                  class="button button-primary"
-                  type="button"
-                  onClick={props.onOpenCart}
-                >
-                  <Icon name="cart" />
-                  Open shopping cart
-                </button>
+                  <For each={props.recipes}>
+                    {(item, index) => (
+                      <RecipePill
+                        item={item}
+                        order={index() + 1}
+                        onOpen={() => props.onOpenRecipe(item)}
+                        onAmount={() => props.onOpenAmount(item)}
+                        onMove={() => props.onMoveRecipe(item)}
+                        onMoveKeyDown={(event) =>
+                          props.onMoveKeyDown(item, event)
+                        }
+                        isLifted={props.isLifted(item)}
+                        moveLabel={props.moveLabel(item)}
+                        registerRow={(element) =>
+                          props.registerRow(item, element)
+                        }
+                        touchDropActive={
+                          props.touchTargetMealId ===
+                          item.plannedRecipeReference.id
+                        }
+                        onTouchMoveStart={(event) =>
+                          props.onTouchMoveStart(item, event)
+                        }
+                        onMoveFailure={props.onMoveFailure}
+                      />
+                    )}
+                  </For>
+                  <li class="meal-end-drop" aria-hidden="true">
+                    Move to end
+                  </li>
+                </ol>
               </Show>
-            </div>
-          </Show>
-        </div>
+
+              <details class="day-secondary">
+                <summary>Day settings and shopping</summary>
+                <div class="day-secondary-content">
+                  <label class="people-control">
+                    <Icon name="people" />
+                    <span>People</span>
+                    <input
+                      class="people-number"
+                      inputmode="numeric"
+                      value={peopleDraft()}
+                      aria-invalid={!!peopleError()}
+                      aria-describedby={peopleError() ? "people-error" : undefined}
+                      disabled={updatePeopleCount.isLoading()}
+                      onInput={(event) => setPeopleDraft(event.currentTarget.value)}
+                      onBlur={() => void savePeople()}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          void savePeople();
+                        }
+                      }}
+                    />
+                  </label>
+                  <Show when={peopleError()}>
+                    <p class="field-error" id="people-error">
+                      {peopleError()}
+                    </p>
+                  </Show>
+                  <Show when={peopleSaveError()}>
+                    <p class="field-error" role="alert">
+                      {peopleSaveError()}
+                    </p>
+                  </Show>
+                  <div class="ticket-summary">
+                    <strong>Readiness</strong>
+                    <Show
+                      when={missingCount() > 0}
+                      fallback={<StatusText kind="ready">All ready</StatusText>}
+                    >
+                      <StatusText kind="missing">{missingCount()} missing</StatusText>
+                    </Show>
+                  </div>
+                  <details class="disclosure">
+                    <summary>How readiness works</summary>
+                    <p>
+                      Captain Cook looks ahead in date and meal order. It adds
+                      what is still expected from each day’s cart, then subtracts
+                      ingredients as planned meals use them.
+                    </p>
+                  </details>
+                  <div class="ticket-cart">
+                    <Show
+                      when={cartEntries().length > 0}
+                      fallback={<p>Nothing to buy for this day.</p>}
+                    >
+                      <div class="ticket-cart-line">
+                        <strong>Shopping</strong>
+                        <span>
+                          {cartEntries().length}{" "}
+                          {cartEntries().length === 1 ? "item" : "items"},{" "}
+                          {cartPercent()}% obtained
+                        </span>
+                      </div>
+                      <div
+                        class="progress"
+                        role="progressbar"
+                        aria-label={`Shopping progress for ${longDate()}`}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow={cartPercent()}
+                      >
+                        <span style={{ width: `${cartPercent()}%` }} />
+                      </div>
+                      <button
+                        class="button button-primary"
+                        type="button"
+                        onClick={props.onOpenCart}
+                      >
+                        <Icon name="cart" />
+                        Open shopping cart
+                      </button>
+                    </Show>
+                  </div>
+                </div>
+              </details>
+            </Show>
+          </div>
         </aside>
       </div>
     </Overlay>

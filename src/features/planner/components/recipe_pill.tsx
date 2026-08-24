@@ -27,6 +27,10 @@ export function RecipePill(props: {
   const id = () => props.item.plannedRecipeReference.id;
   const title = () => props.item.plannedRecipeReference.recipeId.title;
   const override = () => props.item.plannedRecipeReference.overrideDayMultiplier;
+  const readyIngredientCount = () =>
+    Object.keys(props.item.scratchPadOfIngredientsNeededToUse).length;
+  const totalIngredientCount = () =>
+    readyIngredientCount() + props.item.unfulfilledIngredients.length;
 
   const handleDragStart = (event: DragEvent) => {
     event.dataTransfer?.setData("text/plain", id());
@@ -76,24 +80,36 @@ export function RecipePill(props: {
         <span class="sr-only">Meal {props.order}</span>
         <RecipeImage title={title()} />
       </div>
-      <span class="meal-main"><button class="meal-title" type="button" onClick={props.onOpen}>{title()}</button><span class="meal-meta"><StatusText kind={props.item.couldMake ? "ready" : "missing"}/><Show when={override() !== undefined}><span class="serving-override">{override()} people</span></Show></span><Show when={props.moveLabel}><span class="move-proposal">{props.moveLabel}</span></Show><Show when={moveError()}><span class="field-error" role="status">{moveError()}</span></Show></span>
-      <span class="meal-row-actions">
-        <button
-          class="icon-button drag-control"
-          type="button"
-          draggable="true"
-          aria-label={`Move ${title()}`}
-          aria-pressed={props.isLifted}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={() => document.body.classList.remove("is-dragging-meal")}
-          onPointerDown={props.onTouchMoveStart}
-          onKeyDown={props.onMoveKeyDown}
-        ><Icon name="grip"/></button>
-        <div class="anchored-control">
-          <button class="icon-button" type="button" aria-label={`More actions for ${title()}`} aria-expanded={menuOpen()} onClick={() => setMenuOpen((open) => !open)}><Icon name="more"/></button>
-          <Show when={menuOpen()}><div class="action-menu"><button type="button" onClick={() => { setMenuOpen(false); props.onOpen(); }}>Open details</button><button type="button" onClick={() => { setMenuOpen(false); props.onAmount(); }}>Amount to make</button><button type="button" onClick={() => { setMenuOpen(false); props.onMove(); }}>Move meal</button></div></Show>
-        </div>
+      <span class="meal-main">
+        <button class="meal-title" type="button" onClick={props.onOpen}>{title()}</button>
+        <span class="meal-ingredient-summary">
+          <Icon name={props.item.couldMake ? "check" : "warning"} />
+          {readyIngredientCount()} of {totalIngredientCount()} ingredients ready
+        </span>
+        <Show when={override() !== undefined}><span class="serving-override">{override()} people</span></Show>
+        <Show when={props.moveLabel}><span class="move-proposal">{props.moveLabel}</span></Show>
+        <Show when={moveError()}><span class="field-error" role="status">{moveError()}</span></Show>
+      </span>
+      <span class="meal-side">
+        <StatusText kind={props.item.couldMake ? "ready" : "missing"}/>
+        <span class="meal-row-actions">
+          <button
+            class="icon-button drag-control"
+            type="button"
+            draggable="true"
+            aria-label={`Move ${title()}`}
+            aria-pressed={props.isLifted}
+            onDragStart={handleDragStart}
+            onDrag={handleDrag}
+            onDragEnd={() => document.body.classList.remove("is-dragging-meal")}
+            onPointerDown={props.onTouchMoveStart}
+            onKeyDown={props.onMoveKeyDown}
+          ><Icon name="grip"/></button>
+          <div class="anchored-control">
+            <button class="icon-button" type="button" aria-label={`More actions for ${title()}`} aria-expanded={menuOpen()} onClick={() => setMenuOpen((open) => !open)}><Icon name="more"/></button>
+            <Show when={menuOpen()}><div class="action-menu"><button type="button" onClick={() => { setMenuOpen(false); props.onOpen(); }}>Open details</button><button type="button" onClick={() => { setMenuOpen(false); props.onAmount(); }}>Amount to make</button><button type="button" onClick={() => { setMenuOpen(false); props.onMove(); }}>Move meal</button></div></Show>
+          </div>
+        </span>
       </span>
     </li>
   );

@@ -15,12 +15,19 @@ function activeDestination(pathname: string, href: string): boolean {
 }
 
 function routeLabel(pathname: string): string {
-  return destinations.find((destination) => activeDestination(pathname, destination.href))?.label ?? "Recipe 99";
+  return destinations.find((destination) => activeDestination(pathname, destination.href))?.label ?? "Captain Cook";
 }
 
 function documentTitle(pathname: string): string {
   const destination = destinations.find((d) => activeDestination(pathname, d.href));
-  return destination ? `${destination.label} — Recipe 99` : "Recipe 99";
+  return destination ? `${destination.label} — Captain Cook` : "Captain Cook";
+}
+
+function routeDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function AppShell(props: RouteSectionProps) {
@@ -31,7 +38,7 @@ export function AppShell(props: RouteSectionProps) {
   const initials = createMemo(() => {
     const value = email();
     const parts = value.split(/[@.\s_-]+/).filter(Boolean);
-    return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "99";
+    return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "CC";
   });
 
   createEffect(() => {
@@ -44,7 +51,15 @@ export function AppShell(props: RouteSectionProps) {
   window.addEventListener("keydown", closeOnEscape);
   onCleanup(() => window.removeEventListener("keydown", closeOnEscape));
 
-  const Wordmark = () => <A class="wordmark" href="/planner"><span class="wordmark-mark" aria-hidden="true">99</span>Recipe 99</A>;
+  const Wordmark = () => (
+    <A class="wordmark" href="/planner" aria-label="Captain Cook home">
+      <img class="wordmark-mark" src="/brand/captain-cook-logo.png" alt="" />
+      <span class="wordmark-copy">
+        <strong>Captain Cook</strong>
+        <small>Recipe app</small>
+      </span>
+    </A>
+  );
   const NavLinks = (navProps: { mode: "primary" | "tablet" | "bottom" }) => (
     <For each={destinations}>{(destination) => (
       <A
@@ -57,12 +72,34 @@ export function AppShell(props: RouteSectionProps) {
       </A>
     )}</For>
   );
+  const plannerDate = () =>
+    location.pathname.match(/^\/planner\/day\/(\d{4}-\d{2}-\d{2})/)?.[1] ??
+    routeDate(new Date());
+  const PlannerBottomNav = () => (
+    <>
+      <A class="bottom-link" href="/pantry">
+        <Icon name="pantry" />
+        Pantry
+      </A>
+      <A class="bottom-link" href="/planner" aria-current="page">
+        <Icon name="calendar" />
+        Plan
+      </A>
+      <A
+        class="bottom-link"
+        href={`/planner/day/${plannerDate()}/cart`}
+      >
+        <Icon name="cart" />
+        Groceries
+      </A>
+    </>
+  );
 
   return (
     <>
       <a class="skip-link" href="#main">Skip to main content</a>
       <div class="app-shell">
-        <aside class="sidebar" aria-label="Recipe 99 navigation">
+        <aside class="sidebar" aria-label="Captain Cook navigation">
           <Wordmark/>
           <nav class="primary-nav" aria-label="Primary"><NavLinks mode="primary"/></nav>
           <p class="shell-note">Pantry to plate, one day at a time.</p>
@@ -96,7 +133,18 @@ export function AppShell(props: RouteSectionProps) {
           {props.children}
         </div>
       </div>
-      <nav class="bottom-nav" aria-label="Primary"><NavLinks mode="bottom"/></nav>
+      <nav
+        class="bottom-nav"
+        classList={{ "planner-bottom-nav": activeDestination(location.pathname, "/planner") }}
+        aria-label={activeDestination(location.pathname, "/planner") ? "Captain Cook Planner navigation" : "Primary"}
+      >
+        <Show
+          when={activeDestination(location.pathname, "/planner")}
+          fallback={<NavLinks mode="bottom" />}
+        >
+          <PlannerBottomNav />
+        </Show>
+      </nav>
       <div class="sr-only" aria-live="polite" id="app-live-region"/>
     </>
   );
