@@ -6,7 +6,10 @@ import '@fontsource/chivo/latin-600.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '@fontsource/ibm-plex-mono/latin-600.css';
 import { render } from 'solid-js/web';
-import 'solid-devtools';
+
+if (import.meta.env.DEV) {
+  await import('solid-devtools');
+}
 
 const root = document.getElementById('root');
 
@@ -28,7 +31,7 @@ if (!import.meta.env.VITE_CONVEX_URL) {
             <h1>Captain Cook is not configured.</h1>
             <p>
               This deployment has no backend address. Set <code>VITE_CONVEX_URL</code>{' '}
-              in the site’s environment variables and deploy again.
+              in the site's environment variables and deploy again.
             </p>
           </div>
         </section>
