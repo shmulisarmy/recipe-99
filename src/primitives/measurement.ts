@@ -98,8 +98,6 @@ function convertFromGrams(
   export  function Measurement_GTE(a: Measurement, b: Measurement): boolean {
     zMeasurement.parse(a);
     zMeasurement.parse(b);
-    zMeasurement.parse(a);
-    zMeasurement.parse(b);
     return convertToGrams(a) >= convertToGrams(b);
   }
   
