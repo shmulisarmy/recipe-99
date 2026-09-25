@@ -54,6 +54,7 @@ Thumbs.db
 # Ralph runtime logs and stop signal; configuration and prompt stay tracked.
 .ralph/logs/
 .ralph/detector-prompt.*
+.ralph/.env
 stop.md
 
 # Playwright runtime artifacts.
